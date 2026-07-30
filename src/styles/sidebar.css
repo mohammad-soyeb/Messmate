@@ -804,3 +804,110 @@
     padding-bottom: 4px;
   }
 }
+
+/* ==================================
+   FULL DRAWER FIX FOR SMALL LAPTOP
+================================== */
+
+@media (max-width: 1100px) {
+  .sidebar {
+    width: min(
+      305px,
+      calc(100vw - 25px)
+    );
+    padding: 17px;
+  }
+
+  .sidebar-logo {
+    justify-content: flex-start;
+    padding: 2px 2px 15px;
+  }
+
+  .sidebar-brand {
+    display: block;
+  }
+
+  .sidebar-logo h2,
+  .sidebar-logo span,
+  .sidebar-link-content,
+  .sidebar-link-content strong,
+  .sidebar-link-content small,
+  .logout-btn span {
+    display: block;
+  }
+
+  .sidebar-link-icon {
+    display: flex;
+  }
+
+  .sidebar-link {
+    justify-content: flex-start;
+    padding: 9px 10px;
+  }
+
+  .logout-btn {
+    justify-content: center;
+    padding: 9px 12px;
+  }
+
+  .sidebar-link:hover {
+    transform: translateX(3px);
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar {
+    width: min(
+      290px,
+      calc(100vw - 18px)
+    );
+    padding: 14px;
+  }
+}/* Compact sidebar width */
+
+.sidebar {
+  width: min(
+    270px,
+    calc(100vw - 22px)
+  );
+  padding: 15px;
+  border-radius: 0 20px 20px 0;
+}
+
+.sidebar-logo {
+  gap: 9px;
+}
+
+.logo-circle {
+  width: 41px;
+  height: 41px;
+  border-radius: 12px;
+}
+
+.sidebar-brand h2 {
+  font-size: 17px;
+}
+
+.sidebar-link {
+  gap: 8px;
+  padding: 8px 9px;
+}
+
+.sidebar-link-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.sidebar-footer {
+  padding-top: 9px;
+}
+
+@media (max-width: 600px) {
+  .sidebar {
+    width: min(
+      260px,
+      calc(100vw - 16px)
+    );
+    padding: 13px;
+  }
+}
