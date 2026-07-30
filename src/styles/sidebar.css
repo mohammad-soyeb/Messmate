@@ -1,0 +1,145 @@
+.sidebar{
+width:270px;
+height:100vh;
+position:sticky;
+top:0;
+display:flex;
+flex-direction:column;
+justify-content:space-between;
+background:#0f172a;
+color:#fff;
+padding:24px 18px;
+box-shadow:6px 0 20px rgba(0,0,0,.12);
+overflow:hidden;
+}
+
+.sidebar-top{
+margin-bottom:25px;
+}
+
+.sidebar-logo{
+display:flex;
+align-items:center;
+gap:14px;
+padding-bottom:20px;
+border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.logo-circle{
+width:55px;
+height:55px;
+border-radius:16px;
+background:linear-gradient(135deg,#2563eb,#06b6d4);
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:26px;
+box-shadow:0 8px 20px rgba(37,99,235,.35);
+}
+
+.sidebar-logo h2{
+font-size:24px;
+font-weight:700;
+margin:0;
+}
+
+.sidebar-logo span{
+font-size:13px;
+opacity:.7;
+}
+
+.sidebar-menu{
+display:flex;
+flex-direction:column;
+gap:10px;
+flex:1;
+margin-top:25px;
+}
+
+.sidebar-link{
+display:flex;
+align-items:center;
+gap:14px;
+padding:14px 18px;
+text-decoration:none;
+color:#cbd5e1;
+border-radius:14px;
+transition:.25s;
+font-weight:500;
+}
+
+.sidebar-link svg{
+flex-shrink:0;
+}
+
+.sidebar-link:hover{
+background:#1e293b;
+color:#fff;
+transform:translateX(6px);
+}
+
+.sidebar-link.active{
+background:linear-gradient(135deg,#2563eb,#3b82f6);
+color:#fff;
+box-shadow:0 10px 25px rgba(37,99,235,.35);
+}
+
+.sidebar-footer{
+padding-top:18px;
+border-top:1px solid rgba(255,255,255,.08);
+}
+
+.logout-btn{
+width:100%;
+display:flex;
+align-items:center;
+justify-content:center;
+gap:10px;
+padding:14px;
+border:none;
+border-radius:14px;
+background:#ef4444;
+color:#fff;
+font-size:15px;
+font-weight:600;
+cursor:pointer;
+transition:.3s;
+}
+
+.logout-btn:hover{
+background:#dc2626;
+transform:translateY(-2px);
+box-shadow:0 8px 20px rgba(239,68,68,.35);
+}
+
+@media(max-width:992px){
+
+.sidebar{
+width:85px;
+padding:18px 10px;
+}
+
+.sidebar-logo h2,
+.sidebar-logo span,
+.sidebar-link span,
+.logout-btn span{
+display:none;
+}
+
+.logo-circle{
+width:48px;
+height:48px;
+font-size:22px;
+margin:auto;
+}
+
+.sidebar-link{
+justify-content:center;
+padding:14px;
+}
+
+.logout-btn{
+padding:14px;
+}
+
+}

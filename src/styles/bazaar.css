@@ -1,0 +1,1230 @@
+.bazaar-page {
+  width: 100%;
+  padding: 30px;
+}
+
+/* =========================
+   Page Header
+========================= */
+
+.bazaar-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 26px;
+}
+
+.bazaar-page-header > div:first-child {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.bazaar-heading-icon {
+  width: 54px;
+  height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 16px;
+  color: #ffffff;
+  background: linear-gradient(
+    135deg,
+    #16a34a,
+    #059669
+  );
+  box-shadow: 0 12px 25px
+    rgba(22, 163, 74, 0.24);
+}
+
+.bazaar-page-header h1 {
+  margin: 0 0 5px;
+  color: #0f172a;
+  font-size: 30px;
+  line-height: 1.2;
+}
+
+.bazaar-page-header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.bazaar-current-member {
+  min-width: 180px;
+  padding: 12px 16px;
+  border: 1px solid #bbf7d0;
+  border-radius: 13px;
+  text-align: right;
+  background: #f0fdf4;
+}
+
+.bazaar-current-member span {
+  display: block;
+  margin-bottom: 3px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+
+.bazaar-current-member strong {
+  color: #15803d;
+  font-size: 14px;
+}
+
+/* =========================
+   Summary Cards
+========================= */
+
+.bazaar-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+  margin-bottom: 24px;
+}
+
+.bazaar-stat-card {
+  position: relative;
+  overflow: hidden;
+  padding: 22px;
+  border: 1px solid #e2e8f0;
+  border-radius: 17px;
+  background: #ffffff;
+  box-shadow: 0 8px 25px
+    rgba(15, 23, 42, 0.06);
+}
+
+.bazaar-stat-card::after {
+  position: absolute;
+  content: "";
+  width: 84px;
+  height: 84px;
+  top: -35px;
+  right: -35px;
+  border-radius: 50%;
+  background: rgba(22, 163, 74, 0.08);
+}
+
+.bazaar-stat-card span {
+  display: block;
+  margin-bottom: 9px;
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.bazaar-stat-card strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #15803d;
+  font-size: 29px;
+  line-height: 1.1;
+}
+
+.bazaar-stat-card small {
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+/* =========================
+   Warning
+========================= */
+
+.bazaar-warning {
+  margin-bottom: 20px;
+  padding: 13px 16px;
+  border: 1px solid #fde68a;
+  border-radius: 11px;
+  color: #92400e;
+  background: #fffbeb;
+  font-size: 13px;
+}
+
+/* =========================
+   Entry Card
+========================= */
+
+.bazaar-entry-card {
+  overflow: hidden;
+  margin-bottom: 26px;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 12px 35px
+    rgba(15, 23, 42, 0.07);
+}
+
+.bazaar-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 24px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.bazaar-card-header h2 {
+  margin: 0 0 4px;
+  color: #0f172a;
+  font-size: 21px;
+}
+
+.bazaar-card-header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.bazaar-date-field {
+  min-width: 220px;
+}
+
+.bazaar-date-field label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-bottom: 7px;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.bazaar-date-field input {
+  width: 100%;
+  min-height: 42px;
+  padding: 9px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  outline: none;
+  color: #0f172a;
+  background: #ffffff;
+  font-family: inherit;
+  font-size: 13px;
+  transition: 0.2s ease;
+}
+
+.bazaar-date-field input:focus {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 4px
+    rgba(22, 163, 74, 0.11);
+}
+
+/* =========================
+   Item Table
+========================= */
+
+.bazaar-items-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.bazaar-items-table {
+  width: 100%;
+  min-width: 980px;
+  border-collapse: collapse;
+}
+
+.bazaar-items-table thead {
+  background: #f8fafc;
+}
+
+.bazaar-items-table th {
+  padding: 14px 12px;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 800;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.45px;
+}
+
+.bazaar-items-table th:nth-child(3),
+.bazaar-items-table th:nth-child(4),
+.bazaar-items-table th:nth-child(5),
+.bazaar-items-table th:nth-child(6),
+.bazaar-items-table th:nth-child(7) {
+  text-align: center;
+}
+
+.bazaar-items-table td {
+  padding: 13px 10px;
+  border-top: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.bazaar-items-table tbody tr {
+  transition: 0.2s ease;
+}
+
+.bazaar-items-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.bazaar-items-table input,
+.bazaar-items-table select {
+  width: 100%;
+  min-height: 41px;
+  padding: 8px 10px;
+  border: 1px solid #cbd5e1;
+  border-radius: 9px;
+  outline: none;
+  color: #0f172a;
+  background: #ffffff;
+  font-family: inherit;
+  font-size: 13px;
+  transition: 0.2s ease;
+}
+
+.bazaar-items-table input:focus,
+.bazaar-items-table select:focus {
+  border-color: #16a34a;
+  box-shadow: 0 0 0 3px
+    rgba(22, 163, 74, 0.1);
+}
+
+.bazaar-items-table td:nth-child(1) {
+  min-width: 135px;
+}
+
+.bazaar-items-table td:nth-child(2) {
+  min-width: 180px;
+}
+
+.bazaar-items-table td:nth-child(3) {
+  width: 110px;
+}
+
+.bazaar-items-table td:nth-child(4) {
+  width: 120px;
+}
+
+.bazaar-items-table td:nth-child(5) {
+  width: 135px;
+}
+
+.bazaar-items-table td:nth-child(6) {
+  width: 130px;
+  text-align: center;
+}
+
+.bazaar-items-table td:nth-child(7) {
+  width: 75px;
+  text-align: center;
+}
+
+.bazaar-money-input {
+  position: relative;
+}
+
+.bazaar-money-input span {
+  position: absolute;
+  top: 50%;
+  left: 11px;
+  z-index: 2;
+  color: #64748b;
+  font-size: 13px;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.bazaar-money-input input {
+  padding-left: 27px;
+}
+
+.bazaar-row-total {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 90px;
+  padding: 8px 10px;
+  border-radius: 9px;
+  color: #15803d;
+  background: #dcfce7;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.bazaar-remove-row-button {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 9px;
+  color: #dc2626;
+  background: #fee2e2;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.bazaar-remove-row-button:hover {
+  color: #ffffff;
+  background: #dc2626;
+  transform: translateY(-1px);
+}
+
+.bazaar-add-item-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 41px;
+  margin: 17px 24px;
+  padding: 9px 15px;
+  border: 1px solid #bbf7d0;
+  border-radius: 10px;
+  color: #15803d;
+  background: #f0fdf4;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.bazaar-add-item-button:hover {
+  color: #ffffff;
+  background: #16a34a;
+  border-color: #16a34a;
+}
+
+/* =========================
+   Receipt and Total Section
+========================= */
+
+.bazaar-entry-bottom {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 24px;
+  padding: 22px 24px;
+  border-top: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+.bazaar-receipt-section {
+  min-width: 0;
+}
+
+.bazaar-receipt-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 13px;
+  color: #475569;
+}
+
+.bazaar-receipt-heading > svg {
+  color: #16a34a;
+}
+
+.bazaar-receipt-heading strong {
+  display: block;
+  color: #0f172a;
+  font-size: 13px;
+}
+
+.bazaar-receipt-heading span {
+  display: block;
+  margin-top: 2px;
+  color: #94a3b8;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+}
+
+.bazaar-receipt-upload {
+  width: 100%;
+  max-width: 380px;
+  min-height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 16px;
+  border: 1px dashed #86efac;
+  border-radius: 12px;
+  color: #15803d;
+  background: #f0fdf4;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.bazaar-receipt-upload:hover {
+  border-color: #16a34a;
+  background: #dcfce7;
+}
+
+.bazaar-receipt-upload input {
+  display: none;
+}
+
+.bazaar-receipt-section > small {
+  display: block;
+  margin-top: 8px;
+  color: #94a3b8;
+  font-size: 10px;
+}
+
+.bazaar-receipt-preview {
+  max-width: 410px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding: 10px;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.bazaar-receipt-preview img {
+  width: 74px;
+  height: 74px;
+  flex-shrink: 0;
+  border-radius: 9px;
+  object-fit: cover;
+}
+
+.bazaar-receipt-preview > div {
+  min-width: 0;
+}
+
+.bazaar-receipt-preview strong {
+  display: block;
+  overflow: hidden;
+  margin-bottom: 9px;
+  color: #0f172a;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bazaar-receipt-preview button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 8px;
+  color: #dc2626;
+  background: #fee2e2;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.bazaar-total-section {
+  padding: 19px;
+  border: 1px solid #d1fae5;
+  border-radius: 15px;
+  background: #ffffff;
+  box-shadow: 0 6px 18px
+    rgba(15, 23, 42, 0.05);
+}
+
+.bazaar-total-section > div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding-bottom: 13px;
+  color: #64748b;
+  font-size: 12px;
+}
+
+.bazaar-total-section > div > strong {
+  color: #0f172a;
+  font-size: 15px;
+}
+
+.bazaar-total-section
+  .bazaar-grand-total {
+  margin-top: 2px;
+  padding: 15px 0;
+  border-top: 1px solid #e2e8f0;
+}
+
+.bazaar-grand-total span {
+  color: #475569;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.bazaar-grand-total strong {
+  color: #15803d !important;
+  font-size: 25px !important;
+}
+
+.bazaar-save-button {
+  width: 100%;
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin-top: 8px;
+  padding: 11px 17px;
+  border: 0;
+  border-radius: 11px;
+  color: #ffffff;
+  background: linear-gradient(
+    135deg,
+    #16a34a,
+    #059669
+  );
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 20px
+    rgba(22, 163, 74, 0.22);
+  transition: 0.2s ease;
+}
+
+.bazaar-save-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 13px 24px
+    rgba(22, 163, 74, 0.3);
+}
+
+.bazaar-save-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* =========================
+   History Section
+========================= */
+
+.bazaar-history-card {
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 12px 35px
+    rgba(15, 23, 42, 0.07);
+}
+
+.bazaar-history-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 22px 24px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.bazaar-history-header h2 {
+  margin: 0 0 4px;
+  color: #0f172a;
+  font-size: 21px;
+}
+
+.bazaar-history-header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.bazaar-history-header > span {
+  padding: 8px 12px;
+  border-radius: 9px;
+  color: #15803d;
+  background: #dcfce7;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.bazaar-history-list {
+  display: grid;
+}
+
+.bazaar-history-entry {
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.bazaar-history-entry:last-child {
+  border-bottom: 0;
+}
+
+.bazaar-history-summary {
+  display: grid;
+  grid-template-columns:
+    minmax(200px, 1.2fr)
+    minmax(170px, 0.9fr)
+    minmax(130px, 0.6fr)
+    auto;
+  align-items: center;
+  gap: 20px;
+  padding: 18px 24px;
+  transition: 0.2s ease;
+}
+
+.bazaar-history-summary:hover {
+  background: #f8fafc;
+}
+
+.bazaar-history-date {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.bazaar-history-date > svg {
+  color: #16a34a;
+}
+
+.bazaar-history-date strong {
+  display: block;
+  margin-bottom: 3px;
+  color: #0f172a;
+  font-size: 14px;
+}
+
+.bazaar-history-date span {
+  color: #64748b;
+  font-size: 11px;
+}
+
+.bazaar-history-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.bazaar-history-meta span {
+  padding: 6px 9px;
+  border-radius: 8px;
+  color: #475569;
+  background: #f1f5f9;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.bazaar-history-total {
+  color: #15803d;
+  font-size: 18px;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.bazaar-history-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.bazaar-details-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 36px;
+  padding: 8px 11px;
+  border: 1px solid #bbf7d0;
+  border-radius: 9px;
+  color: #15803d;
+  background: #f0fdf4;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.bazaar-details-button:hover {
+  color: #ffffff;
+  background: #16a34a;
+  border-color: #16a34a;
+}
+
+.bazaar-delete-entry-button {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 9px;
+  color: #dc2626;
+  background: #fee2e2;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.bazaar-delete-entry-button:hover {
+  color: #ffffff;
+  background: #dc2626;
+}
+
+.bazaar-history-details {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 20px;
+  padding: 0 24px 22px;
+  background: #f8fafc;
+}
+
+.bazaar-details-table-wrapper {
+  overflow-x: auto;
+}
+
+.bazaar-details-table {
+  width: 100%;
+  min-width: 600px;
+  border-collapse: collapse;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.bazaar-details-table th {
+  padding: 11px 12px;
+  color: #475569;
+  background: #f1f5f9;
+  font-size: 10px;
+  text-align: left;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.bazaar-details-table td {
+  padding: 11px 12px;
+  border-top: 1px solid #e2e8f0;
+  color: #475569;
+  font-size: 12px;
+}
+
+.bazaar-details-table td strong {
+  color: #15803d;
+}
+
+.bazaar-saved-receipt {
+  width: 160px;
+}
+
+.bazaar-saved-receipt span {
+  display: block;
+  margin-bottom: 7px;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.bazaar-saved-receipt img {
+  width: 160px;
+  height: 130px;
+  border: 1px solid #e2e8f0;
+  border-radius: 11px;
+  object-fit: cover;
+  background: #ffffff;
+}
+
+/* =========================
+   Empty State
+========================= */
+
+.bazaar-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 250px;
+  padding: 40px 20px;
+  text-align: center;
+}
+
+.bazaar-empty-state svg {
+  margin-bottom: 15px;
+  color: #86efac;
+}
+
+.bazaar-empty-state h3 {
+  margin: 0 0 7px;
+  color: #0f172a;
+  font-size: 17px;
+}
+
+.bazaar-empty-state p {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+/* =========================
+   Dark Mode
+========================= */
+
+body.dark .bazaar-page-header h1,
+body.dark .bazaar-card-header h2,
+body.dark .bazaar-history-header h2,
+body.dark .bazaar-history-date strong,
+body.dark .bazaar-receipt-heading strong,
+body.dark .bazaar-receipt-preview strong,
+body.dark .bazaar-empty-state h3 {
+  color: #f8fafc;
+}
+
+body.dark .bazaar-page-header p,
+body.dark .bazaar-card-header p,
+body.dark .bazaar-history-header p {
+  color: #94a3b8;
+}
+
+body.dark .bazaar-current-member {
+  border-color: #166534;
+  background: #052e16;
+}
+
+body.dark .bazaar-current-member strong {
+  color: #86efac;
+}
+
+body.dark .bazaar-stat-card,
+body.dark .bazaar-entry-card,
+body.dark .bazaar-history-card,
+body.dark .bazaar-total-section {
+  border-color: #334155;
+  background: #1e293b;
+}
+
+body.dark .bazaar-stat-card span,
+body.dark .bazaar-stat-card small {
+  color: #94a3b8;
+}
+
+body.dark .bazaar-card-header,
+body.dark .bazaar-history-header,
+body.dark .bazaar-entry-bottom {
+  border-color: #334155;
+}
+
+body.dark .bazaar-entry-bottom,
+body.dark .bazaar-items-table thead,
+body.dark .bazaar-history-details {
+  background: #0f172a;
+}
+
+body.dark .bazaar-date-field label,
+body.dark .bazaar-items-table th,
+body.dark .bazaar-receipt-heading,
+body.dark .bazaar-grand-total span {
+  color: #cbd5e1;
+}
+
+body.dark .bazaar-date-field input,
+body.dark .bazaar-items-table input,
+body.dark .bazaar-items-table select {
+  border-color: #475569;
+  color: #f8fafc;
+  background: #0f172a;
+}
+
+body.dark .bazaar-items-table td,
+body.dark .bazaar-history-entry {
+  border-color: #334155;
+}
+
+body.dark .bazaar-items-table tbody tr:hover,
+body.dark .bazaar-history-summary:hover {
+  background: #334155;
+}
+
+body.dark .bazaar-add-item-button,
+body.dark .bazaar-details-button,
+body.dark .bazaar-receipt-upload {
+  border-color: #166534;
+  color: #86efac;
+  background: #052e16;
+}
+
+body.dark .bazaar-receipt-preview {
+  border-color: #166534;
+  background: #0f172a;
+}
+
+body.dark .bazaar-total-section > div > strong {
+  color: #f8fafc;
+}
+
+body.dark .bazaar-history-meta span {
+  color: #cbd5e1;
+  background: #334155;
+}
+
+body.dark .bazaar-details-table {
+  border-color: #334155;
+  background: #1e293b;
+}
+
+body.dark .bazaar-details-table th {
+  color: #cbd5e1;
+  background: #334155;
+}
+
+body.dark .bazaar-details-table td {
+  border-color: #334155;
+  color: #cbd5e1;
+}
+
+body.dark .bazaar-saved-receipt img {
+  border-color: #334155;
+  background: #0f172a;
+}
+
+/* =========================
+   Responsive
+========================= */
+
+@media (max-width: 1150px) {
+  .bazaar-summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .bazaar-entry-bottom {
+    grid-template-columns: 1fr 300px;
+  }
+
+  .bazaar-history-summary {
+    grid-template-columns:
+      minmax(180px, 1fr)
+      minmax(150px, 0.8fr)
+      120px
+      auto;
+    gap: 14px;
+  }
+}
+
+@media (max-width: 900px) {
+  .bazaar-page {
+    padding: 22px;
+  }
+
+  .bazaar-card-header {
+    align-items: flex-start;
+  }
+
+  .bazaar-entry-bottom {
+    grid-template-columns: 1fr;
+  }
+
+  .bazaar-total-section {
+    width: 100%;
+  }
+
+  .bazaar-history-summary {
+    grid-template-columns: 1fr auto;
+  }
+
+  .bazaar-history-meta {
+    grid-column: 1;
+  }
+
+  .bazaar-history-total {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .bazaar-history-actions {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .bazaar-history-details {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 650px) {
+  .bazaar-page {
+    padding: 15px;
+  }
+
+  .bazaar-page-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .bazaar-page-header > div:first-child {
+    align-items: flex-start;
+  }
+
+  .bazaar-page-header h1 {
+    font-size: 25px;
+  }
+
+  .bazaar-current-member {
+    width: 100%;
+    text-align: left;
+  }
+
+  .bazaar-summary-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .bazaar-stat-card {
+    padding: 18px;
+  }
+
+  .bazaar-stat-card strong {
+    font-size: 26px;
+  }
+
+  .bazaar-card-header {
+    flex-direction: column;
+    padding: 18px;
+  }
+
+  .bazaar-date-field {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .bazaar-add-item-button {
+    width: calc(100% - 36px);
+    margin: 16px 18px;
+  }
+
+  .bazaar-entry-bottom {
+    padding: 18px;
+  }
+
+  .bazaar-receipt-upload,
+  .bazaar-receipt-preview {
+    max-width: 100%;
+  }
+
+  .bazaar-history-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 18px;
+  }
+
+  .bazaar-history-summary {
+    grid-template-columns: 1fr;
+    padding: 17px 18px;
+  }
+
+  .bazaar-history-meta,
+  .bazaar-history-total,
+  .bazaar-history-actions {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .bazaar-history-total {
+    text-align: left;
+  }
+
+  .bazaar-history-actions {
+    justify-content: flex-start;
+  }
+
+  .bazaar-history-details {
+    padding: 0 18px 18px;
+  }
+
+  .bazaar-saved-receipt {
+    width: 100%;
+  }
+
+  .bazaar-saved-receipt img {
+    width: 100%;
+    max-width: 250px;
+    height: 180px;
+  }
+}
+
+@media (max-width: 420px) {
+  .bazaar-heading-icon {
+    width: 46px;
+    height: 46px;
+  }
+
+  .bazaar-page-header h1 {
+    font-size: 22px;
+  }
+
+  .bazaar-card-header h2,
+  .bazaar-history-header h2 {
+    font-size: 18px;
+  }
+
+  .bazaar-receipt-preview {
+    align-items: flex-start;
+  }
+
+  .bazaar-receipt-preview img {
+    width: 60px;
+    height: 60px;
+  }
+}
+/* Updated simple Bazaar item fields */
+
+.bazaar-items-table {
+  min-width: 760px;
+}
+
+.bazaar-items-table th:nth-child(3),
+.bazaar-items-table th:nth-child(4),
+.bazaar-items-table th:nth-child(5) {
+  text-align: center;
+}
+
+.bazaar-items-table td:nth-child(1) {
+  min-width: 150px;
+}
+
+.bazaar-items-table td:nth-child(2) {
+  min-width: 230px;
+}
+
+.bazaar-items-table td:nth-child(3) {
+  width: 170px;
+}
+
+.bazaar-items-table td:nth-child(4) {
+  width: 170px;
+}
+
+.bazaar-items-table td:nth-child(5) {
+  width: 80px;
+  text-align: center;
+}
+
+.bazaar-quantity-input {
+  position: relative;
+}
+
+.bazaar-quantity-input input {
+  padding-right: 43px;
+}
+
+.bazaar-quantity-input span {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.bazaar-details-table {
+  min-width: 520px;
+}
+
+body.dark .bazaar-quantity-input span {
+  color: #94a3b8;
+}
