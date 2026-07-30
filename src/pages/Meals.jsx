@@ -24,7 +24,17 @@ import {
 import "../styles/meals.css";
 
 const getTodayDate = () => {
-  return new Date().toISOString().split("T")[0];
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(
+    today.getMonth() + 1
+  ).padStart(2, "0");
+  const day = String(today.getDate()).padStart(
+    2,
+    "0"
+  );
+
+  return `${year}-${month}-${day}`;
 };
 
 const normalizeText = (value = "") => {
@@ -52,11 +62,26 @@ const formatSelectedDate = (dateString) => {
 };
 
 const changeDateByDays = (dateString, numberOfDays) => {
-  const date = new Date(`${dateString}T00:00:00`);
+  const [year, month, day] = dateString
+    .split("-")
+    .map(Number);
 
-  date.setDate(date.getDate() + numberOfDays);
+  const date = new Date(
+    Date.UTC(year, month - 1, day)
+  );
 
-  return date.toISOString().split("T")[0];
+  date.setUTCDate(
+    date.getUTCDate() + numberOfDays
+  );
+
+  return [
+    date.getUTCFullYear(),
+    String(date.getUTCMonth() + 1).padStart(
+      2,
+      "0"
+    ),
+    String(date.getUTCDate()).padStart(2, "0"),
+  ].join("-");
 };
 
 const Meals = () => {

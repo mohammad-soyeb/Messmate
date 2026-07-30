@@ -1,10 +1,7 @@
+import { useEffect, useState } from "react";
 import {
-  useEffect,
-  useState,
-} from "react";
-import {
+  CircleDollarSign,
   Edit3,
-  ListChecks,
   Save,
   ShoppingBasket,
   UtensilsCrossed,
@@ -16,23 +13,15 @@ import { getWorkspaceData } from "../services/dataService";
 import "../styles/profile.css";
 
 const getMealTotal = (meal) => {
-  if (
-    meal.breakfast !== undefined ||
-    meal.lunch !== undefined ||
-    meal.dinner !== undefined
-  ) {
-    return (
-      Number(meal.breakfast || 0) +
-      Number(meal.lunch || 0) +
-      Number(meal.dinner || 0)
-    );
-  }
-
-  return Number(meal.quantity || 0);
+  return (
+    Number(meal.breakfast || 0) +
+    Number(meal.lunch || 0) +
+    Number(meal.dinner || 0)
+  );
 };
 
 const getBazaarTotal = (entry) => {
-  return Number(entry.grandTotal ?? entry.price ?? 0);
+  return Number(entry.grandTotal || 0);
 };
 
 const formatNumber = (value) => {
@@ -41,19 +30,48 @@ const formatNumber = (value) => {
   }).format(Number(value) || 0);
 };
 
+const getCurrentMonth = () => {
+  const today = new Date();
+
+  return `${today.getFullYear()}-${String(
+    today.getMonth() + 1
+  ).padStart(2, "0")}`;
+};
+
+const normalizeText = (value = "") => {
+  return String(value).trim().toLowerCase();
+};
+
+const formatSignedMoney = (value) => {
+  const amount = Number(value) || 0;
+
+  const sign =
+    amount > 0 ? "+" : amount < 0 ? "-" : "";
+
+  return `${sign}৳ ${formatNumber(
+    Math.abs(amount)
+  )}`;
+};
+
 const Profile = () => {
-  const { user: accountUser, updateProfile } = useAuth();
-  const [user, setUser] = useState(() => ({
+  const {
+    user: accountUser,
+    updateProfile,
+  } = useAuth();
+
+  const [user, setUser] = useState({
     name: accountUser?.name || "",
     email: accountUser?.email || "",
     phone: accountUser?.phone || "",
     room: accountUser?.room || "",
-  }));
+  });
+
   const [editing, setEditing] = useState(false);
+
   const [stats, setStats] = useState({
     meals: 0,
     bazaar: 0,
-    bazaarEntries: 0,
+    currentMonthBalance: 0,
   });
 
   useEffect(() => {
@@ -76,19 +94,110 @@ const Profile = () => {
           return;
         }
 
+        const currentMonth = getCurrentMonth();
+
+        const currentMember =
+          data.members.find(
+            (member) =>
+              member.userId === accountUser?.id
+          ) ||
+          data.members.find((member) => {
+            const sameEmail =
+              accountUser?.email &&
+              member.email &&
+              normalizeText(member.email) ===
+                normalizeText(
+                  accountUser.email
+                );
+
+            const sameName =
+              accountUser?.name &&
+              member.name &&
+              normalizeText(member.name) ===
+                normalizeText(
+                  accountUser.name
+                );
+
+            return sameEmail || sameName;
+          });
+
+        const monthlyMeals = data.meals.filter(
+          (meal) =>
+            meal.date?.startsWith(currentMonth)
+        );
+
+        const monthlyBazaar =
+          data.bazaarEntries.filter((entry) =>
+            entry.date?.startsWith(currentMonth)
+          );
+
+        const totalMonthlyMeals =
+          monthlyMeals.reduce(
+            (total, meal) =>
+              total + getMealTotal(meal),
+            0
+          );
+
+        const totalMonthlyBazaar =
+          monthlyBazaar.reduce(
+            (total, entry) =>
+              total + getBazaarTotal(entry),
+            0
+          );
+
+        const mealRate =
+          totalMonthlyMeals > 0
+            ? totalMonthlyBazaar /
+              totalMonthlyMeals
+            : 0;
+
+        const myMonthlyMeals = currentMember
+          ? monthlyMeals
+              .filter(
+                (meal) =>
+                  meal.memberId ===
+                  currentMember.id
+              )
+              .reduce(
+                (total, meal) =>
+                  total + getMealTotal(meal),
+                0
+              )
+          : 0;
+
+        const myMonthlyBazaar = currentMember
+          ? monthlyBazaar
+              .filter(
+                (entry) =>
+                  entry.memberId ===
+                  currentMember.id
+              )
+              .reduce(
+                (total, entry) =>
+                  total +
+                  getBazaarTotal(entry),
+                0
+              )
+          : 0;
+
+        const currentMonthBalance =
+          myMonthlyBazaar -
+          myMonthlyMeals * mealRate;
+
         setStats({
           meals: data.meals.reduce(
-            (sum, meal) =>
-              sum + getMealTotal(meal),
+            (total, meal) =>
+              total + getMealTotal(meal),
             0
           ),
+
           bazaar: data.bazaarEntries.reduce(
-            (sum, entry) =>
-              sum + getBazaarTotal(entry),
+            (total, entry) =>
+              total + getBazaarTotal(entry),
             0
           ),
-          bazaarEntries:
-            data.bazaarEntries.length,
+
+          currentMonthBalance,
         });
       } catch (error) {
         console.error(
@@ -103,10 +212,11 @@ const Profile = () => {
     return () => {
       active = false;
     };
-  }, []);
+  }, [accountUser]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
+
     setUser((currentUser) => ({
       ...currentUser,
       [name]: value,
@@ -122,8 +232,13 @@ const Profile = () => {
       room: user.room.trim(),
     };
 
-    if (!updatedUser.name || !updatedUser.email) {
-      toast.error("Name and email are required.");
+    if (
+      !updatedUser.name ||
+      !updatedUser.email
+    ) {
+      toast.error(
+        "Name and email are required."
+      );
       return;
     }
 
@@ -131,8 +246,10 @@ const Profile = () => {
       const savedUser = await updateProfile(
         updatedUser
       );
+
       setUser(savedUser);
       setEditing(false);
+
       toast.success(
         "Profile updated successfully."
       );
@@ -150,7 +267,11 @@ const Profile = () => {
         <div>
           <span>MY ACCOUNT</span>
           <h1>Profile</h1>
-          <p>Keep your personal and mess details up to date.</p>
+
+          <p>
+            Keep your personal and mess details up
+            to date.
+          </p>
         </div>
 
         {!editing && (
@@ -168,13 +289,21 @@ const Profile = () => {
       <div className="profile-card">
         <div className="profile-top">
           <div className="profile-avatar">
-            {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+            {user.name
+              ? user.name.charAt(0).toUpperCase()
+              : "U"}
           </div>
 
           <div className="profile-identity">
             <span>MessMate member</span>
-            <h2>{user.name || "Your name"}</h2>
-            <p>{user.email || "Add your email"}</p>
+
+            <h2>
+              {user.name || "Your name"}
+            </h2>
+
+            <p>
+              {user.email || "Add your email"}
+            </p>
           </div>
         </div>
 
@@ -182,6 +311,7 @@ const Profile = () => {
           <div className="profile-form">
             <label>
               Full name
+
               <input
                 name="name"
                 value={user.name}
@@ -192,6 +322,7 @@ const Profile = () => {
 
             <label>
               Email address
+
               <input
                 name="email"
                 type="email"
@@ -203,6 +334,7 @@ const Profile = () => {
 
             <label>
               Phone number
+
               <input
                 name="phone"
                 value={user.phone}
@@ -213,6 +345,7 @@ const Profile = () => {
 
             <label>
               Room
+
               <input
                 name="room"
                 value={user.room}
@@ -225,11 +358,16 @@ const Profile = () => {
           <div className="profile-info">
             <div className="info-box">
               <h4>Phone number</h4>
-              <p>{user.phone || "Not added yet"}</p>
+              <p>
+                {user.phone || "Not added yet"}
+              </p>
             </div>
+
             <div className="info-box">
               <h4>Room</h4>
-              <p>{user.room || "Not added yet"}</p>
+              <p>
+                {user.room || "Not added yet"}
+              </p>
             </div>
           </div>
         )}
@@ -240,6 +378,7 @@ const Profile = () => {
           <span className="profile-stat-icon meals">
             <UtensilsCrossed size={21} />
           </span>
+
           <div>
             <span>Total recorded meals</span>
             <h2>{formatNumber(stats.meals)}</h2>
@@ -250,30 +389,56 @@ const Profile = () => {
           <span className="profile-stat-icon bazaar">
             <ShoppingBasket size={21} />
           </span>
+
           <div>
             <span>Total bazaar</span>
-            <h2>৳ {formatNumber(stats.bazaar)}</h2>
+
+            <h2>
+              ৳ {formatNumber(stats.bazaar)}
+            </h2>
           </div>
         </article>
 
         <article className="stat-box">
           <span className="profile-stat-icon entries">
-            <ListChecks size={21} />
+            <CircleDollarSign size={21} />
           </span>
+
           <div>
-            <span>Bazaar entries</span>
-            <h2>{stats.bazaarEntries}</h2>
+            <span>Current month balance</span>
+
+            <h2
+              style={{
+                color:
+                  stats.currentMonthBalance > 0
+                    ? "#059669"
+                    : stats.currentMonthBalance < 0
+                      ? "#e11d48"
+                      : "#d97706",
+              }}
+            >
+              {formatSignedMoney(
+                stats.currentMonthBalance
+              )}
+            </h2>
           </div>
         </article>
       </div>
 
       {editing && (
         <div className="profile-actions">
-          <button type="button" onClick={saveProfile}>
+          <button
+            type="button"
+            onClick={saveProfile}
+          >
             <Save size={17} />
             Save changes
           </button>
-          <button type="button" onClick={() => setEditing(false)}>
+
+          <button
+            type="button"
+            onClick={() => setEditing(false)}
+          >
             Cancel
           </button>
         </div>

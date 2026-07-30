@@ -495,6 +495,21 @@ const Members = () => {
       return;
     }
 
+    const editingMember = members.find(
+      (member) => member.id === editingId
+    );
+    const isLastManagerDemotion =
+      editingMember?.role === "manager" &&
+      editForm.role === "member" &&
+      managerCount <= 1;
+
+    if (isLastManagerDemotion) {
+      toast.error(
+        "Assign another manager before changing your role."
+      );
+      return;
+    }
+
     try {
       const savedMember = await updateMember(
         editingId,
@@ -574,7 +589,9 @@ const Members = () => {
   };
 
   const managerCount = members.filter(
-    (member) => member.role === "manager"
+    (member) =>
+      member.role === "manager" &&
+      member.userId
   ).length;
 
   return (
@@ -794,11 +811,28 @@ const Members = () => {
                 onChange={handleEditChange}
                 disabled={!currentUserIsManager}
               >
-                <option value="member">
+                <option
+                  value="member"
+                  disabled={
+                    members.find(
+                      (member) =>
+                        member.id === editingId
+                    )?.role === "manager" &&
+                    managerCount <= 1
+                  }
+                >
                   Member
                 </option>
 
-                <option value="manager">
+                <option
+                  value="manager"
+                  disabled={
+                    !members.find(
+                      (member) =>
+                        member.id === editingId
+                    )?.userId
+                  }
+                >
                   Manager
                 </option>
               </select>

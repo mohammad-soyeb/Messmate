@@ -2,6 +2,7 @@ import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { AuthContext } from "../context/AuthContext";
+import { getCurrentMessState } from "../services/messService";
 import "../styles/auth.css";
 
 const Login = () => {
@@ -31,8 +32,17 @@ const Login = () => {
         formData.email,
         formData.password
       );
+
+      const currentMess =
+        await getCurrentMessState();
+
       toast.success("Welcome back.");
-      navigate("/mess-setup");
+      navigate(
+        currentMess
+          ? "/dashboard"
+          : "/mess-setup",
+        { replace: true }
+      );
     } catch (error) {
       toast.error(
         error.message ||
