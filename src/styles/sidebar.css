@@ -697,3 +697,110 @@
   }
 }
 
+/* ==================================
+   MOBILE SIDEBAR FULL HEIGHT FIX
+================================== */
+
+.sidebar {
+  height: 100vh;
+  height: 100dvh;
+  max-height: 100dvh;
+}
+
+.sidebar-menu {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sidebar-top,
+.sidebar-footer {
+  flex: 0 0 auto;
+}
+
+@media (max-width: 600px) {
+  .sidebar {
+    width: min(290px, calc(100vw - 16px));
+    height: 100vh;
+    height: 100dvh;
+    max-height: 100dvh;
+    padding:
+      max(13px, env(safe-area-inset-top))
+      13px
+      max(13px, env(safe-area-inset-bottom));
+    border-radius: 0 19px 19px 0;
+  }
+
+  .sidebar-logo {
+    padding-bottom: 11px;
+  }
+
+  .sidebar-workspace-status {
+    margin-top: 9px;
+    padding: 7px 9px;
+  }
+
+  .sidebar-menu {
+    gap: 4px;
+    margin-top: 10px;
+    margin-bottom: 8px;
+  }
+
+  .sidebar-link {
+    min-height: 45px;
+    padding: 6px 8px;
+    border-radius: 10px;
+  }
+
+  .sidebar-link-icon {
+    width: 31px;
+    height: 31px;
+    border-radius: 9px;
+  }
+
+  .sidebar-link-content strong {
+    font-size: 10px;
+  }
+
+  .sidebar-link-content small {
+    font-size: 7px;
+  }
+
+  .sidebar-footer {
+    padding-top: 9px;
+  }
+
+  .sidebar-user-card {
+    margin-bottom: 7px;
+    padding: 6px;
+  }
+
+  .logout-btn {
+    min-height: 36px;
+  }
+}
+
+/* ছোট height-এর mobile */
+
+@media (max-height: 620px) {
+  .sidebar-workspace-status {
+    display: none;
+  }
+
+  .sidebar-user-card {
+    display: none;
+  }
+
+  .sidebar-menu {
+    margin-top: 7px;
+  }
+
+  .sidebar-link {
+    min-height: 40px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+}
