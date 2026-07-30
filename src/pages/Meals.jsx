@@ -8,11 +8,11 @@ import {
   CalendarDays,
   ChevronLeft,
   ChevronRight,
+  ClipboardCheck,
   Lock,
   Minus,
   Plus,
   Save,
-  Utensils,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -61,7 +61,10 @@ const formatSelectedDate = (dateString) => {
   }).format(new Date(`${dateString}T00:00:00`));
 };
 
-const changeDateByDays = (dateString, numberOfDays) => {
+const changeDateByDays = (
+  dateString,
+  numberOfDays
+) => {
   const [year, month, day] = dateString
     .split("-")
     .map(Number);
@@ -92,27 +95,38 @@ const Meals = () => {
   const [selectedDate, setSelectedDate] =
     useState(getTodayDate());
   const [draftMeals, setDraftMeals] = useState({});
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     let active = true;
 
     const loadData = async () => {
+      setLoading(true);
+
       try {
         const data = await getWorkspaceData();
 
-        if (active) {
-          setMembers(data.members);
-          setMeals(data.meals);
+        if (!active) {
+          return;
         }
+
+        setMembers(data.members || []);
+        setMeals(data.meals || []);
       } catch (error) {
         console.error(
           "Unable to load meals:",
           error
         );
+
         toast.error(
-          error.message || "Unable to load meals."
+          error.message ||
+            "Unable to load meals."
         );
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
       }
     };
 
@@ -130,7 +144,7 @@ const Meals = () => {
 
     return (
       members.find((member) => {
-        if (member.userId && user?.id) {
+        if (member.userId && user.id) {
           return member.userId === user.id;
         }
 
@@ -180,9 +194,9 @@ const Meals = () => {
 
   const dailyTotal = useMemo(() => {
     return Object.values(draftMeals).reduce(
-      (grandTotal, memberMeal) => {
+      (total, memberMeal) => {
         return (
-          grandTotal +
+          total +
           Number(memberMeal.breakfast || 0) +
           Number(memberMeal.lunch || 0) +
           Number(memberMeal.dinner || 0)
@@ -191,24 +205,6 @@ const Meals = () => {
       0
     );
   }, [draftMeals]);
-
-  const monthlyTotal = useMemo(() => {
-    const selectedMonth =
-      selectedDate.substring(0, 7);
-
-    return meals
-      .filter((meal) =>
-        meal.date?.startsWith(selectedMonth)
-      )
-      .reduce((total, meal) => {
-        return (
-          total +
-          Number(meal.breakfast || 0) +
-          Number(meal.lunch || 0) +
-          Number(meal.dinner || 0)
-        );
-      }, 0);
-  }, [meals, selectedDate]);
 
   const currentMemberDailyTotal = useMemo(() => {
     if (!currentMember) {
@@ -228,30 +224,6 @@ const Meals = () => {
       Number(memberMeal.dinner || 0)
     );
   }, [currentMember, draftMeals]);
-
-  const currentMemberMonthlyTotal = useMemo(() => {
-    if (!currentMember) {
-      return 0;
-    }
-
-    const selectedMonth =
-      selectedDate.substring(0, 7);
-
-    return meals
-      .filter(
-        (meal) =>
-          meal.memberId === currentMember.id &&
-          meal.date?.startsWith(selectedMonth)
-      )
-      .reduce((total, meal) => {
-        return (
-          total +
-          Number(meal.breakfast || 0) +
-          Number(meal.lunch || 0) +
-          Number(meal.dinner || 0)
-        );
-      }, 0);
-  }, [currentMember, meals, selectedDate]);
 
   const handleMealChange = (
     memberId,
@@ -340,9 +312,11 @@ const Meals = () => {
             meal,
           ])
         );
+
         const updatedMeals = currentMeals.map(
           (meal) => savedById.get(meal.id) || meal
         );
+
         const currentIds = new Set(
           currentMeals.map((meal) => meal.id)
         );
@@ -354,14 +328,19 @@ const Meals = () => {
           ),
         ];
       });
+
       toast.success(
         currentMember.role === "manager"
           ? "Daily meals saved successfully."
-          : "Meal saved successfully."
+          : "Your meal saved successfully."
       );
     } catch (error) {
       console.error("Meal save error:", error);
-      toast.error("Unable to save the meal.");
+
+      toast.error(
+        error.message ||
+          "Unable to save the meal."
+      );
     } finally {
       setSaving(false);
     }
@@ -384,20 +363,19 @@ const Meals = () => {
   };
 
   return (
-    <div className="page-container meals-page">
-      <div className="meal-page-header">
+    <div className="meals-page">
+      <header className="meal-subpage-header">
         <div>
-          <div className="meal-heading-icon">
-            <Utensils size={24} />
-          </div>
+          <span className="meal-subpage-eyebrow">
+            <ClipboardCheck size={15} />
+            Daily entry
+          </span>
 
-          <div>
-            <h1>Daily Meals</h1>
-            <p>
-              Add your meals and view everyone&apos;s
-              daily meal amount.
-            </p>
-          </div>
+          <h2>Daily Meals</h2>
+
+          <p>
+            Add or update meals for a selected date.
+          </p>
         </div>
 
         <button
@@ -408,51 +386,45 @@ const Meals = () => {
           <CalendarDays size={17} />
           Today
         </button>
-      </div>
+      </header>
 
-      <div className="meal-summary-grid">
-        <div className="meal-stat-card">
-          <span>Today&apos;s total</span>
+      <section className="meal-daily-summary">
+        <article>
+          <span>Selected date total</span>
+
           <strong>
             {formatMealNumber(dailyTotal)}
           </strong>
-          <small>Selected date meals</small>
-        </div>
 
-        <div className="meal-stat-card">
-          <span>Your meal today</span>
+          <small>All members&apos; meals</small>
+        </article>
+
+        <article>
+          <span>Your meal</span>
+
           <strong>
             {formatMealNumber(
               currentMemberDailyTotal
             )}
           </strong>
+
           <small>
             Breakfast, lunch and dinner
           </small>
-        </div>
+        </article>
 
-        <div className="meal-stat-card">
-          <span>Monthly total</span>
+        <article>
+          <span>Saved records</span>
+
           <strong>
-            {formatMealNumber(monthlyTotal)}
+            {selectedDateMeals.length}
           </strong>
-          <small>All members</small>
-        </div>
 
-        <div className="meal-stat-card">
-          <span>Your monthly meal</span>
-          <strong>
-            {formatMealNumber(
-              currentMemberMonthlyTotal
-            )}
-          </strong>
-          <small>
-            Current selected month
-          </small>
-        </div>
-      </div>
+          <small>Members with saved entry</small>
+        </article>
+      </section>
 
-      <div className="meal-date-card">
+      <section className="meal-date-card">
         <button
           type="button"
           className="meal-date-arrow"
@@ -486,22 +458,25 @@ const Meals = () => {
         >
           <ChevronRight size={20} />
         </button>
-      </div>
+      </section>
 
-      {!currentMember && (
+      {!currentMember && !loading && (
         <div className="meal-warning">
           Your login account is not connected to a
-          member profile. Add the same name or email in
-          the Members page.
+          member profile. Add the same email address
+          from the Members page.
         </div>
       )}
 
-      <div className="meal-sheet-card">
+      <section className="meal-sheet-card">
         <div className="meal-sheet-header">
           <div>
-            <h2>Meal sheet</h2>
+            <h3>Meal sheet</h3>
+
             <p>
-              You can edit only your own meal row.
+              {currentMember?.role === "manager"
+                ? "As a manager, you can update every member's meal."
+                : "You can update only your own meal row."}
             </p>
           </div>
 
@@ -527,7 +502,16 @@ const Meals = () => {
             </thead>
 
             <tbody>
-              {members.length === 0 ? (
+              {loading ? (
+                <tr>
+                  <td
+                    colSpan="6"
+                    className="meal-empty-state"
+                  >
+                    Loading daily meals...
+                  </td>
+                </tr>
+              ) : members.length === 0 ? (
                 <tr>
                   <td
                     colSpan="6"
@@ -541,6 +525,7 @@ const Meals = () => {
                 members.map((member) => {
                   const isCurrentMember =
                     member.id === currentMember?.id;
+
                   const canEdit =
                     isCurrentMember ||
                     currentMember?.role ===
@@ -591,7 +576,10 @@ const Meals = () => {
                                 ? "Your meal"
                                 : member.room
                                   ? `Room ${member.room}`
-                                  : "Mess member"}
+                                  : member.role ===
+                                      "manager"
+                                    ? "Manager"
+                                    : "Mess member"}
                             </span>
                           </div>
                         </div>
@@ -613,19 +601,19 @@ const Meals = () => {
                             {canEdit && (
                               <button
                                 type="button"
-                                onClick={() =>
-                                  handleMealChange(
-                                    member.id,
-                                    mealType,
-                                    -0.5
-                                  )
-                                }
                                 disabled={
                                   Number(
                                     memberMeal[
                                       mealType
                                     ] || 0
                                   ) <= 0
+                                }
+                                onClick={() =>
+                                  handleMealChange(
+                                    member.id,
+                                    mealType,
+                                    -0.5
+                                  )
                                 }
                                 aria-label={`Decrease ${mealType}`}
                               >
@@ -635,9 +623,7 @@ const Meals = () => {
 
                             <strong>
                               {formatMealNumber(
-                                memberMeal[
-                                  mealType
-                                ]
+                                memberMeal[mealType]
                               )}
                             </strong>
 
@@ -691,6 +677,7 @@ const Meals = () => {
         <div className="meal-sheet-footer">
           <div>
             <span>Selected date total meal</span>
+
             <strong>
               {formatMealNumber(dailyTotal)}
             </strong>
@@ -700,7 +687,11 @@ const Meals = () => {
             type="button"
             className="meal-save-button"
             onClick={handleSaveMeal}
-            disabled={saving || !currentMember}
+            disabled={
+              saving ||
+              loading ||
+              !currentMember
+            }
           >
             <Save size={18} />
 
@@ -711,7 +702,7 @@ const Meals = () => {
                 : "Save My Meal"}
           </button>
         </div>
-      </div>
+      </section>
     </div>
   );
 };

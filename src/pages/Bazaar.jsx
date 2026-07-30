@@ -6,9 +6,7 @@ import {
 } from "react";
 import {
   CalendarDays,
-  ChevronDown,
-  ChevronUp,
-  Image,
+  ImagePlus,
   Plus,
   Receipt,
   Save,
@@ -21,7 +19,6 @@ import toast from "react-hot-toast";
 import { AuthContext } from "../context/AuthContext";
 import {
   createBazaarEntry,
-  deleteBazaarEntry as removeBazaarEntry,
   getWorkspaceData,
 } from "../services/dataService";
 import "../styles/bazaar.css";
@@ -58,171 +55,103 @@ const ITEM_SUGGESTIONS = [
 
 const getTodayDate = () => {
   const today = new Date();
-
-  const year =
-    today.getFullYear();
-
+  const year = today.getFullYear();
   const month = String(
     today.getMonth() + 1
   ).padStart(2, "0");
-
-  const day = String(
-    today.getDate()
-  ).padStart(2, "0");
+  const day = String(today.getDate()).padStart(
+    2,
+    "0"
+  );
 
   return `${year}-${month}-${day}`;
 };
 
-const createId = (
-  prefix = "id"
-) => {
-  return `${prefix}_${Date.now()}_${Math.random()
+const createId = () => {
+  return `item_${Date.now()}_${Math.random()
     .toString(36)
-    .substring(2, 8)}`;
+    .slice(2, 8)}`;
 };
 
-const normalizeText = (
-  value = ""
-) => {
-  return String(value)
-    .trim()
-    .toLowerCase();
+const createEmptyItem = () => ({
+  id: createId(),
+  category: "Grocery",
+  itemName: "",
+  quantity: "",
+  amount: "",
+});
+
+const normalizeText = (value = "") => {
+  return String(value).trim().toLowerCase();
 };
 
-const formatMoney = (amount) => {
-  return new Intl.NumberFormat(
-    "en-BD",
-    {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 2,
-    }
-  ).format(Number(amount) || 0);
+const formatMoney = (value) => {
+  return new Intl.NumberFormat("en-BD", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(Number(value) || 0);
 };
 
-const formatQuantity = (
-  quantity
-) => {
-  const value =
-    Number(quantity) || 0;
-
-  return Number.isInteger(value)
-    ? value
-    : value
-        .toFixed(2)
-        .replace(/0+$/, "")
-        .replace(/\.$/, "");
-};
-
-const formatDate = (
-  dateString
-) => {
+const formatDate = (dateString) => {
   if (!dateString) {
     return "";
   }
 
-  return new Intl.DateTimeFormat(
-    "en-GB",
-    {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    }
-  ).format(
-    new Date(
-      `${dateString}T00:00:00`
-    )
-  );
-};
-
-const createEmptyItem = () => {
-  return {
-    id: createId("item"),
-    category: "Grocery",
-    itemName: "",
-    quantity: "",
-    amount: "",
-  };
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date(`${dateString}T00:00:00`));
 };
 
 const Bazaar = () => {
-  const { user } =
-    useContext(AuthContext);
+  const { user } = useContext(AuthContext);
 
-  const [members, setMembers] =
-    useState([]);
-
-  const [
-    bazaarEntries,
-    setBazaarEntries,
-  ] = useState([]);
-
-  const [
-    bazaarDate,
-    setBazaarDate,
-  ] = useState(getTodayDate());
-
-  const [items, setItems] =
-    useState([
-      createEmptyItem(),
-    ]);
-
-  const [
-    receiptData,
-    setReceiptData,
-  ] = useState(null);
-
-  const [
-    receiptFile,
-    setReceiptFile,
-  ] = useState(null);
-
-  const [
-    receiptName,
-    setReceiptName,
-  ] = useState("");
-
-  const [saving, setSaving] =
-    useState(false);
-
-  const [
-    deletingEntryId,
-    setDeletingEntryId,
-  ] = useState(null);
-
-  const [
-    expandedEntryId,
-    setExpandedEntryId,
-  ] = useState(null);
+  const [members, setMembers] = useState([]);
+  const [entries, setEntries] = useState([]);
+  const [bazaarDate, setBazaarDate] =
+    useState(getTodayDate());
+  const [items, setItems] = useState([
+    createEmptyItem(),
+  ]);
+  const [receiptFile, setReceiptFile] =
+    useState(null);
+  const [receiptPreview, setReceiptPreview] =
+    useState("");
+  const [receiptName, setReceiptName] =
+    useState("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     let active = true;
 
     const loadData = async () => {
+      setLoading(true);
+
       try {
-        const data =
-          await getWorkspaceData();
+        const data = await getWorkspaceData();
 
         if (!active) {
           return;
         }
 
-        setMembers(
-          data.members
-        );
-
-        setBazaarEntries(
-          data.bazaarEntries
-        );
+        setMembers(data.members || []);
+        setEntries(data.bazaarEntries || []);
       } catch (error) {
         console.error(
-          "Unable to load bazaar:",
+          "Unable to load bazaar data:",
           error
         );
 
         toast.error(
           error.message ||
-            "Unable to load bazaar records."
+            "Unable to load bazaar data."
         );
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
       }
     };
 
@@ -231,760 +160,403 @@ const Bazaar = () => {
     return () => {
       active = false;
     };
-  }, [user]);
+  }, []);
 
-  const currentMember =
-    useMemo(() => {
-      if (!user) {
-        return null;
-      }
+  const currentMember = useMemo(() => {
+    if (!user) {
+      return null;
+    }
 
-      return (
-        members.find(
-          (member) => {
-            if (
-              member.userId &&
-              user.id
-            ) {
-              return (
-                member.userId ===
-                user.id
-              );
-            }
-
-            const sameEmail =
-              user.email &&
-              member.email &&
-              normalizeText(
-                member.email
-              ) ===
-                normalizeText(
-                  user.email
-                );
-
-            const sameName =
-              user.name &&
-              member.name &&
-              normalizeText(
-                member.name
-              ) ===
-                normalizeText(
-                  user.name
-                );
-
-            return (
-              sameEmail ||
-              sameName
-            );
-          }
-        ) || null
-      );
-    }, [members, user]);
-
-  const currentUserIsManager =
-    currentMember?.role ===
-    "manager";
-
-  const grandTotal =
-    useMemo(() => {
-      return items.reduce(
-        (total, item) =>
-          total +
-          Number(
-            item.amount || 0
-          ),
-        0
-      );
-    }, [items]);
-
-  const monthlyTotal =
-    useMemo(() => {
-      const selectedMonth =
-        bazaarDate.substring(
-          0,
-          7
-        );
-
-      return bazaarEntries
-        .filter((entry) =>
-          entry.date?.startsWith(
-            selectedMonth
-          )
-        )
-        .reduce(
-          (total, entry) =>
-            total +
-            Number(
-              entry.grandTotal ||
-                0
-            ),
-          0
-        );
-    }, [
-      bazaarEntries,
-      bazaarDate,
-    ]);
-
-  const todayTotal =
-    useMemo(() => {
-      const today =
-        getTodayDate();
-
-      return bazaarEntries
-        .filter(
-          (entry) =>
-            entry.date === today
-        )
-        .reduce(
-          (total, entry) =>
-            total +
-            Number(
-              entry.grandTotal ||
-                0
-            ),
-          0
-        );
-    }, [bazaarEntries]);
-
-  const totalItemsPurchased =
-    useMemo(() => {
-      return bazaarEntries.reduce(
-        (total, entry) =>
-          total +
-          (
-            Array.isArray(
-              entry.items
-            )
-              ? entry.items.length
-              : 0
-          ),
-        0
-      );
-    }, [bazaarEntries]);
-
-  const sortedEntries =
-    useMemo(() => {
-      return [
-        ...bazaarEntries,
-      ].sort((a, b) => {
-        const dateDifference =
-          new Date(
-            `${b.date}T00:00:00`
-          ) -
-          new Date(
-            `${a.date}T00:00:00`
-          );
-
-        if (
-          dateDifference !== 0
-        ) {
-          return dateDifference;
+    return (
+      members.find((member) => {
+        if (member.userId && user.id) {
+          return member.userId === user.id;
         }
 
-        return (
-          new Date(
-            b.createdAt || 0
-          ) -
-          new Date(
-            a.createdAt || 0
-          )
-        );
-      });
-    }, [bazaarEntries]);
+        const sameEmail =
+          user.email &&
+          member.email &&
+          normalizeText(member.email) ===
+            normalizeText(user.email);
 
-  const handleItemChange = (
+        const sameName =
+          user.name &&
+          member.name &&
+          normalizeText(member.name) ===
+            normalizeText(user.name);
+
+        return sameEmail || sameName;
+      }) || null
+    );
+  }, [members, user]);
+
+  const grandTotal = useMemo(() => {
+    return items.reduce(
+      (total, item) =>
+        total + (Number(item.amount) || 0),
+      0
+    );
+  }, [items]);
+
+  const validItemCount = useMemo(() => {
+    return items.filter(
+      (item) =>
+        item.itemName.trim() &&
+        Number(item.quantity) > 0 &&
+        Number(item.amount) > 0
+    ).length;
+  }, [items]);
+
+  const updateItem = (
     itemId,
     field,
     value
   ) => {
-    setItems(
-      (previousItems) =>
-        previousItems.map(
-          (item) =>
-            item.id === itemId
-              ? {
-                  ...item,
-                  [field]:
-                    value,
-                }
-              : item
-        )
+    setItems((currentItems) =>
+      currentItems.map((item) =>
+        item.id === itemId
+          ? {
+              ...item,
+              [field]: value,
+            }
+          : item
+      )
     );
   };
 
-  const addItemRow = () => {
-    setItems(
-      (previousItems) => [
-        ...previousItems,
-        createEmptyItem(),
-      ]
-    );
+  const addItem = () => {
+    setItems((currentItems) => [
+      ...currentItems,
+      createEmptyItem(),
+    ]);
   };
 
-  const removeItemRow = (
-    itemId
-  ) => {
+  const removeItem = (itemId) => {
     if (items.length === 1) {
       toast.error(
-        "At least one item row is required."
+        "At least one item is required."
       );
-
       return;
     }
 
-    setItems(
-      (previousItems) =>
-        previousItems.filter(
-          (item) =>
-            item.id !== itemId
-        )
+    setItems((currentItems) =>
+      currentItems.filter(
+        (item) => item.id !== itemId
+      )
     );
   };
 
-  const handleReceiptChange = (
-    event
-  ) => {
-    const file =
-      event.target.files?.[0];
+  const handleReceiptChange = (event) => {
+    const file = event.target.files?.[0];
 
     if (!file) {
       return;
     }
 
-    if (
-      !file.type.startsWith(
-        "image/"
-      )
-    ) {
+    if (!file.type.startsWith("image/")) {
       toast.error(
-        "Please select an image file."
+        "Receipt must be an image file."
       );
-
       event.target.value = "";
       return;
     }
 
-    if (
-      file.size >
-      2 * 1024 * 1024
-    ) {
+    if (file.size > 2 * 1024 * 1024) {
       toast.error(
         "Receipt image must be smaller than 2 MB."
       );
-
       event.target.value = "";
       return;
     }
 
-    const reader =
-      new FileReader();
+    if (receiptPreview) {
+      URL.revokeObjectURL(receiptPreview);
+    }
 
-    reader.onload = () => {
-      setReceiptData(
-        reader.result
-      );
-
-      setReceiptFile(file);
-
-      setReceiptName(
-        file.name
-      );
-    };
-
-    reader.onerror = () => {
-      toast.error(
-        "Unable to read the receipt image."
-      );
-    };
-
-    reader.readAsDataURL(file);
+    setReceiptFile(file);
+    setReceiptName(file.name);
+    setReceiptPreview(
+      URL.createObjectURL(file)
+    );
   };
 
   const removeReceipt = () => {
-    setReceiptData(null);
+    if (receiptPreview) {
+      URL.revokeObjectURL(receiptPreview);
+    }
+
     setReceiptFile(null);
+    setReceiptPreview("");
     setReceiptName("");
 
-    const receiptInput =
-      document.getElementById(
-        "bazaarReceiptInput"
-      );
+    const input = document.getElementById(
+      "bazaarReceiptInput"
+    );
 
-    if (receiptInput) {
-      receiptInput.value = "";
+    if (input) {
+      input.value = "";
     }
   };
 
-  const validateItems = () => {
-    const incompleteItem =
-      items.find(
-        (item) =>
-          !item.itemName.trim() ||
-          Number(
-            item.quantity
-          ) <= 0 ||
-          Number(
-            item.amount
-          ) <= 0
-      );
+  const resetForm = () => {
+    setBazaarDate(getTodayDate());
+    setItems([createEmptyItem()]);
+    removeReceipt();
+  };
 
-    if (incompleteItem) {
+  const validateForm = () => {
+    if (!currentMember) {
+      toast.error(
+        "Your account is not connected to a member."
+      );
+      return false;
+    }
+
+    if (!bazaarDate) {
+      toast.error(
+        "Please select a bazaar date."
+      );
+      return false;
+    }
+
+    const invalidItem = items.find(
+      (item) =>
+        !item.itemName.trim() ||
+        Number(item.quantity) <= 0 ||
+        Number(item.amount) <= 0
+    );
+
+    if (invalidItem) {
       toast.error(
         "Complete every item name, quantity and amount."
       );
-
       return false;
     }
 
     if (grandTotal <= 0) {
       toast.error(
-        "Grand total must be greater than zero."
+        "Total amount must be greater than zero."
       );
-
       return false;
     }
 
     return true;
   };
 
-  const resetForm = () => {
-    setBazaarDate(
-      getTodayDate()
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!validateForm()) {
+      return;
+    }
+
+    const sameDayEntryExists = entries.some(
+      (entry) =>
+        entry.memberId === currentMember.id &&
+        entry.date === bazaarDate
     );
 
-    setItems([
-      createEmptyItem(),
-    ]);
-
-    setReceiptData(null);
-    setReceiptFile(null);
-    setReceiptName("");
-
-    const receiptInput =
-      document.getElementById(
-        "bazaarReceiptInput"
+    if (sameDayEntryExists) {
+      const confirmed = window.confirm(
+        "You already added a bazaar entry on this date. Do you want to add another one?"
       );
 
-    if (receiptInput) {
-      receiptInput.value = "";
+      if (!confirmed) {
+        return;
+      }
+    }
+
+    setSaving(true);
+
+    try {
+      const normalizedItems = items.map(
+        (item) => ({
+          category: item.category,
+          itemName: item.itemName.trim(),
+          quantity:
+            Number(item.quantity) || 0,
+          amount: Number(item.amount) || 0,
+        })
+      );
+
+      const savedEntry =
+        await createBazaarEntry({
+          date: bazaarDate,
+          memberId: currentMember.id,
+          items: normalizedItems,
+          receiptFile,
+        });
+
+      if (savedEntry) {
+        setEntries((currentEntries) => [
+          savedEntry,
+          ...currentEntries,
+        ]);
+      }
+
+      resetForm();
+
+      toast.success(
+        "Bazaar entry saved successfully."
+      );
+    } catch (error) {
+      console.error(
+        "Unable to save bazaar entry:",
+        error
+      );
+
+      toast.error(
+        error.message ||
+          "Unable to save the bazaar entry."
+      );
+    } finally {
+      setSaving(false);
     }
   };
 
-  const handleSaveBazaar =
-    async (event) => {
-      event.preventDefault();
-
-      if (!currentMember) {
-        toast.error(
-          "Your member profile could not be found."
-        );
-
-        return;
-      }
-
-      if (!bazaarDate) {
-        toast.error(
-          "Please select a bazaar date."
-        );
-
-        return;
-      }
-
-      if (!validateItems()) {
-        return;
-      }
-
-      const existingSameDayEntry =
-        bazaarEntries.some(
-          (entry) =>
-            entry.memberId ===
-              currentMember.id &&
-            entry.date ===
-              bazaarDate
-        );
-
-      if (
-        existingSameDayEntry
-      ) {
-        const shouldContinue =
-          window.confirm(
-            "You already have a bazaar entry on this date. Do you want to create another entry?"
-          );
-
-        if (!shouldContinue) {
-          return;
-        }
-      }
-
-      setSaving(true);
-
-      try {
-        const normalizedItems =
-          items.map((item) => ({
-            id:
-              item.id,
-
-            category:
-              item.category,
-
-            itemName:
-              item.itemName.trim(),
-
-            quantity:
-              Number(
-                item.quantity
-              ) || 0,
-
-            amount:
-              Number(
-                item.amount
-              ) || 0,
-          }));
-
-        const newEntry =
-          await createBazaarEntry({
-            date:
-              bazaarDate,
-
-            memberId:
-              currentMember.id,
-
-            items:
-              normalizedItems,
-
-            receiptFile,
-          });
-
-        setBazaarEntries(
-          (currentEntries) => [
-            ...currentEntries,
-            newEntry,
-          ]
-        );
-
-        resetForm();
-
-        toast.success(
-          "Bazaar entry saved successfully."
-        );
-      } catch (error) {
-        console.error(
-          "Bazaar save error:",
-          error
-        );
-
-        toast.error(
-          error.message ||
-            "Unable to save the bazaar entry."
-        );
-      } finally {
-        setSaving(false);
-      }
-    };
-
-  const deleteBazaarEntry =
-    async (entryId) => {
-      if (
-        !currentUserIsManager
-      ) {
-        toast.error(
-          "Only a manager can delete bazaar data."
-        );
-
-        return;
-      }
-
-      const selectedEntry =
-        bazaarEntries.find(
-          (entry) =>
-            entry.id === entryId
-        );
-
-      if (!selectedEntry) {
-        return;
-      }
-
-      const shouldDelete =
-        window.confirm(
-          "Are you sure you want to delete this bazaar entry?"
-        );
-
-      if (!shouldDelete) {
-        return;
-      }
-
-      setDeletingEntryId(
-        entryId
-      );
-
-      try {
-        await removeBazaarEntry(
-          entryId,
-          selectedEntry.receiptPath
-        );
-
-        setBazaarEntries(
-          (currentEntries) =>
-            currentEntries.filter(
-              (entry) =>
-                entry.id !==
-                entryId
-            )
-        );
-
-        if (
-          expandedEntryId ===
-          entryId
-        ) {
-          setExpandedEntryId(
-            null
-          );
-        }
-
-        toast.success(
-          "Bazaar entry deleted."
-        );
-      } catch (error) {
-        toast.error(
-          error.message ||
-            "Unable to delete bazaar entry."
-        );
-      } finally {
-        setDeletingEntryId(
-          null
-        );
-      }
-    };
-
-  const toggleEntryDetails = (
-    entryId
-  ) => {
-    setExpandedEntryId(
-      (currentId) =>
-        currentId === entryId
-          ? null
-          : entryId
-    );
-  };
-
   return (
-    <div className="page-container bazaar-page">
-      <div className="bazaar-page-header">
+    <div className="bazaar-add-page">
+      <header className="bazaar-subpage-header">
         <div>
-          <div className="bazaar-heading-icon">
-            <ShoppingBasket
-              size={25}
-            />
-          </div>
+          <span className="bazaar-subpage-eyebrow">
+            <ShoppingBasket size={15} />
+            New purchase
+          </span>
 
-          <div>
-            <h1>
-              Bazaar Management
-            </h1>
+          <h2>Add Bazaar</h2>
 
-            <p>
-              Add bazaar items,
-              quantities and total
-              amounts.
-            </p>
-          </div>
+          <p>
+            Add purchased items, their total amounts
+            and an optional receipt.
+          </p>
         </div>
 
         <div className="bazaar-current-member">
-          <span>
-            Bazaar by
-          </span>
+          <div className="bazaar-current-avatar">
+            {currentMember?.name
+              ?.charAt(0)
+              .toUpperCase() || "M"}
+          </div>
 
-          <strong>
-            {currentMember?.name ||
-              user?.name ||
-              "Unknown Member"}
-          </strong>
+          <div>
+            <span>Adding as</span>
+
+            <strong>
+              {loading
+                ? "Loading..."
+                : currentMember?.name ||
+                  "Member not connected"}
+            </strong>
+          </div>
         </div>
-      </div>
+      </header>
 
-      <div className="bazaar-summary-grid">
-        <div className="bazaar-stat-card">
-          <span>
-            Today&apos;s bazaar
-          </span>
-
-          <strong>
-            ৳{" "}
-            {formatMoney(
-              todayTotal
-            )}
-          </strong>
-
-          <small>
-            All entries made today
-          </small>
-        </div>
-
-        <div className="bazaar-stat-card">
-          <span>
-            Monthly bazaar
-          </span>
-
-          <strong>
-            ৳{" "}
-            {formatMoney(
-              monthlyTotal
-            )}
-          </strong>
-
-          <small>
-            Selected month total
-          </small>
-        </div>
-
-        <div className="bazaar-stat-card">
-          <span>
-            Total entries
-          </span>
-
-          <strong>
-            {bazaarEntries.length}
-          </strong>
-
-          <small>
-            Saved bazaar records
-          </small>
-        </div>
-
-        <div className="bazaar-stat-card">
-          <span>
-            Total items
-          </span>
-
-          <strong>
-            {totalItemsPurchased}
-          </strong>
-
-          <small>
-            Items in all records
-          </small>
-        </div>
-      </div>
-
-      {!currentMember && (
+      {!currentMember && !loading && (
         <div className="bazaar-warning">
-          Your login account is not
-          connected to a member
-          profile.
+          Your login account is not connected to an
+          active member profile. Ask the manager to
+          connect your account.
         </div>
       )}
 
       <form
-        className="bazaar-entry-card"
-        onSubmit={
-          handleSaveBazaar
-        }
+        className="bazaar-entry-form"
+        onSubmit={handleSubmit}
       >
-        <div className="bazaar-card-header">
-          <div>
-            <h2>
-              New Bazaar Entry
-            </h2>
+        <section className="bazaar-form-card">
+          <div className="bazaar-form-heading">
+            <div>
+              <h3>Bazaar information</h3>
 
-            <p>
-              Enter the purchased
-              quantity and total
-              amount manually.
-            </p>
+              <p>
+                Select the purchase date and add all
+                purchased items.
+              </p>
+            </div>
+
+            <div className="bazaar-selected-date">
+              <CalendarDays size={17} />
+
+              <span>
+                {formatDate(bazaarDate)}
+              </span>
+            </div>
           </div>
 
           <div className="bazaar-date-field">
             <label htmlFor="bazaarDate">
-              <CalendarDays
-                size={16}
-              />
-
               Bazaar date
             </label>
 
-            <input
-              id="bazaarDate"
-              type="date"
-              value={bazaarDate}
-              onChange={(event) =>
-                setBazaarDate(
-                  event.target
-                    .value
-                )
-              }
-              required
-            />
+            <div>
+              <CalendarDays size={18} />
+
+              <input
+                id="bazaarDate"
+                type="date"
+                value={bazaarDate}
+                onChange={(event) =>
+                  setBazaarDate(
+                    event.target.value
+                  )
+                }
+                required
+              />
+            </div>
           </div>
-        </div>
+        </section>
 
-        <div className="bazaar-items-table-wrapper">
-          <table className="bazaar-items-table">
-            <thead>
-              <tr>
-                <th>
-                  Category
-                </th>
+        <section className="bazaar-form-card">
+          <div className="bazaar-form-heading">
+            <div>
+              <h3>Purchased items</h3>
 
-                <th>
-                  Item name
-                </th>
+              <p>
+                Enter the amount paid for each item.
+              </p>
+            </div>
 
-                <th>
-                  Quantity (Kg)
-                </th>
+            <span className="bazaar-item-count">
+              {items.length}{" "}
+              {items.length === 1
+                ? "item"
+                : "items"}
+            </span>
+          </div>
 
-                <th>
-                  Amount
-                </th>
+          <div className="bazaar-entry-table-wrapper">
+            <table className="bazaar-entry-table">
+              <thead>
+                <tr>
+                  <th>Category</th>
+                  <th>Item name</th>
+                  <th>Quantity</th>
+                  <th>Amount</th>
+                  <th aria-label="Remove item" />
+                </tr>
+              </thead>
 
-                <th>
-                  Action
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {items.map(
-                (
-                  item,
-                  index
-                ) => (
-                  <tr
-                    key={item.id}
-                  >
+              <tbody>
+                {items.map((item, index) => (
+                  <tr key={item.id}>
                     <td data-label="Category">
                       <select
-                        value={
-                          item.category
-                        }
-                        onChange={(
-                          event
-                        ) =>
-                          handleItemChange(
+                        value={item.category}
+                        onChange={(event) =>
+                          updateItem(
                             item.id,
                             "category",
-                            event
-                              .target
-                              .value
+                            event.target.value
                           )
                         }
                       >
                         {CATEGORIES.map(
-                          (
-                            category
-                          ) => (
+                          (category) => (
                             <option
-                              key={
-                                category
-                              }
-                              value={
-                                category
-                              }
+                              key={category}
+                              value={category}
                             >
-                              {
-                                category
-                              }
+                              {category}
                             </option>
                           )
                         )}
@@ -994,98 +566,53 @@ const Bazaar = () => {
                     <td data-label="Item name">
                       <input
                         type="text"
-                        list={`itemSuggestions-${index}`}
-                        placeholder="Example: Rice"
-                        value={
-                          item.itemName
-                        }
-                        onChange={(
-                          event
-                        ) =>
-                          handleItemChange(
+                        list="bazaarItemSuggestions"
+                        value={item.itemName}
+                        placeholder={`Item ${index + 1}`}
+                        onChange={(event) =>
+                          updateItem(
                             item.id,
                             "itemName",
-                            event
-                              .target
-                              .value
+                            event.target.value
                           )
                         }
                         required
                       />
-
-                      <datalist
-                        id={`itemSuggestions-${index}`}
-                      >
-                        {ITEM_SUGGESTIONS.map(
-                          (
-                            suggestion
-                          ) => (
-                            <option
-                              key={
-                                suggestion
-                              }
-                              value={
-                                suggestion
-                              }
-                            />
-                          )
-                        )}
-                      </datalist>
                     </td>
 
-                    <td data-label="Quantity (Kg)">
-                      <div className="bazaar-quantity-input">
-                        <input
-                          type="number"
-                          min="0.01"
-                          step="0.01"
-                          placeholder="0"
-                          value={
-                            item.quantity
-                          }
-                          onChange={(
-                            event
-                          ) =>
-                            handleItemChange(
-                              item.id,
-                              "quantity",
-                              event
-                                .target
-                                .value
-                            )
-                          }
-                          required
-                        />
-
-                        <span>
-                          Kg
-                        </span>
-                      </div>
+                    <td data-label="Quantity">
+                      <input
+                        type="number"
+                        min="0.01"
+                        step="0.01"
+                        value={item.quantity}
+                        placeholder="0"
+                        onChange={(event) =>
+                          updateItem(
+                            item.id,
+                            "quantity",
+                            event.target.value
+                          )
+                        }
+                        required
+                      />
                     </td>
 
                     <td data-label="Amount">
                       <div className="bazaar-money-input">
-                        <span>
-                          ৳
-                        </span>
+                        <span>৳</span>
 
                         <input
                           type="number"
                           min="0.01"
                           step="0.01"
+                          value={item.amount}
                           placeholder="0"
-                          value={
-                            item.amount
-                          }
-                          onChange={(
-                            event
-                          ) =>
-                            handleItemChange(
+                          onChange={(event) =>
+                            updateItem(
                               item.id,
                               "amount",
-                              event
-                                .target
-                                .value
+                              event.target.value
                             )
                           }
                           required
@@ -1093,404 +620,142 @@ const Bazaar = () => {
                       </div>
                     </td>
 
-                    <td data-label="Action">
+                    <td>
                       <button
                         type="button"
-                        className="bazaar-remove-row-button"
+                        className="bazaar-remove-item"
                         onClick={() =>
-                          removeItemRow(
-                            item.id
-                          )
+                          removeItem(item.id)
                         }
-                        aria-label="Remove item"
+                        aria-label={`Remove item ${index + 1}`}
                       >
-                        <Trash2
-                          size={17}
-                        />
+                        <Trash2 size={16} />
                       </button>
                     </td>
                   </tr>
-                )
-              )}
-            </tbody>
-          </table>
-        </div>
+                ))}
+              </tbody>
+            </table>
 
-        <button
-          type="button"
-          className="bazaar-add-item-button"
-          onClick={addItemRow}
-        >
-          <Plus size={18} />
+            <datalist id="bazaarItemSuggestions">
+              {ITEM_SUGGESTIONS.map((item) => (
+                <option
+                  key={item}
+                  value={item}
+                />
+              ))}
+            </datalist>
+          </div>
 
-          Add Another Item
-        </button>
+          <div className="bazaar-items-footer">
+            <button
+              type="button"
+              className="bazaar-add-item-button"
+              onClick={addItem}
+            >
+              <Plus size={17} />
+              Add another item
+            </button>
 
-        <div className="bazaar-entry-bottom">
-          <div className="bazaar-receipt-section">
-            <div className="bazaar-receipt-heading">
-              <Receipt
-                size={19}
+            <div className="bazaar-form-total">
+              <span>Grand total</span>
+
+              <strong>
+                ৳{formatMoney(grandTotal)}
+              </strong>
+            </div>
+          </div>
+        </section>
+
+        <section className="bazaar-form-card">
+          <div className="bazaar-form-heading">
+            <div>
+              <h3>Receipt</h3>
+
+              <p>
+                Upload an optional receipt image,
+                maximum 2 MB.
+              </p>
+            </div>
+
+            <Receipt size={21} />
+          </div>
+
+          {!receiptPreview ? (
+            <label
+              className="bazaar-receipt-upload"
+              htmlFor="bazaarReceiptInput"
+            >
+              <div>
+                <ImagePlus size={28} />
+              </div>
+
+              <strong>Upload receipt image</strong>
+
+              <span>
+                JPG, PNG or WEBP — maximum 2 MB
+              </span>
+
+              <input
+                id="bazaarReceiptInput"
+                type="file"
+                accept="image/*"
+                onChange={handleReceiptChange}
+              />
+            </label>
+          ) : (
+            <div className="bazaar-receipt-preview">
+              <img
+                src={receiptPreview}
+                alt="Receipt preview"
               />
 
               <div>
-                <strong>
-                  Receipt image
-                </strong>
+                <strong>{receiptName}</strong>
 
                 <span>
-                  Optional
+                  Receipt is ready to upload.
                 </span>
               </div>
-            </div>
 
-            {!receiptData ? (
-              <label
-                htmlFor="bazaarReceiptInput"
-                className="bazaar-receipt-upload"
+              <button
+                type="button"
+                onClick={removeReceipt}
+                aria-label="Remove receipt"
               >
-                <Image
-                  size={19}
-                />
-
-                Choose Receipt Image
-
-                <input
-                  id="bazaarReceiptInput"
-                  type="file"
-                  accept="image/*"
-                  onChange={
-                    handleReceiptChange
-                  }
-                />
-              </label>
-            ) : (
-              <div className="bazaar-receipt-preview">
-                <img
-                  src={
-                    receiptData
-                  }
-                  alt="Receipt preview"
-                />
-
-                <div>
-                  <strong>
-                    {receiptName}
-                  </strong>
-
-                  <button
-                    type="button"
-                    onClick={
-                      removeReceipt
-                    }
-                  >
-                    <X
-                      size={15}
-                    />
-
-                    Remove
-                  </button>
-                </div>
-              </div>
-            )}
-
-            <small>
-              Maximum image size:
-              2 MB
-            </small>
-          </div>
-
-          <div className="bazaar-total-section">
-            <div>
-              <span>
-                Total item rows
-              </span>
-
-              <strong>
-                {items.length}
-              </strong>
+                <X size={17} />
+              </button>
             </div>
-
-            <div className="bazaar-grand-total">
-              <span>
-                Grand total
-              </span>
-
-              <strong>
-                ৳{" "}
-                {formatMoney(
-                  grandTotal
-                )}
-              </strong>
-            </div>
-
-            <button
-              type="submit"
-              className="bazaar-save-button"
-              disabled={
-                saving ||
-                !currentMember
-              }
-            >
-              <Save
-                size={18}
-              />
-
-              {saving
-                ? "Saving..."
-                : "Save Bazaar"}
-            </button>
-          </div>
-        </div>
-      </form>
-
-      <section className="bazaar-history-card">
-        <div className="bazaar-history-header">
-          <div>
-            <h2>
-              Bazaar History
-            </h2>
-
-            <p>
-              View saved bazaar
-              records and item
-              details.
-            </p>
-          </div>
-
-          <span>
-            {bazaarEntries.length}{" "}
-            {bazaarEntries.length ===
-            1
-              ? "entry"
-              : "entries"}
-          </span>
-        </div>
-
-        <div className="bazaar-history-list">
-          {sortedEntries.length ===
-          0 ? (
-            <div className="bazaar-empty-state">
-              <ShoppingBasket
-                size={42}
-              />
-
-              <h3>
-                No Bazaar Records
-                Found
-              </h3>
-
-              <p>
-                Saved bazaar entries
-                will appear here.
-              </p>
-            </div>
-          ) : (
-            sortedEntries.map(
-              (entry) => {
-                const isExpanded =
-                  expandedEntryId ===
-                  entry.id;
-
-                const isDeleting =
-                  deletingEntryId ===
-                  entry.id;
-
-                return (
-                  <article
-                    className="bazaar-history-entry"
-                    key={
-                      entry.id
-                    }
-                  >
-                    <div className="bazaar-history-summary">
-                      <div className="bazaar-history-date">
-                        <CalendarDays
-                          size={19}
-                        />
-
-                        <div>
-                          <strong>
-                            {formatDate(
-                              entry.date
-                            )}
-                          </strong>
-
-                          <span>
-                            {
-                              entry.memberName
-                            }
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="bazaar-history-meta">
-                        <span>
-                          {entry.items
-                            ?.length ||
-                            0}{" "}
-                          items
-                        </span>
-
-                        {entry.receipt && (
-                          <span>
-                            Receipt
-                            attached
-                          </span>
-                        )}
-                      </div>
-
-                      <strong className="bazaar-history-total">
-                        ৳{" "}
-                        {formatMoney(
-                          entry.grandTotal
-                        )}
-                      </strong>
-
-                      <div className="bazaar-history-actions">
-                        <button
-                          type="button"
-                          className="bazaar-details-button"
-                          onClick={() =>
-                            toggleEntryDetails(
-                              entry.id
-                            )
-                          }
-                        >
-                          {isExpanded ? (
-                            <ChevronUp
-                              size={
-                                17
-                              }
-                            />
-                          ) : (
-                            <ChevronDown
-                              size={
-                                17
-                              }
-                            />
-                          )}
-
-                          {isExpanded
-                            ? "Hide"
-                            : "Details"}
-                        </button>
-
-                        {currentUserIsManager && (
-                          <button
-                            type="button"
-                            className="bazaar-delete-entry-button"
-                            onClick={() =>
-                              deleteBazaarEntry(
-                                entry.id
-                              )
-                            }
-                            disabled={
-                              isDeleting
-                            }
-                            aria-label="Delete bazaar entry"
-                          >
-                            <Trash2
-                              size={
-                                17
-                              }
-                            />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-
-                    {isExpanded && (
-                      <div className="bazaar-history-details">
-                        <div className="bazaar-details-table-wrapper">
-                          <table className="bazaar-details-table">
-                            <thead>
-                              <tr>
-                                <th>
-                                  Category
-                                </th>
-
-                                <th>
-                                  Item
-                                </th>
-
-                                <th>
-                                  Quantity
-                                </th>
-
-                                <th>
-                                  Amount
-                                </th>
-                              </tr>
-                            </thead>
-
-                            <tbody>
-                              {entry.items?.map(
-                                (
-                                  item
-                                ) => (
-                                  <tr
-                                    key={
-                                      item.id
-                                    }
-                                  >
-                                    <td>
-                                      {
-                                        item.category
-                                      }
-                                    </td>
-
-                                    <td>
-                                      {
-                                        item.itemName
-                                      }
-                                    </td>
-
-                                    <td>
-                                      {formatQuantity(
-                                        item.quantity
-                                      )}{" "}
-                                      Kg
-                                    </td>
-
-                                    <td>
-                                      <strong>
-                                        ৳{" "}
-                                        {formatMoney(
-                                          item.amount
-                                        )}
-                                      </strong>
-                                    </td>
-                                  </tr>
-                                )
-                              )}
-                            </tbody>
-                          </table>
-                        </div>
-
-                        {entry.receipt && (
-                          <div className="bazaar-saved-receipt">
-                            <span>
-                              Receipt
-                            </span>
-
-                            <img
-                              src={
-                                entry.receipt
-                              }
-                              alt="Saved bazaar receipt"
-                            />
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </article>
-                );
-              }
-            )
           )}
-        </div>
-      </section>
+        </section>
+
+        <section className="bazaar-submit-card">
+          <div>
+            <span>Ready to save</span>
+
+            <strong>
+              {validItemCount} items · ৳
+              {formatMoney(grandTotal)}
+            </strong>
+          </div>
+
+          <button
+            type="submit"
+            className="bazaar-save-button"
+            disabled={
+              saving ||
+              loading ||
+              !currentMember
+            }
+          >
+            <Save size={18} />
+
+            {saving
+              ? "Saving Bazaar..."
+              : "Save Bazaar Entry"}
+          </button>
+        </section>
+      </form>
     </div>
   );
 };

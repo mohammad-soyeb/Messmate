@@ -1,34 +1,52 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import {
+  BrowserRouter,
+  Route,
+  Routes,
+} from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
 
 import Loading from "./components/common/Loading";
-
-import AuthProvider from "./context/AuthContext";
-import ThemeProvider from "./context/ThemeContext";
-
 import ProtectedRoute from "./components/ProtectedRoute";
 import WorkspaceRoute from "./components/WorkspaceRoute";
 import Layout from "./components/layout/Layout";
 
-// Public Pages
+import AuthProvider from "./context/AuthContext";
+import ThemeProvider from "./context/ThemeContext";
+
+// Public pages
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 
-// Mess Setup Page
+// Mess setup
 import MessSetup from "./pages/MessSetup";
 
-// Dashboard Pages
+// Dashboard pages
 import Dashboard from "./pages/Dashboard";
 import Meals from "./pages/Meals";
 import Bazaar from "./pages/Bazaar";
-import Profile from "./pages/Profile";
 import Members from "./pages/Members";
 import Reports from "./pages/Reports";
+import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 
-// Error Page
+// Meal sub-pages
+import MealsLayout from "./pages/meals/MealsLayout";
+import MealHistory from "./pages/meals/MealHistory";
+import MealReport from "./pages/meals/MealReport";
+
+// Bazaar sub-pages
+import BazaarLayout from "./pages/bazaar/BazaarLayout";
+import BazaarHistory from "./pages/bazaar/BazaarHistory";
+import BazaarSummary from "./pages/bazaar/BazaarSummary";
+
+// Member sub-pages
+import MembersLayout from "./pages/members/MembersLayout";
+import AddMember from "./pages/members/AddMember";
+import ManagerControl from "./pages/members/ManagerControl";
+
+// Error page
 import NotFound from "./pages/NotFound";
 
 function App() {
@@ -62,39 +80,114 @@ function App() {
           />
 
           <Routes>
-            {/* Public Routes */}
+            {/* Public routes */}
             <Route path="/" element={<Landing />} />
 
-            <Route path="/login" element={<Login />} />
+            <Route
+              path="/login"
+              element={<Login />}
+            />
 
-            <Route path="/register" element={<Register />} />
+            <Route
+              path="/register"
+              element={<Register />}
+            />
 
-            {/* Login করার পর Mess Create অথবা Join */}
             <Route element={<ProtectedRoute />}>
-              <Route path="/mess-setup" element={<MessSetup />} />
+              <Route
+                path="/mess-setup"
+                element={<MessSetup />}
+              />
 
-              {/* Dashboard Layout Routes */}
               <Route element={<WorkspaceRoute />}>
                 <Route element={<Layout />}>
-                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route
+                    path="/dashboard"
+                    element={<Dashboard />}
+                  />
 
-                  <Route path="/meals" element={<Meals />} />
+                  {/* Meals */}
+                  <Route
+                    path="/meals"
+                    element={<MealsLayout />}
+                  >
+                    <Route index element={<Meals />} />
 
-                  <Route path="/bazaar" element={<Bazaar />} />
+                    <Route
+                      path="history"
+                      element={<MealHistory />}
+                    />
 
-                  <Route path="/members" element={<Members />} />
+                    <Route
+                      path="report"
+                      element={<MealReport />}
+                    />
+                  </Route>
 
-                  <Route path="/reports" element={<Reports />} />
+                  {/* Bazaar */}
+                  <Route
+                    path="/bazaar"
+                    element={<BazaarLayout />}
+                  >
+                    <Route
+                      index
+                      element={<Bazaar />}
+                    />
 
-                  <Route path="/profile" element={<Profile />} />
+                    <Route
+                      path="history"
+                      element={<BazaarHistory />}
+                    />
 
-                  <Route path="/settings" element={<Settings />} />
+                    <Route
+                      path="summary"
+                      element={<BazaarSummary />}
+                    />
+                  </Route>
+
+                  {/* Members */}
+                  <Route
+                    path="/members"
+                    element={<MembersLayout />}
+                  >
+                    <Route
+                      index
+                      element={<Members />}
+                    />
+
+                    <Route
+                      path="add"
+                      element={<AddMember />}
+                    />
+
+                    <Route
+                      path="managers"
+                      element={<ManagerControl />}
+                    />
+                  </Route>
+
+                  <Route
+                    path="/reports"
+                    element={<Reports />}
+                  />
+
+                  <Route
+                    path="/profile"
+                    element={<Profile />}
+                  />
+
+                  <Route
+                    path="/settings"
+                    element={<Settings />}
+                  />
                 </Route>
               </Route>
             </Route>
 
-            {/* 404 Route */}
-            <Route path="*" element={<NotFound />} />
+            <Route
+              path="*"
+              element={<NotFound />}
+            />
           </Routes>
         </ThemeProvider>
       </AuthProvider>

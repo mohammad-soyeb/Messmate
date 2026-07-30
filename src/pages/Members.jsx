@@ -7,14 +7,17 @@ import {
 import {
   Check,
   Copy,
-  Edit3,
+  Crown,
+  DoorOpen,
   KeyRound,
   Mail,
+  Pencil,
   Phone,
+  RefreshCw,
   Search,
+  ShieldCheck,
   Trash2,
-  UserCog,
-  UserPlus,
+  UserCheck,
   Users,
   X,
 } from "lucide-react";
@@ -22,106 +25,59 @@ import toast from "react-hot-toast";
 
 import { AuthContext } from "../context/AuthContext";
 import {
-  addMember,
   getWorkspaceData,
   removeMember,
   updateMember,
 } from "../services/dataService";
-import {
-  regenerateMessCode as requestNewMessCode,
-} from "../services/messService";
+import { regenerateMessCode } from "../services/messService";
 import "../styles/members.css";
-
-const getCurrentMonth = () => {
-  return new Date().toISOString().slice(0, 7);
-};
 
 const normalizeText = (value = "") => {
   return String(value).trim().toLowerCase();
 };
 
-const getMealTotal = (meal) => {
-  if (
-    meal.breakfast !== undefined ||
-    meal.lunch !== undefined ||
-    meal.dinner !== undefined
-  ) {
-    return (
-      Number(meal.breakfast || 0) +
-      Number(meal.lunch || 0) +
-      Number(meal.dinner || 0)
-    );
+const formatJoinedDate = (dateString) => {
+  if (!dateString) {
+    return "Not available";
   }
 
-  return Number(meal.quantity || 0);
-};
-
-const getBazaarTotal = (entry) => {
-  if (entry.grandTotal !== undefined) {
-    return Number(entry.grandTotal || 0);
-  }
-
-  return Number(entry.price || 0);
-};
-
-const formatMoney = (amount) => {
-  return new Intl.NumberFormat("en-BD", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 2,
-  }).format(Number(amount) || 0);
-};
-
-const formatMeal = (amount) => {
-  const number = Number(amount) || 0;
-
-  return Number.isInteger(number)
-    ? String(number)
-    : number
-        .toFixed(2)
-        .replace(/0+$/, "")
-        .replace(/\.$/, "");
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(new Date(dateString));
 };
 
 const Members = () => {
   const { user } = useContext(AuthContext);
 
+  const [mess, setMess] = useState(null);
   const [members, setMembers] = useState([]);
-  const [meals, setMeals] = useState([]);
-  const [bazaarEntries, setBazaarEntries] =
-    useState([]);
-
-  const [messInfo, setMessInfo] = useState(null);
-  const [codeCopied, setCodeCopied] =
-    useState(false);
-
-  const [selectedMonth, setSelectedMonth] =
-    useState(getCurrentMonth());
-
-  const [searchText, setSearchText] =
-    useState("");
-
-  const [editingId, setEditingId] =
+  const [searchText, setSearchText] = useState("");
+  const [roleFilter, setRoleFilter] =
+    useState("all");
+  const [editingMember, setEditingMember] =
     useState(null);
-
-  const [joinForm, setJoinForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    room: "",
-  });
-
   const [editForm, setEditForm] = useState({
     name: "",
     email: "",
     phone: "",
     room: "",
-    role: "member",
   });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [removingId, setRemovingId] =
+    useState(null);
+  const [regenerating, setRegenerating] =
+    useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     let active = true;
 
-    const loadData = async () => {
+    const loadMembers = async () => {
+      setLoading(true);
+
       try {
         const data = await getWorkspaceData();
 
@@ -129,44 +85,51 @@ const Members = () => {
           return;
         }
 
-        setMessInfo(data.mess);
-        setMembers(data.members);
-        setMeals(data.meals);
-        setBazaarEntries(data.bazaarEntries);
+        setMess(data.mess || null);
+        setMembers(data.members || []);
       } catch (error) {
         console.error(
           "Unable to load members:",
           error
         );
+
         toast.error(
           error.message ||
-            "Unable to load workspace data."
+            "Unable to load members."
         );
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
       }
     };
 
-    loadData();
+    loadMembers();
 
     return () => {
       active = false;
     };
-  }, [user]);
+  }, []);
 
   const currentMember = useMemo(() => {
+    if (!user) {
+      return null;
+    }
+
     return (
       members.find((member) => {
-        if (member.userId && user?.id) {
+        if (member.userId && user.id) {
           return member.userId === user.id;
         }
 
         const sameEmail =
-          user?.email &&
+          user.email &&
           member.email &&
           normalizeText(member.email) ===
             normalizeText(user.email);
 
         const sameName =
-          user?.name &&
+          user.name &&
           member.name &&
           normalizeText(member.name) ===
             normalizeText(user.name);
@@ -176,377 +139,258 @@ const Members = () => {
     );
   }, [members, user]);
 
-  const currentUserIsManager =
+  const isManager =
     currentMember?.role === "manager";
 
-  const monthlyMeals = useMemo(() => {
-    return meals.filter((meal) =>
-      meal.date?.startsWith(selectedMonth)
-    );
-  }, [meals, selectedMonth]);
+  const managerCount = useMemo(() => {
+    return members.filter(
+      (member) =>
+        member.role === "manager" &&
+        member.isActive !== false &&
+        Boolean(member.userId)
+    ).length;
+  }, [members]);
 
-  const monthlyBazaar = useMemo(() => {
-    return bazaarEntries.filter((entry) =>
-      entry.date?.startsWith(selectedMonth)
-    );
-  }, [bazaarEntries, selectedMonth]);
-
-  const totalMonthlyMeal = useMemo(() => {
-    return monthlyMeals.reduce(
-      (total, meal) =>
-        total + getMealTotal(meal),
-      0
-    );
-  }, [monthlyMeals]);
-
-  const totalMonthlyBazaar = useMemo(() => {
-    return monthlyBazaar.reduce(
-      (total, entry) =>
-        total + getBazaarTotal(entry),
-      0
-    );
-  }, [monthlyBazaar]);
-
-  const mealRate =
-    totalMonthlyMeal > 0
-      ? totalMonthlyBazaar /
-        totalMonthlyMeal
-      : 0;
-
-  const memberSummaries = useMemo(() => {
-    return members.map((member) => {
-      const memberMeals = monthlyMeals
-        .filter((meal) => {
-          if (meal.memberId) {
-            return meal.memberId === member.id;
-          }
-
-          return (
-            normalizeText(
-              meal.memberName || meal.member
-            ) === normalizeText(member.name)
-          );
-        })
-        .reduce(
-          (total, meal) =>
-            total + getMealTotal(meal),
-          0
-        );
-
-      const bazaarPaid = monthlyBazaar
-        .filter((entry) => {
-          if (entry.memberId) {
-            return entry.memberId === member.id;
-          }
-
-          return (
-            normalizeText(
-              entry.memberName || entry.member
-            ) === normalizeText(member.name)
-          );
-        })
-        .reduce(
-          (total, entry) =>
-            total + getBazaarTotal(entry),
-          0
-        );
-
-      const mealCost =
-        memberMeals * mealRate;
-
-      return {
-        ...member,
-        totalMeal: memberMeals,
-        bazaarPaid,
-        mealCost,
-        balance: bazaarPaid - mealCost,
-      };
-    });
-  }, [
-    members,
-    monthlyMeals,
-    monthlyBazaar,
-    mealRate,
-  ]);
+  const connectedCount = useMemo(() => {
+    return members.filter((member) =>
+      Boolean(member.userId)
+    ).length;
+  }, [members]);
 
   const filteredMembers = useMemo(() => {
-    const normalizedSearch =
-      normalizeText(searchText);
+    const query = normalizeText(searchText);
 
-    if (!normalizedSearch) {
-      return memberSummaries;
-    }
+    return members.filter((member) => {
+      const matchesRole =
+        roleFilter === "all"
+          ? true
+          : member.role === roleFilter;
 
-    return memberSummaries.filter(
-      (member) =>
-        normalizeText(member.name).includes(
-          normalizedSearch
-        ) ||
-        normalizeText(member.email).includes(
-          normalizedSearch
-        ) ||
-        normalizeText(member.phone).includes(
-          normalizedSearch
-        ) ||
-        normalizeText(member.room).includes(
-          normalizedSearch
-        )
-    );
-  }, [memberSummaries, searchText]);
+      const searchableText = [
+        member.name,
+        member.email,
+        member.phone,
+        member.room,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
 
-  const handleJoinChange = (event) => {
-    const { name, value } = event.target;
+      const matchesSearch = query
+        ? searchableText.includes(query)
+        : true;
 
-    setJoinForm((previousForm) => ({
-      ...previousForm,
-      [name]:
-        name === "messCode"
-          ? value.toUpperCase()
-          : value,
-    }));
-  };
-
-  const handleEditChange = (event) => {
-    const { name, value } = event.target;
-
-    setEditForm((previousForm) => ({
-      ...previousForm,
-      [name]: value,
-    }));
-  };
-
-  const resetJoinForm = () => {
-    setJoinForm({
-      name: "",
-      email: "",
-      phone: "",
-      room: "",
+      return matchesRole && matchesSearch;
     });
-  };
-
-  const resetEditForm = () => {
-    setEditingId(null);
-
-    setEditForm({
-      name: "",
-      email: "",
-      phone: "",
-      room: "",
-      role: "member",
-    });
-  };
-
-  const handleJoinMess = async (event) => {
-    event.preventDefault();
-
-    const cleanName = joinForm.name.trim();
-    const cleanEmail = joinForm.email.trim();
-    const cleanPhone = joinForm.phone.trim();
-    const cleanRoom = joinForm.room.trim();
-
-    if (!cleanName) {
-      toast.error("Member name is required.");
-      return;
-    }
-
-    const duplicateMember = members.find(
-      (member) => {
-        const sameEmail =
-          cleanEmail &&
-          member.email &&
-          normalizeText(member.email) ===
-            normalizeText(cleanEmail);
-
-        const samePhone =
-          cleanPhone &&
-          member.phone &&
-          member.phone === cleanPhone;
-
-        const sameName =
-          normalizeText(member.name) ===
-          normalizeText(cleanName);
-
-        return sameEmail || samePhone || sameName;
-      }
-    );
-
-    if (duplicateMember) {
-      toast.error(
-        "This member has already joined the mess."
-      );
-      return;
-    }
-
-    try {
-      const newMember = await addMember({
-        name: cleanName,
-        email: cleanEmail,
-        phone: cleanPhone,
-        room: cleanRoom,
-      });
-
-      setMembers((currentMembers) => [
-        ...currentMembers,
-        newMember,
-      ]);
-      resetJoinForm();
-      toast.success(
-        `${cleanName} was added successfully.`
-      );
-    } catch (error) {
-      toast.error(
-        error.message || "Unable to add member."
-      );
-    }
-  };
+  }, [members, roleFilter, searchText]);
 
   const copyMessCode = async () => {
-    if (!messInfo?.code) {
+    if (!mess?.code) {
+      toast.error("Mess code is not available.");
       return;
     }
 
     try {
       await navigator.clipboard.writeText(
-        messInfo.code
+        mess.code
       );
 
-      setCodeCopied(true);
+      setCopied(true);
       toast.success("Mess code copied.");
 
-      setTimeout(() => {
-        setCodeCopied(false);
-      }, 2000);
-    } catch (error) {
-      console.error(error);
-      toast.error("Could not copy mess code.");
+      window.setTimeout(() => {
+        setCopied(false);
+      }, 1800);
+    } catch {
+      toast.error(
+        "Unable to copy the mess code."
+      );
     }
   };
 
-  const regenerateMessCode = async () => {
-    if (!currentUserIsManager) {
+  const handleRegenerateCode = async () => {
+    if (!isManager) {
       toast.error(
-        "Only the manager can generate a new code."
+        "Only a manager can generate a new code."
       );
       return;
     }
 
-    const shouldRegenerate = window.confirm(
+    const confirmed = window.confirm(
       "Generate a new mess code? The previous code will stop working."
     );
 
-    if (!shouldRegenerate) {
+    if (!confirmed) {
       return;
     }
 
+    setRegenerating(true);
+
     try {
-      const code = await requestNewMessCode();
-      setMessInfo((currentMess) => ({
+      const result =
+        await regenerateMessCode();
+
+      if (!result?.success) {
+        throw new Error(
+          result?.message ||
+            "Unable to generate a new code."
+        );
+      }
+
+      setMess((currentMess) => ({
         ...currentMess,
-        code,
+        code:
+          result.code ||
+          result.mess?.code ||
+          currentMess?.code,
       }));
-      setCodeCopied(false);
-      toast.success("New mess code generated.");
+
+      toast.success(
+        "New mess code generated."
+      );
     } catch (error) {
+      console.error(
+        "Code regeneration error:",
+        error
+      );
+
       toast.error(
         error.message ||
-          "Unable to regenerate the code."
+          "Unable to regenerate mess code."
       );
+    } finally {
+      setRegenerating(false);
     }
   };
 
-  const editMember = (member) => {
-    if (
-      !currentUserIsManager &&
-      member.id !== currentMember?.id
-    ) {
+  const openEditModal = (member) => {
+    if (!isManager) {
       toast.error(
-        "You cannot edit another member."
+        "Only a manager can edit a member."
       );
       return;
     }
 
-    setEditingId(member.id);
+    setEditingMember(member);
 
     setEditForm({
       name: member.name || "",
       email: member.email || "",
       phone: member.phone || "",
       room: member.room || "",
-      role: member.role || "member",
-    });
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
     });
   };
 
-  const handleUpdateMember = async (event) => {
+  const closeEditModal = () => {
+    if (saving) {
+      return;
+    }
+
+    setEditingMember(null);
+  };
+
+  const handleEditInput = (event) => {
+    const { name, value } = event.target;
+
+    setEditForm((currentForm) => ({
+      ...currentForm,
+      [name]: value,
+    }));
+  };
+
+  const saveMemberChanges = async (
+    event
+  ) => {
     event.preventDefault();
 
-    if (!editingId) {
+    if (!isManager || !editingMember) {
       return;
     }
 
-    const cleanName = editForm.name.trim();
-
-    if (!cleanName) {
-      toast.error("Member name is required.");
-      return;
-    }
-
-    const editingMember = members.find(
-      (member) => member.id === editingId
-    );
-    const isLastManagerDemotion =
-      editingMember?.role === "manager" &&
-      editForm.role === "member" &&
-      managerCount <= 1;
-
-    if (isLastManagerDemotion) {
+    if (!editForm.name.trim()) {
       toast.error(
-        "Assign another manager before changing your role."
+        "Member name is required."
       );
       return;
     }
 
+    const email = normalizeText(
+      editForm.email
+    );
+
+    if (
+      email &&
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(
+        email
+      )
+    ) {
+      toast.error(
+        "Please enter a valid email address."
+      );
+      return;
+    }
+
+    const duplicateEmail = members.some(
+      (member) =>
+        member.id !== editingMember.id &&
+        email &&
+        normalizeText(member.email) === email
+    );
+
+    if (duplicateEmail) {
+      toast.error(
+        "Another member already uses this email."
+      );
+      return;
+    }
+
+    setSaving(true);
+
     try {
-      const savedMember = await updateMember(
-        editingId,
+      const updatedMember = await updateMember(
+        editingMember.id,
         {
-          name: cleanName,
+          name: editForm.name,
           email: editForm.email,
           phone: editForm.phone,
           room: editForm.room,
-          role: currentUserIsManager
-            ? editForm.role
-            : undefined,
         }
       );
 
       setMembers((currentMembers) =>
         currentMembers.map((member) =>
-          member.id === editingId
-            ? savedMember
+          member.id === updatedMember.id
+            ? updatedMember
             : member
         )
       );
-      resetEditForm();
+
+      setEditingMember(null);
+
       toast.success(
-        "Member updated successfully."
+        "Member information updated."
       );
     } catch (error) {
+      console.error(
+        "Unable to update member:",
+        error
+      );
+
       toast.error(
         error.message ||
           "Unable to update member."
       );
+    } finally {
+      setSaving(false);
     }
   };
 
-  const deleteMember = async (member) => {
-    if (!currentUserIsManager) {
+  const handleRemoveMember = async (
+    member
+  ) => {
+    if (!isManager) {
       toast.error(
-        "Only the manager can remove members."
+        "Only a manager can remove a member."
       );
       return;
     }
@@ -558,580 +402,466 @@ const Members = () => {
       return;
     }
 
-    const shouldDelete = window.confirm(
-      `Remove ${member.name} from this mess?`
-    );
-
-    if (!shouldDelete) {
+    if (
+      member.role === "manager" &&
+      managerCount <= 1
+    ) {
+      toast.error(
+        "Assign another manager before removing the last manager."
+      );
       return;
     }
 
+    const confirmed = window.confirm(
+      `Remove ${member.name} from this mess? Their previous meal and bazaar records will be preserved.`
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setRemovingId(member.id);
+
     try {
       await removeMember(member.id);
+
       setMembers((currentMembers) =>
         currentMembers.filter(
-          (savedMember) =>
-            savedMember.id !== member.id
+          (current) =>
+            current.id !== member.id
         )
       );
 
-      if (editingId === member.id) {
-        resetEditForm();
-      }
-
-      toast.success("Member removed.");
+      toast.success(
+        `${member.name} removed successfully.`
+      );
     } catch (error) {
+      console.error(
+        "Unable to remove member:",
+        error
+      );
+
       toast.error(
         error.message ||
           "Unable to remove member."
       );
+    } finally {
+      setRemovingId(null);
     }
   };
 
-  const managerCount = members.filter(
-    (member) =>
-      member.role === "manager" &&
-      member.userId
-  ).length;
-
   return (
-    <div className="page-container members-page">
-      <div className="members-page-header">
+    <div className="member-list-page">
+      <header className="members-subpage-header">
         <div>
-          <div className="members-heading-icon">
-            <Users size={25} />
+          <span className="members-subpage-eyebrow">
+            <Users size={15} />
+            Active member directory
+          </span>
+
+          <h2>Member List</h2>
+
+          <p>
+            View active members and manage their
+            contact information.
+          </p>
+        </div>
+
+        <div className="member-list-count">
+          <UserCheck size={18} />
+
+          <div>
+            <span>Active members</span>
+
+            <strong>{members.length}</strong>
+          </div>
+        </div>
+      </header>
+
+      <section className="mess-code-card">
+        <div className="mess-code-information">
+          <div className="mess-code-icon">
+            <KeyRound size={22} />
           </div>
 
           <div>
-            <h1>Mess Members</h1>
+            <span>Mess joining code</span>
+
+            <strong>
+              {mess?.code || "Unavailable"}
+            </strong>
 
             <p>
-              Invite members with your mess code
-              and manage joined members.
+              Share this code with members who need
+              to join the mess.
             </p>
           </div>
         </div>
 
-        <div className="members-month-field">
-          <label htmlFor="membersMonth">
-            Summary month
-          </label>
+        <div className="mess-code-actions">
+          <button
+            type="button"
+            className="mess-code-copy"
+            disabled={!mess?.code}
+            onClick={copyMessCode}
+          >
+            {copied ? (
+              <Check size={17} />
+            ) : (
+              <Copy size={17} />
+            )}
 
-          <input
-            id="membersMonth"
-            type="month"
-            value={selectedMonth}
-            onChange={(event) =>
-              setSelectedMonth(
-                event.target.value
-              )
-            }
-          />
-        </div>
-      </div>
+            {copied ? "Copied" : "Copy Code"}
+          </button>
 
-      <div className="members-summary-grid">
-        <div className="members-summary-card">
-          <span>Total Members</span>
-          <strong>{members.length}</strong>
-          <small>Joined mess members</small>
-        </div>
-
-        <div className="members-summary-card">
-          <span>Managers</span>
-          <strong>{managerCount}</strong>
-          <small>Manager accounts</small>
-        </div>
-
-        <div className="members-summary-card">
-          <span>Monthly Meal</span>
-          <strong>
-            {formatMeal(totalMonthlyMeal)}
-          </strong>
-          <small>All members combined</small>
-        </div>
-
-        <div className="members-summary-card featured">
-          <span>Meal Rate</span>
-          <strong>
-            ৳ {formatMoney(mealRate)}
-          </strong>
-          <small>
-            Bazaar divided by meal
-          </small>
-        </div>
-      </div>
-
-      <section className="member-form-card">
-        <div className="member-form-header">
-          <div>
-            <h2>Invite Members</h2>
-
-            <p>
-              Share this code with members to join
-              the mess.
-            </p>
-          </div>
-
-          {currentUserIsManager && (
+          {isManager && (
             <button
               type="button"
-              className="member-cancel-edit"
-              onClick={regenerateMessCode}
+              className="mess-code-regenerate"
+              disabled={regenerating}
+              onClick={handleRegenerateCode}
             >
-              <KeyRound size={17} />
-              New Code
+              <RefreshCw
+                size={17}
+                className={
+                  regenerating
+                    ? "spinning"
+                    : ""
+                }
+              />
+
+              {regenerating
+                ? "Generating..."
+                : "New Code"}
             </button>
           )}
         </div>
+      </section>
 
-        <div
-          style={{
-            padding: "24px",
-            display: "grid",
-            gridTemplateColumns:
-              "minmax(0, 1fr) auto",
-            alignItems: "center",
-            gap: "20px",
-          }}
+      <section className="member-summary-grid">
+        <article>
+          <span>Total members</span>
+          <strong>{members.length}</strong>
+          <small>Currently active</small>
+        </article>
+
+        <article>
+          <span>Managers</span>
+          <strong>{managerCount}</strong>
+          <small>Active mess managers</small>
+        </article>
+
+        <article>
+          <span>Connected accounts</span>
+          <strong>{connectedCount}</strong>
+          <small>Joined login accounts</small>
+        </article>
+      </section>
+
+      <section className="member-filter-card">
+        <div className="member-search-control">
+          <Search size={18} />
+
+          <input
+            type="search"
+            value={searchText}
+            placeholder="Search name, email, phone or room"
+            onChange={(event) =>
+              setSearchText(event.target.value)
+            }
+          />
+        </div>
+
+        <select
+          value={roleFilter}
+          onChange={(event) =>
+            setRoleFilter(event.target.value)
+          }
+          aria-label="Filter members by role"
         >
-          <div>
-            <span
-              style={{
-                display: "block",
-                marginBottom: "8px",
-                color: "#64748b",
-                fontSize: "12px",
-                fontWeight: "700",
-              }}
-            >
-              YOUR MESS CODE
-            </span>
+          <option value="all">All roles</option>
+          <option value="manager">
+            Managers
+          </option>
+          <option value="member">
+            Members
+          </option>
+        </select>
+      </section>
 
-            <strong
-              style={{
-                display: "block",
-                color: "#2563eb",
-                fontSize: "30px",
-                letterSpacing: "3px",
-              }}
-            >
-              {messInfo?.code || "Loading..."}
-            </strong>
+      <section className="member-directory-card">
+        <div className="member-directory-heading">
+          <div>
+            <h3>Active members</h3>
+
+            <p>
+              {filteredMembers.length} member
+              {filteredMembers.length === 1
+                ? ""
+                : "s"}{" "}
+              found.
+            </p>
           </div>
 
-          <button
-            type="button"
-            className="member-submit-button"
-            onClick={copyMessCode}
-          >
-            {codeCopied ? (
-              <Check size={18} />
-            ) : (
-              <Copy size={18} />
-            )}
+          {!isManager && (
+            <span className="member-readonly-label">
+              View only
+            </span>
+          )}
+        </div>
 
-            {codeCopied ? "Copied" : "Copy Code"}
-          </button>
+        <div className="member-list-grid">
+          {loading ? (
+            <div className="members-page-state">
+              Loading members...
+            </div>
+          ) : filteredMembers.length === 0 ? (
+            <div className="members-page-state">
+              No members match your search.
+            </div>
+          ) : (
+            filteredMembers.map((member) => {
+              const isCurrentMember =
+                member.id === currentMember?.id;
+
+              return (
+                <article
+                  key={member.id}
+                  className={`member-profile-card ${
+                    isCurrentMember
+                      ? "current"
+                      : ""
+                  }`}
+                >
+                  <div className="member-profile-top">
+                    <div className="member-profile-avatar">
+                      {member.name
+                        ?.charAt(0)
+                        .toUpperCase() || "M"}
+                    </div>
+
+                    <div className="member-profile-title">
+                      <div>
+                        <h4>{member.name}</h4>
+
+                        {isCurrentMember && (
+                          <span>You</span>
+                        )}
+                      </div>
+
+                      {member.role ===
+                      "manager" ? (
+                        <div className="member-manager-role">
+                          <Crown size={13} />
+                          Manager
+                        </div>
+                      ) : (
+                        <div className="member-normal-role">
+                          Member
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="member-contact-list">
+                    <div>
+                      <Mail size={15} />
+
+                      <span>
+                        {member.email ||
+                          "No email added"}
+                      </span>
+                    </div>
+
+                    <div>
+                      <Phone size={15} />
+
+                      <span>
+                        {member.phone ||
+                          "No phone added"}
+                      </span>
+                    </div>
+
+                    <div>
+                      <DoorOpen size={15} />
+
+                      <span>
+                        {member.room
+                          ? `Room ${member.room}`
+                          : "No room added"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="member-account-status">
+                    {member.userId ? (
+                      <span className="connected">
+                        <UserCheck size={14} />
+                        Account connected
+                      </span>
+                    ) : (
+                      <span className="pending">
+                        Account not connected
+                      </span>
+                    )}
+
+                    <small>
+                      Joined{" "}
+                      {formatJoinedDate(
+                        member.joinedAt
+                      )}
+                    </small>
+                  </div>
+
+                  {isManager && (
+                    <div className="member-card-actions">
+                      <button
+                        type="button"
+                        className="member-edit-button"
+                        onClick={() =>
+                          openEditModal(member)
+                        }
+                      >
+                        <Pencil size={15} />
+                        Edit
+                      </button>
+
+                      <button
+                        type="button"
+                        className="member-remove-button"
+                        disabled={
+                          removingId === member.id ||
+                          isCurrentMember
+                        }
+                        onClick={() =>
+                          handleRemoveMember(member)
+                        }
+                      >
+                        <Trash2 size={15} />
+
+                        {removingId === member.id
+                          ? "Removing..."
+                          : "Remove"}
+                      </button>
+                    </div>
+                  )}
+                </article>
+              );
+            })
+          )}
         </div>
       </section>
 
-      {editingId ? (
-        <section className="member-form-card">
-          <div className="member-form-header">
-            <div>
-              <h2>Update Member</h2>
-              <p>Edit member information.</p>
+      {editingMember && (
+        <div
+          className="member-modal-backdrop"
+          role="presentation"
+          onMouseDown={(event) => {
+            if (
+              event.target === event.currentTarget
+            ) {
+              closeEditModal();
+            }
+          }}
+        >
+          <form
+            className="member-edit-modal"
+            onSubmit={saveMemberChanges}
+          >
+            <div className="member-edit-heading">
+              <div>
+                <span>Edit member</span>
+
+                <h3>{editingMember.name}</h3>
+              </div>
+
+              <button
+                type="button"
+                disabled={saving}
+                onClick={closeEditModal}
+                aria-label="Close edit modal"
+              >
+                <X size={18} />
+              </button>
             </div>
 
-            <button
-              type="button"
-              className="member-cancel-edit"
-              onClick={resetEditForm}
-            >
-              <X size={17} />
-              Cancel Edit
-            </button>
-          </div>
-
-          <form onSubmit={handleUpdateMember}>
-            <div className="member-form-field">
-              <label>
-                Member name <span>*</span>
-              </label>
+            <label>
+              <span>Full name</span>
 
               <input
                 type="text"
                 name="name"
                 value={editForm.name}
-                onChange={handleEditChange}
+                onChange={handleEditInput}
                 required
               />
-            </div>
+            </label>
 
-            <div className="member-form-field">
-              <label>Email</label>
+            <label>
+              <span>Email address</span>
 
               <input
                 type="email"
                 name="email"
                 value={editForm.email}
-                onChange={handleEditChange}
+                onChange={handleEditInput}
               />
-            </div>
+            </label>
 
-            <div className="member-form-field">
-              <label>Phone</label>
-
-              <input
-                type="tel"
-                name="phone"
-                value={editForm.phone}
-                onChange={handleEditChange}
-              />
-            </div>
-
-            <div className="member-form-field">
-              <label>Room</label>
-
-              <input
-                type="text"
-                name="room"
-                value={editForm.room}
-                onChange={handleEditChange}
-              />
-            </div>
-
-            <div className="member-form-field">
-              <label>Role</label>
-
-              <select
-                name="role"
-                value={editForm.role}
-                onChange={handleEditChange}
-                disabled={!currentUserIsManager}
-              >
-                <option
-                  value="member"
-                  disabled={
-                    members.find(
-                      (member) =>
-                        member.id === editingId
-                    )?.role === "manager" &&
-                    managerCount <= 1
-                  }
-                >
-                  Member
-                </option>
-
-                <option
-                  value="manager"
-                  disabled={
-                    !members.find(
-                      (member) =>
-                        member.id === editingId
-                    )?.userId
-                  }
-                >
-                  Manager
-                </option>
-              </select>
-            </div>
-
-            <button
-              type="submit"
-              className="member-submit-button"
-            >
-              <Edit3 size={18} />
-              Update Member
-            </button>
-          </form>
-        </section>
-      ) : currentUserIsManager ? (
-        <section className="member-form-card">
-          <div className="member-form-header">
-            <div>
-              <h2>Add an Offline Member</h2>
-
-              <p>
-                Add someone who does not need their
-                own login yet.
-              </p>
-            </div>
-          </div>
-
-          <form onSubmit={handleJoinMess}>
-            <div className="member-form-field">
+            <div className="member-edit-row">
               <label>
-                Member name <span>*</span>
+                <span>Phone number</span>
+
+                <input
+                  type="tel"
+                  name="phone"
+                  value={editForm.phone}
+                  onChange={handleEditInput}
+                />
               </label>
 
-              <input
-                type="text"
-                name="name"
-                placeholder="Full name"
-                value={joinForm.name}
-                onChange={handleJoinChange}
-                required
-              />
+              <label>
+                <span>Room number</span>
+
+                <input
+                  type="text"
+                  name="room"
+                  value={editForm.room}
+                  onChange={handleEditInput}
+                />
+              </label>
             </div>
 
-            <div className="member-form-field">
-              <label>Email</label>
+            <div className="member-edit-note">
+              <ShieldCheck size={16} />
 
-              <input
-                type="email"
-                name="email"
-                placeholder="name@example.com"
-                value={joinForm.email}
-                onChange={handleJoinChange}
-              />
+              Role পরিবর্তন করতে Manager Control
+              page ব্যবহার করো।
             </div>
 
-            <div className="member-form-field">
-              <label>Phone</label>
+            <div className="member-edit-footer">
+              <button
+                type="button"
+                className="member-modal-cancel"
+                disabled={saving}
+                onClick={closeEditModal}
+              >
+                Cancel
+              </button>
 
-              <input
-                type="tel"
-                name="phone"
-                placeholder="01XXXXXXXXX"
-                value={joinForm.phone}
-                onChange={handleJoinChange}
-              />
+              <button
+                type="submit"
+                className="member-modal-save"
+                disabled={saving}
+              >
+                {saving
+                  ? "Saving..."
+                  : "Save Changes"}
+              </button>
             </div>
-
-            <div className="member-form-field">
-              <label>Room</label>
-
-              <input
-                type="text"
-                name="room"
-                placeholder="Example: 102"
-                value={joinForm.room}
-                onChange={handleJoinChange}
-              />
-            </div>
-
-            <button
-              type="submit"
-              className="member-submit-button"
-            >
-              <UserPlus size={18} />
-              Add Member
-            </button>
           </form>
-        </section>
-      ) : null}
-
-      <section className="members-table-card">
-        <div className="members-table-header">
-          <div>
-            <h2>Joined Members</h2>
-
-            <p>
-              Members who joined this mess.
-            </p>
-          </div>
-
-          <div className="members-search-field">
-            <Search size={17} />
-
-            <input
-              type="text"
-              placeholder="Search member..."
-              value={searchText}
-              onChange={(event) =>
-                setSearchText(
-                  event.target.value
-                )
-              }
-            />
-          </div>
         </div>
-
-        <div className="members-table-wrapper">
-          <table className="members-data-table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Member</th>
-                <th>Contact</th>
-                <th>Room</th>
-                <th>Role</th>
-                <th>Meal</th>
-                <th>Meal Cost</th>
-                <th>Bazaar Paid</th>
-                <th>Balance</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {filteredMembers.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan="10"
-                    className="members-empty-state"
-                  >
-                    No joined members found.
-                  </td>
-                </tr>
-              ) : (
-                filteredMembers.map(
-                  (member, index) => (
-                    <tr key={member.id}>
-                      <td>{index + 1}</td>
-
-                      <td>
-                        <div className="member-profile-cell">
-                          <div className="member-avatar">
-                            {member.name
-                              ?.charAt(0)
-                              .toUpperCase() || "M"}
-                          </div>
-
-                          <div>
-                            <strong>
-                              {member.name}
-                            </strong>
-
-                            {member.id ===
-                              currentMember?.id && (
-                              <span>
-                                Current user
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </td>
-
-                      <td>
-                        <div className="member-contact-cell">
-                          {member.phone && (
-                            <span>
-                              <Phone size={13} />
-                              {member.phone}
-                            </span>
-                          )}
-
-                          {member.email && (
-                            <span>
-                              <Mail size={13} />
-                              {member.email}
-                            </span>
-                          )}
-
-                          {!member.phone &&
-                            !member.email && (
-                              <span>
-                                No contact
-                              </span>
-                            )}
-                        </div>
-                      </td>
-
-                      <td>
-                        {member.room || "—"}
-                      </td>
-
-                      <td>
-                        <span
-                          className={`member-role-badge ${member.role}`}
-                        >
-                          {member.role ===
-                          "manager" ? (
-                            <UserCog size={13} />
-                          ) : (
-                            <Users size={13} />
-                          )}
-
-                          {member.role}
-                        </span>
-                      </td>
-
-                      <td>
-                        <span className="member-meal-badge">
-                          {formatMeal(
-                            member.totalMeal
-                          )}
-                        </span>
-                      </td>
-
-                      <td>
-                        ৳{" "}
-                        {formatMoney(
-                          member.mealCost
-                        )}
-                      </td>
-
-                      <td>
-                        ৳{" "}
-                        {formatMoney(
-                          member.bazaarPaid
-                        )}
-                      </td>
-
-                      <td>
-                        <span
-                          className={
-                            member.balance > 0
-                              ? "member-balance positive"
-                              : member.balance < 0
-                                ? "member-balance negative"
-                                : "member-balance neutral"
-                          }
-                        >
-                          {member.balance > 0
-                            ? "+"
-                            : member.balance < 0
-                              ? "-"
-                              : ""}
-                          ৳{" "}
-                          {formatMoney(
-                            Math.abs(
-                              member.balance
-                            )
-                          )}
-                        </span>
-                      </td>
-
-                      <td>
-                        <div className="member-action-buttons">
-                          <button
-                            type="button"
-                            className="member-edit-button"
-                            onClick={() =>
-                              editMember(member)
-                            }
-                          >
-                            <Edit3 size={16} />
-                          </button>
-
-                          {currentUserIsManager &&
-                            member.id !==
-                              currentMember?.id && (
-                              <button
-                                type="button"
-                                className="member-delete-button"
-                                onClick={() =>
-                                  deleteMember(member)
-                                }
-                              >
-                                <Trash2
-                                  size={16}
-                                />
-                              </button>
-                            )}
-                        </div>
-                      </td>
-                    </tr>
-                  )
-                )
-              )}
-            </tbody>
-          </table>
-        </div>
-      </section>
+      )}
     </div>
   );
 };
