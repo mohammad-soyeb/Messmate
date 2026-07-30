@@ -1,31 +1,91 @@
 .layout {
-  display: flex;
+  position: relative;
   min-height: 100vh;
-  background: #f8fafc;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(52, 211, 153, 0.06),
+      transparent 28%
+    ),
+    #f8fafc;
 }
 
 .layout-main {
-  flex: 1;
+  width: 100%;
+  min-width: 0;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   overflow-x: hidden;
 }
 
 .layout-content {
+  position: relative;
+  z-index: 1;
   flex: 1;
-  padding: 30px;
+  width: 100%;
 }
 
+/* Menu backdrop */
+
+.navigation-backdrop {
+  position: fixed;
+  z-index: 990;
+  inset: 0;
+  visibility: hidden;
+  border: 0;
+  opacity: 0;
+  background:
+    radial-gradient(
+      circle at left,
+      rgba(16, 185, 129, 0.1),
+      transparent 35%
+    ),
+    rgba(15, 23, 42, 0.58);
+  backdrop-filter: blur(7px);
+  cursor: pointer;
+  pointer-events: none;
+  transition:
+    opacity 0.28s ease,
+    visibility 0.28s ease;
+}
+
+.navigation-backdrop.visible {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Dark mode */
+
 body.dark .layout {
-  background: #0f172a;
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(16, 185, 129, 0.07),
+      transparent 30%
+    ),
+    #0f172a;
 }
 
 body.dark .layout-content {
-  background: #0f172a;
+  background: transparent;
 }
 
-@media (max-width: 992px) {
+/* Desktop page spacing */
+
+@media (min-width: 1200px) {
   .layout-content {
-    padding: 20px;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+}
+
+/* Reduced animation */
+
+@media (prefers-reduced-motion: reduce) {
+  .navigation-backdrop {
+    transition: none;
+    backdrop-filter: none;
   }
 }
