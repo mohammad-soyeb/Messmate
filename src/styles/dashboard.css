@@ -9,7 +9,7 @@
   background:
     radial-gradient(
       circle at 90% 0%,
-      rgba(16, 185, 129, 0.055),
+      rgba(193, 122, 78, 0.055),
       transparent 25%
     ),
     #f8fafc;
@@ -31,7 +31,7 @@
 .dashboard-label {
   display: block;
   margin-bottom: 4px;
-  color: #059669;
+  color: #a65f36;
   font-size: 8px;
   font-weight: 850;
   text-transform: uppercase;
@@ -67,7 +67,7 @@
 }
 
 .dashboard-month-field label svg {
-  color: #059669;
+  color: #a65f36;
 }
 
 .dashboard-month-field input {
@@ -90,10 +90,10 @@
 }
 
 .dashboard-month-field input:focus {
-  border-color: #10b981;
+  border-color: #c17a4e;
   box-shadow:
     0 0 0 3px
-      rgba(16, 185, 129, 0.11),
+      rgba(193, 122, 78, 0.11),
     0 6px 16px
       rgba(15, 23, 42, 0.05);
 }
@@ -143,8 +143,8 @@
   height: 2px;
   background: linear-gradient(
     90deg,
-    #34d399,
-    #059669
+    #cd9169,
+    #a65f36
   );
   content: "";
   transition: width 0.35s ease;
@@ -157,16 +157,16 @@
   width: 77px;
   height: 77px;
   border-radius: 50%;
-  background: rgba(16, 185, 129, 0.055);
+  background: rgba(193, 122, 78, 0.055);
   content: "";
   pointer-events: none;
 }
 
 .dashboard-stat-card:hover {
   z-index: 2;
-  border-color: #a7f3d0;
+  border-color: #e4c7b4;
   box-shadow:
-    0 13px 27px rgba(5, 150, 105, 0.09),
+    0 13px 27px rgba(166, 95, 54, 0.09),
     inset 0 1px 0 #ffffff;
   transform: translateY(-3px);
 }
@@ -176,16 +176,16 @@
 }
 
 .dashboard-stat-card.featured {
-  border-color: #a7f3d0;
+  border-color: #e4c7b4;
   background:
     radial-gradient(
       circle at top right,
-      rgba(52, 211, 153, 0.12),
+      rgba(205, 145, 105, 0.12),
       transparent 40%
     ),
     linear-gradient(
       135deg,
-      #f0fdf4,
+      #fcf8f5,
       #ffffff
     );
 }
@@ -226,14 +226,14 @@
 
 .dashboard-stat-card.monthly
   .dashboard-stat-icon {
-  color: #7c3aed;
-  background: #ede9fe;
+  color: #9b5a35;
+  background: #f3e7df;
 }
 
 .dashboard-stat-card.bazaar
   .dashboard-stat-icon {
-  color: #047857;
-  background: #d1fae5;
+  color: #7e4325;
+  background: #f1dfd2;
 }
 
 .dashboard-stat-card.rate
@@ -241,11 +241,11 @@
   color: #ffffff;
   background: linear-gradient(
     135deg,
-    #10b981,
-    #047857
+    #c17a4e,
+    #7e4325
   );
   box-shadow: 0 6px 14px
-    rgba(5, 150, 105, 0.2);
+    rgba(166, 95, 54, 0.2);
 }
 
 /* Stat text */
@@ -290,7 +290,7 @@
 
 .dashboard-stat-card.featured
   .dashboard-stat-content strong {
-  color: #047857;
+  color: #7e4325;
 }
 
 /* ==================================
@@ -348,10 +348,10 @@
   justify-content: center;
   gap: 4px;
   padding: 7px 10px;
-  border: 1px solid #a7f3d0;
+  border: 1px solid #e4c7b4;
   border-radius: 9px;
-  color: #047857;
-  background: #ecfdf5;
+  color: #7e4325;
+  background: #fbf4ef;
   font-family: inherit;
   font-size: 9px;
   font-weight: 800;
@@ -386,11 +386,11 @@
   border-color: transparent;
   background: linear-gradient(
     135deg,
-    #10b981,
-    #047857
+    #c17a4e,
+    #7e4325
   );
   box-shadow: 0 8px 18px
-    rgba(5, 150, 105, 0.23);
+    rgba(166, 95, 54, 0.23);
   transform: translateY(-2px);
 }
 
@@ -428,7 +428,7 @@
   background: linear-gradient(
     90deg,
     #f8fafc,
-    #ecfdf5
+    #fbf4ef
   );
 }
 
@@ -440,8 +440,8 @@
   justify-content: center;
   flex-shrink: 0;
   border-radius: 9px;
-  color: #047857;
-  background: #d1fae5;
+  color: #7e4325;
+  background: #f1dfd2;
   transition:
     color 0.2s ease,
     background 0.2s ease,
@@ -453,8 +453,8 @@
   color: #ffffff;
   background: linear-gradient(
     135deg,
-    #10b981,
-    #047857
+    #c17a4e,
+    #7e4325
   );
   transform: scale(1.05);
 }
@@ -486,8 +486,8 @@
 .dashboard-list-amount {
   padding: 5px 8px;
   border-radius: 8px;
-  color: #047857;
-  background: #ecfdf5;
+  color: #7e4325;
+  background: #fbf4ef;
   font-size: 10px;
   font-weight: 850;
   white-space: nowrap;
@@ -530,7 +530,7 @@ body.dark .dashboard {
   background:
     radial-gradient(
       circle at 90% 0%,
-      rgba(16, 185, 129, 0.055),
+      rgba(193, 122, 78, 0.055),
       transparent 25%
     ),
     #0f172a;
@@ -576,7 +576,7 @@ body.dark
     153,
     0.23
   );
-  background: rgba(16, 185, 129, 0.075);
+  background: rgba(193, 122, 78, 0.075);
 }
 
 body.dark .dashboard-panel-header {
@@ -589,7 +589,7 @@ body.dark .dashboard-list-item {
 }
 
 body.dark .dashboard-list-item:hover {
-  background: rgba(16, 185, 129, 0.055);
+  background: rgba(193, 122, 78, 0.055);
 }
 
 /* ==================================

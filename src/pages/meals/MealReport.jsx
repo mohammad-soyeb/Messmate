@@ -1,92 +1,121 @@
+import { useEffect, useMemo, useState } from "react";
 import {
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import {
-  CalendarCheck,
-  Coffee,
-  Moon,
+  CalendarDays,
+  CircleDollarSign,
   PieChart,
-  Sun,
   Users,
-  Utensils,
+  UtensilsCrossed,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
 import { getWorkspaceData } from "../../services/dataService";
+import "../../styles/mealReport.css";
 
-const getLocalDate = () => {
+const getCurrentMonth = () => {
   const today = new Date();
 
-  const year = today.getFullYear();
-  const month = String(
+  return `${today.getFullYear()}-${String(
     today.getMonth() + 1
-  ).padStart(2, "0");
-  const day = String(today.getDate()).padStart(
-    2,
-    "0"
+  ).padStart(2, "0")}`;
+};
+
+const normalizeText = (value = "") =>
+  String(value).trim().toLowerCase();
+
+const getMealTotal = (meal) => {
+  if (
+    meal.breakfast !== undefined ||
+    meal.lunch !== undefined ||
+    meal.dinner !== undefined
+  ) {
+    return (
+      Number(meal.breakfast || 0) +
+      Number(meal.lunch || 0) +
+      Number(meal.dinner || 0)
+    );
+  }
+
+  return Number(meal.quantity || 0);
+};
+
+const getBazaarTotal = (entry) => {
+  if (entry.grandTotal !== undefined) {
+    return Number(entry.grandTotal || 0);
+  }
+
+  return Number(entry.price || 0);
+};
+
+const formatMeal = (value) => {
+  const amount = Number(value) || 0;
+
+  return Number.isInteger(amount)
+    ? String(amount)
+    : amount.toFixed(2).replace(/\.?0+$/, "");
+};
+
+const formatMoney = (value) =>
+  new Intl.NumberFormat("en-BD", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(Number(value) || 0);
+
+const formatMonthName = (monthValue) => {
+  if (!monthValue) return "";
+
+  const [year, month] = monthValue.split("-");
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "long",
+    year: "numeric",
+  }).format(
+    new Date(Number(year), Number(month) - 1, 1)
   );
-
-  return `${year}-${month}-${day}`;
 };
 
-const formatMealNumber = (value) => {
-  const number = Number(value) || 0;
+const getCurrentDate = () => {
+  const today = new Date();
 
-  return Number.isInteger(number)
-    ? number
-    : number.toFixed(1);
+  return `${today.getFullYear()}-${String(
+    today.getMonth() + 1
+  ).padStart(2, "0")}-${String(
+    today.getDate()
+  ).padStart(2, "0")}`;
 };
 
-const formatFullDate = (dateString) => {
-  return new Intl.DateTimeFormat("en-GB", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(new Date(`${dateString}T00:00:00`));
-};
-
-const formatMonthName = (dateString) => {
-  return new Intl.DateTimeFormat("en-GB", {
-    month: "long",
-    year: "numeric",
-  }).format(new Date(`${dateString}T00:00:00`));
+const formatNumber = (value) => {
+  return new Intl.NumberFormat("en-BD", {
+    maximumFractionDigits: 2,
+  }).format(Number(value) || 0);
 };
 
 const MealReport = () => {
+  const [selectedMonth, setSelectedMonth] = useState(
+    getCurrentMonth()
+  );
+
   const [members, setMembers] = useState([]);
   const [meals, setMeals] = useState([]);
+  const [bazaarEntries, setBazaarEntries] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const today = getLocalDate();
-  const currentMonth = today.substring(0, 7);
-  const currentDay = Number(today.substring(8, 10));
 
   useEffect(() => {
     let active = true;
 
     const loadReport = async () => {
-      setLoading(true);
-
       try {
+        setLoading(true);
+
         const data = await getWorkspaceData();
 
-        if (!active) {
-          return;
-        }
+        if (!active) return;
 
         setMembers(data.members || []);
         setMeals(data.meals || []);
+        setBazaarEntries(data.bazaarEntries || []);
       } catch (error) {
-        console.error(
-          "Unable to load monthly meal report:",
-          error
-        );
-
         toast.error(
-          error.message ||
-            "Unable to load monthly meal report."
+          error.message || "Unable to load meal report."
         );
       } finally {
         if (active) {
@@ -102,347 +131,355 @@ const MealReport = () => {
     };
   }, []);
 
-  const currentMonthMeals = useMemo(() => {
+  const reportEndDate = useMemo(() => {
+    if (selectedMonth === getCurrentMonth()) {
+      return getCurrentDate();
+    }
+
+    const [year, month] = selectedMonth
+      .split("-")
+      .map(Number);
+
+    const lastDay = new Date(year, month, 0).getDate();
+
+    return `${selectedMonth}-${String(lastDay).padStart(
+      2,
+      "0"
+    )}`;
+  }, [selectedMonth]);
+
+  const monthlyMeals = useMemo(() => {
     return meals.filter((meal) => {
       return (
-        meal.date?.startsWith(currentMonth) &&
-        meal.date <= today
+        meal.date?.startsWith(selectedMonth) &&
+        meal.date <= reportEndDate
       );
     });
-  }, [currentMonth, meals, today]);
+  }, [meals, selectedMonth, reportEndDate]);
+
+  const monthlyBazaar = useMemo(() => {
+    return bazaarEntries.filter((entry) => {
+      return (
+        entry.date?.startsWith(selectedMonth) &&
+        entry.date <= reportEndDate
+      );
+    });
+  }, [
+    bazaarEntries,
+    selectedMonth,
+    reportEndDate,
+  ]);
+
+  /*
+   * Active member-এর সঙ্গে historical meal থাকা
+   * former member-কেও report-এ রাখা হবে।
+   */
+  const reportMembers = useMemo(() => {
+    const memberMap = new Map();
+
+    members.forEach((member) => {
+      memberMap.set(member.id, {
+        id: member.id,
+        name: member.name || "Member",
+        role: member.role || "member",
+        active: member.isActive !== false,
+      });
+    });
+
+    monthlyMeals.forEach((meal) => {
+      const memberName =
+        meal.memberName || meal.member || "";
+
+      const memberId =
+        meal.memberId ||
+        `name-${normalizeText(memberName)}`;
+
+      if (!memberId || memberId === "name-") return;
+
+      if (!memberMap.has(memberId)) {
+        memberMap.set(memberId, {
+          id: memberId,
+          name: memberName || "Former member",
+          role: "former",
+          active: false,
+        });
+      }
+    });
+
+    return Array.from(memberMap.values()).sort((a, b) =>
+      a.name.localeCompare(b.name)
+    );
+  }, [members, monthlyMeals]);
+
+  const getRecordMemberId = (record) => {
+    return (
+      record.memberId ||
+      `name-${normalizeText(
+        record.memberName || record.member
+      )}`
+    );
+  };
+
+  const totalMeals = useMemo(() => {
+    return monthlyMeals.reduce(
+      (total, meal) => total + getMealTotal(meal),
+      0
+    );
+  }, [monthlyMeals]);
+
+  const totalBazaar = useMemo(() => {
+    return monthlyBazaar.reduce(
+      (total, entry) =>
+        total + getBazaarTotal(entry),
+      0
+    );
+  }, [monthlyBazaar]);
+
+  const mealRate =
+    totalMeals > 0 ? totalBazaar / totalMeals : 0;
 
   const memberReports = useMemo(() => {
-    return members
+    return reportMembers
       .map((member) => {
-        const memberMeals = currentMonthMeals.filter(
-          (meal) => meal.memberId === member.id
-        );
+        const memberMeals = monthlyMeals
+          .filter(
+            (meal) =>
+              getRecordMemberId(meal) === member.id
+          )
+          .reduce(
+            (total, meal) =>
+              total + getMealTotal(meal),
+            0
+          );
 
-        const totals = memberMeals.reduce(
-          (summary, meal) => {
-            const breakfast =
-              Number(meal.breakfast) || 0;
-            const lunch = Number(meal.lunch) || 0;
-            const dinner = Number(meal.dinner) || 0;
+        const mealShare =
+          totalMeals > 0
+            ? (memberMeals / totalMeals) * 100
+            : 0;
 
-            summary.breakfast += breakfast;
-            summary.lunch += lunch;
-            summary.dinner += dinner;
-            summary.total +=
-              breakfast + lunch + dinner;
-
-            if (
-              breakfast + lunch + dinner > 0
-            ) {
-              summary.activeDays += 1;
-            }
-
-            return summary;
-          },
-          {
-            breakfast: 0,
-            lunch: 0,
-            dinner: 0,
-            total: 0,
-            activeDays: 0,
-          }
-        );
+        const estimatedCost = memberMeals * mealRate;
 
         return {
           ...member,
-          ...totals,
-          average:
-            currentDay > 0
-              ? totals.total / currentDay
-              : 0,
+          totalMeal: memberMeals,
+          mealShare,
+          estimatedCost,
         };
       })
-      .sort((firstMember, secondMember) => {
-        return secondMember.total - firstMember.total;
+      .sort((a, b) => {
+        if (b.totalMeal !== a.totalMeal) {
+          return b.totalMeal - a.totalMeal;
+        }
+
+        return a.name.localeCompare(b.name);
       });
   }, [
-    currentDay,
-    currentMonthMeals,
-    members,
+    reportMembers,
+    monthlyMeals,
+    totalMeals,
+    mealRate,
   ]);
 
-  const reportSummary = useMemo(() => {
-    return memberReports.reduce(
-      (summary, member) => {
-        summary.breakfast += member.breakfast;
-        summary.lunch += member.lunch;
-        summary.dinner += member.dinner;
-        summary.total += member.total;
-
-        return summary;
-      },
-      {
-        breakfast: 0,
-        lunch: 0,
-        dinner: 0,
-        total: 0,
-      }
-    );
+  const membersWithMeals = useMemo(() => {
+    return memberReports.filter(
+      (member) => member.totalMeal > 0
+    ).length;
   }, [memberReports]);
 
+  if (loading) {
+    return (
+      <div className="meal-report-loading">
+        <div className="meal-report-loader" />
+
+        <span>Preparing meal report...</span>
+      </div>
+    );
+  }
+
   return (
-    <div className="meal-report-page">
-      <header className="meal-subpage-header">
+    <div className="member-meal-report-page">
+      <header className="member-meal-report-header">
         <div>
-          <span className="meal-subpage-eyebrow">
-            <PieChart size={15} />
-            Current month overview
+          <span className="member-meal-report-eyebrow">
+            <PieChart size={14} />
+            Monthly overview
           </span>
 
-          <h2>Monthly Meal Report</h2>
+          <h2>Member-wise Meal Report</h2>
 
           <p>
-            {formatMonthName(today)} মাসের ১ তারিখ
-            থেকে {formatFullDate(today)} পর্যন্ত
-            প্রত্যেক সদস্যের meal হিসাব।
+            Meal summary up to{" "}
+            {selectedMonth === getCurrentMonth()
+              ? "today"
+              : "the end of the month"}.
           </p>
         </div>
 
-        <div className="meal-report-date">
-          <CalendarCheck size={18} />
+        <label className="member-report-month">
+          <CalendarDays size={17} />
 
-          <div>
-            <span>Report until</span>
-            <strong>
-              {formatFullDate(today)}
-            </strong>
-          </div>
-        </div>
+          <input
+            type="month"
+            value={selectedMonth}
+            onChange={(event) =>
+              setSelectedMonth(event.target.value)
+            }
+          />
+        </label>
       </header>
 
-      <section className="meal-report-summary">
+      <section className="member-report-summary">
         <article>
-          <div className="meal-report-summary-icon breakfast">
-            <Coffee size={21} />
+          <div className="member-report-summary-icon members">
+            <Users size={18} />
           </div>
 
           <div>
-            <span>Total breakfast</span>
-            <strong>
-              {formatMealNumber(
-                reportSummary.breakfast
-              )}
-            </strong>
+            <span>Members</span>
+            <strong>{reportMembers.length}</strong>
+            <small>{membersWithMeals} with meals</small>
           </div>
         </article>
 
         <article>
-          <div className="meal-report-summary-icon lunch">
-            <Sun size={21} />
+          <div className="member-report-summary-icon meals">
+            <UtensilsCrossed size={18} />
           </div>
 
           <div>
-            <span>Total lunch</span>
-            <strong>
-              {formatMealNumber(
-                reportSummary.lunch
-              )}
-            </strong>
+            <span>Total Meals</span>
+            <strong>{formatMeal(totalMeals)}</strong>
+            <small>{formatMonthName(selectedMonth)}</small>
           </div>
         </article>
 
         <article>
-          <div className="meal-report-summary-icon dinner">
-            <Moon size={21} />
+          <div className="member-report-summary-icon rate">
+            <CircleDollarSign size={18} />
           </div>
 
           <div>
-            <span>Total dinner</span>
-            <strong>
-              {formatMealNumber(
-                reportSummary.dinner
-              )}
-            </strong>
-          </div>
-        </article>
-
-        <article className="total">
-          <div className="meal-report-summary-icon total">
-            <Utensils size={21} />
-          </div>
-
-          <div>
-            <span>All meals</span>
-            <strong>
-              {formatMealNumber(
-                reportSummary.total
-              )}
-            </strong>
+            <span>Meal Rate</span>
+            <strong>৳{formatMoney(mealRate)}</strong>
+            <small>Per meal</small>
           </div>
         </article>
       </section>
 
-      <section className="meal-progress-card">
-        <div className="meal-progress-heading">
+      <section className="member-report-table-card">
+        <header className="member-report-table-heading">
           <div>
-            <span>Current month progress</span>
-            <strong>
-              Day {currentDay} of{" "}
-              {new Date(
-                Number(today.substring(0, 4)),
-                Number(today.substring(5, 7)),
-                0
-              ).getDate()}
-            </strong>
-          </div>
-
-          <CalendarCheck size={22} />
-        </div>
-
-        <div className="meal-progress-track">
-          <span
-            style={{
-              width: `${
-                (currentDay /
-                  new Date(
-                    Number(
-                      today.substring(0, 4)
-                    ),
-                    Number(
-                      today.substring(5, 7)
-                    ),
-                    0
-                  ).getDate()) *
-                100
-              }%`,
-            }}
-          />
-        </div>
-
-        <p>
-          এই report-এ ভবিষ্যতের কোনো তারিখের meal
-          যুক্ত হবে না।
-        </p>
-      </section>
-
-      <section className="meal-report-table-card">
-        <div className="meal-report-table-heading">
-          <div>
-            <h3>Member-wise meal report</h3>
+            <h3>Meal Distribution</h3>
 
             <p>
-              মাসের ১ তারিখ থেকে আজ পর্যন্ত মোট
-              meal।
+              Member totals and monthly meal cost.
             </p>
           </div>
 
-          <div className="meal-member-count">
-            <Users size={17} />
-            {members.length} members
-          </div>
-        </div>
+          <span>{memberReports.length} members</span>
+        </header>
 
-        <div className="meal-table-wrapper">
-          <table className="meal-report-table">
+        <div className="member-report-table-wrapper">
+          <table className="member-report-table">
             <thead>
               <tr>
                 <th>Member</th>
-                <th>Breakfast</th>
-                <th>Lunch</th>
-                <th>Dinner</th>
-                <th>Total meals</th>
-                <th>Meal days</th>
-                <th>Daily average</th>
+                <th>Total Meal</th>
+                <th>Meal Share</th>
+                <th>Meal Cost</th>
               </tr>
             </thead>
 
             <tbody>
-              {loading ? (
+              {memberReports.length === 0 ? (
                 <tr>
                   <td
-                    colSpan="7"
-                    className="meal-empty-state"
+                    colSpan="4"
+                    className="member-report-empty"
                   >
-                    Loading monthly report...
-                  </td>
-                </tr>
-              ) : memberReports.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan="7"
-                    className="meal-empty-state"
-                  >
-                    No members found.
+                    No meal records found for this month.
                   </td>
                 </tr>
               ) : (
-                memberReports.map(
-                  (member, index) => (
-                    <tr key={member.id}>
-                      <td>
-                        <div className="meal-report-member">
-                          <div className="meal-report-rank">
-                            {index + 1}
-                          </div>
-
-                          <div className="meal-report-avatar">
-                            {member.name
-                              ?.charAt(0)
-                              .toUpperCase() || "M"}
-                          </div>
-
-                          <div>
-                            <strong>
-                              {member.name}
-                            </strong>
-
-                            <span>
-                              {member.room
-                                ? `Room ${member.room}`
-                                : member.role ===
-                                    "manager"
-                                  ? "Manager"
-                                  : "Mess member"}
-                            </span>
-                          </div>
+                memberReports.map((member, index) => (
+                  <tr key={member.id}>
+                    <td>
+                      <div className="member-report-person">
+                        <div className="member-report-rank">
+                          {index + 1}
                         </div>
-                      </td>
 
-                      <td>
-                        {formatMealNumber(
-                          member.breakfast
-                        )}
-                      </td>
+                        <div className="member-report-avatar">
+                          {member.name
+                            ?.charAt(0)
+                            .toUpperCase() || "M"}
+                        </div>
 
-                      <td>
-                        {formatMealNumber(
-                          member.lunch
-                        )}
-                      </td>
+                        <div className="member-report-name">
+                          <strong title={member.name}>
+                            {member.name}
+                          </strong>
 
-                      <td>
-                        {formatMealNumber(
-                          member.dinner
-                        )}
-                      </td>
+                          <span>
+                            {member.active
+                              ? member.role
+                              : "former member"}
+                          </span>
+                        </div>
+                      </div>
+                    </td>
 
-                      <td>
-                        <strong className="meal-report-total">
-                          {formatMealNumber(
-                            member.total
+                    <td>
+                      <span className="member-report-meal">
+                        {formatMeal(member.totalMeal)}
+                      </span>
+                    </td>
+
+                    <td>
+                      <div className="member-report-share">
+                        <strong>
+                          {formatNumber(
+                            member.mealShare
                           )}
+                          %
                         </strong>
-                      </td>
 
-                      <td>
-                        {member.activeDays} days
-                      </td>
+                        <div className="member-share-track">
+                          <span
+                            style={{
+                              width: `${Math.min(
+                                member.mealShare,
+                                100
+                              )}%`,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    </td>
 
-                      <td>
-                        {formatMealNumber(
-                          member.average
+                    <td>
+                      <strong className="member-report-cost">
+                        ৳
+                        {formatMoney(
+                          member.estimatedCost
                         )}
-                      </td>
-                    </tr>
-                  )
-                )
+                      </strong>
+                    </td>
+                  </tr>
+                ))
               )}
             </tbody>
+
+            {memberReports.length > 0 && (
+              <tfoot>
+                <tr>
+                  <th>Total</th>
+                  <th>{formatMeal(totalMeals)}</th>
+                  <th>100%</th>
+                  <th>৳{formatMoney(totalBazaar)}</th>
+                </tr>
+              </tfoot>
+            )}
           </table>
         </div>
       </section>

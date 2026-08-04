@@ -73,17 +73,17 @@
   flex-direction: column;
   flex-shrink: 0;
   gap: 5px;
-  border: 1px solid #a7f3d0;
+  border: 1px solid #e4c7b4;
   border-radius: 12px;
-  color: #047857;
+  color: #7e4325;
   background:
     linear-gradient(
       145deg,
       #ffffff,
-      #ecfdf5
+      #fbf4ef
     );
   box-shadow:
-    0 7px 17px rgba(5, 150, 105, 0.12),
+    0 7px 17px rgba(166, 95, 54, 0.12),
     inset 0 1px 0 #ffffff;
   cursor: pointer;
   transition:
@@ -114,12 +114,12 @@
   border-color: transparent;
   background: linear-gradient(
     135deg,
-    #10b981,
-    #059669 58%,
-    #0f766e
+    #c17a4e,
+    #a65f36 58%,
+    #6f4a37
   );
   box-shadow:
-    0 11px 23px rgba(5, 150, 105, 0.28),
+    0 11px 23px rgba(166, 95, 54, 0.28),
     inset 0 1px 0 rgba(255, 255, 255, 0.25);
   transform: translateY(-2px);
 }
@@ -135,7 +135,7 @@
   height: 2px;
   display: block;
   border-radius: 20px;
-  background: #059669;
+  background: #a65f36;
   transform-origin: center;
   transition:
     width 0.25s ease,
@@ -158,12 +158,12 @@
   border-color: transparent;
   background: linear-gradient(
     135deg,
-    #10b981,
-    #059669,
-    #0f766e
+    #c17a4e,
+    #a65f36,
+    #6f4a37
   );
   box-shadow: 0 10px 22px
-    rgba(5, 150, 105, 0.28);
+    rgba(166, 95, 54, 0.28);
 }
 
 .navbar-menu-button.active span:first-child {
@@ -199,9 +199,9 @@
   align-items: center;
   gap: 7px;
   padding: 7px 11px;
-  border: 1px solid #a7f3d0;
+  border: 1px solid #e4c7b4;
   border-radius: 30px;
-  color: #047857;
+  color: #7e4325;
   background:
     linear-gradient(
       135deg,
@@ -209,7 +209,7 @@
       rgba(240, 253, 250, 0.92)
     );
   box-shadow: 0 5px 14px
-    rgba(5, 150, 105, 0.07);
+    rgba(166, 95, 54, 0.07);
   font-size: 9px;
   font-weight: 800;
   text-transform: uppercase;
@@ -260,12 +260,12 @@
   border-color: transparent;
   background: linear-gradient(
     135deg,
-    #10b981,
-    #059669,
-    #0f766e
+    #c17a4e,
+    #a65f36,
+    #6f4a37
   );
   box-shadow: 0 9px 20px
-    rgba(5, 150, 105, 0.25);
+    rgba(166, 95, 54, 0.25);
   transform: translateY(-2px) rotate(7deg);
 }
 
@@ -295,10 +295,10 @@
 }
 
 .navbar-user:hover {
-  border-color: #a7f3d0;
-  background: #ecfdf5;
+  border-color: #e4c7b4;
+  background: #fbf4ef;
   box-shadow: 0 7px 17px
-    rgba(5, 150, 105, 0.09);
+    rgba(166, 95, 54, 0.09);
   transform: translateY(-1px);
 }
 
@@ -314,12 +314,12 @@
   color: #ffffff;
   background: linear-gradient(
     135deg,
-    #10b981,
-    #059669 58%,
-    #0f766e
+    #c17a4e,
+    #a65f36 58%,
+    #6f4a37
   );
   box-shadow:
-    0 8px 17px rgba(5, 150, 105, 0.23),
+    0 8px 17px rgba(166, 95, 54, 0.23),
     inset 0 1px 0 rgba(255, 255, 255, 0.3);
   font-size: 13px;
   font-weight: 850;
@@ -371,7 +371,7 @@ body.dark .navbar-user-information span {
 }
 
 body.dark .navbar-menu-button {
-  border-color: rgba(52, 211, 153, 0.25);
+  border-color: rgba(205, 145, 105, 0.25);
   background: rgba(30, 41, 59, 0.88);
 }
 
@@ -386,14 +386,14 @@ body.dark .navbar-user {
 }
 
 body.dark .navbar-user:hover {
-  border-color: rgba(52, 211, 153, 0.24);
-  background: rgba(16, 185, 129, 0.1);
+  border-color: rgba(205, 145, 105, 0.24);
+  background: rgba(193, 122, 78, 0.1);
 }
 
 body.dark .workspace-badge {
-  color: #6ee7b7;
-  border-color: rgba(52, 211, 153, 0.2);
-  background: rgba(16, 185, 129, 0.1);
+  color: #e0b596;
+  border-color: rgba(205, 145, 105, 0.2);
+  background: rgba(193, 122, 78, 0.1);
 }
 
 /* ==================================

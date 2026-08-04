@@ -3,8 +3,8 @@
   overflow: hidden;
   color: #172033;
   background:
-    radial-gradient(circle at 82% 9%, rgba(79, 70, 229, 0.1), transparent 28%),
-    radial-gradient(circle at 8% 32%, rgba(14, 165, 233, 0.08), transparent 24%),
+    radial-gradient(circle at 82% 9%, rgba(166, 95, 54, 0.1), transparent 28%),
+    radial-gradient(circle at 8% 32%, rgba(185, 111, 67, 0.08), transparent 24%),
     #f8faff;
 }
 
@@ -49,8 +49,8 @@
   justify-content: center;
   color: #ffffff;
   border-radius: 13px;
-  background: linear-gradient(135deg, #4f46e5, #0ea5e9);
-  box-shadow: 0 9px 20px rgba(79, 70, 229, 0.28);
+  background: linear-gradient(135deg, #a65f36, #b96f43);
+  box-shadow: 0 9px 20px rgba(166, 95, 54, 0.28);
 }
 
 .landing-header nav {
@@ -70,8 +70,8 @@
 }
 
 .landing-header nav a:hover {
-  color: #4338ca;
-  background: #eef2ff;
+  color: #874827;
+  background: #f8eee7;
 }
 
 .header-buttons {
@@ -105,8 +105,8 @@
   position: relative;
   overflow: hidden;
   color: #ffffff;
-  background: linear-gradient(135deg, #4f46e5, #2563eb);
-  box-shadow: 0 10px 22px rgba(79, 70, 229, 0.24);
+  background: linear-gradient(135deg, #a65f36, #7e4325);
+  box-shadow: 0 10px 22px rgba(166, 95, 54, 0.24);
 }
 
 .landing .btn-primary::after {
@@ -133,7 +133,7 @@
 .landing .btn-primary:hover {
   color: #ffffff;
   transform: translateY(-2px);
-  box-shadow: 0 15px 30px rgba(79, 70, 229, 0.32);
+  box-shadow: 0 15px 30px rgba(166, 95, 54, 0.32);
 }
 
 .landing .btn-outline {
@@ -144,8 +144,8 @@
 }
 
 .landing .btn-outline:hover {
-  color: #4338ca;
-  border-color: #c7d2fe;
+  color: #874827;
+  border-color: #e6cdbd;
   background: #f7f8ff;
   transform: translateY(-2px);
 }
@@ -174,7 +174,7 @@
   gap: 8px;
   margin-bottom: 22px;
   padding: 8px 12px;
-  color: #4f46e5;
+  color: #a65f36;
   border: 1px solid #dbe1ff;
   border-radius: 999px;
   background: rgba(238, 242, 255, 0.78);
@@ -193,7 +193,7 @@
 
 .hero-left h1 span {
   color: transparent;
-  background: linear-gradient(100deg, #4f46e5 10%, #0284c7 88%);
+  background: linear-gradient(100deg, #a65f36 10%, #874827 88%);
   background-clip: text;
   -webkit-background-clip: text;
 }
@@ -233,7 +233,7 @@
 }
 
 .hero-trust svg {
-  color: #10b981;
+  color: #c17a4e;
 }
 
 .hero-right {
@@ -256,7 +256,7 @@
   height: 310px;
   top: 10px;
   right: -60px;
-  background: rgba(99, 102, 241, 0.16);
+  background: rgba(185, 111, 67, 0.16);
 }
 
 .hero-glow-two {
@@ -264,7 +264,7 @@
   height: 230px;
   bottom: 0;
   left: -30px;
-  background: rgba(14, 165, 233, 0.13);
+  background: rgba(185, 111, 67, 0.13);
   animation-delay: -2s;
 }
 
@@ -308,9 +308,9 @@
   align-items: center;
   gap: 7px;
   padding: 7px 10px;
-  color: #047857;
+  color: #7e4325;
   border-radius: 999px;
-  background: #ecfdf5;
+  background: #fbf4ef;
   font-size: 10px;
   font-weight: 700;
 }
@@ -319,8 +319,8 @@
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #10b981;
-  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.12);
+  background: #c17a4e;
+  box-shadow: 0 0 0 4px rgba(193, 122, 78, 0.12);
 }
 
 .hero-highlight {
@@ -332,8 +332,8 @@
   border-radius: 19px;
   background:
     radial-gradient(circle at 95% 0, rgba(255, 255, 255, 0.22), transparent 34%),
-    linear-gradient(135deg, #4f46e5, #2563eb 62%, #0ea5e9);
-  box-shadow: 0 17px 35px rgba(79, 70, 229, 0.25);
+    linear-gradient(135deg, #a65f36, #7e4325 62%, #b96f43);
+  box-shadow: 0 17px 35px rgba(166, 95, 54, 0.25);
 }
 
 .hero-highlight::after {
@@ -433,7 +433,7 @@
 }
 
 .floating-card svg {
-  color: #4f46e5;
+  color: #a65f36;
 }
 
 .floating-card-top {
@@ -464,7 +464,7 @@
 .about-label {
   display: block;
   margin-bottom: 12px;
-  color: #4f46e5;
+  color: #a65f36;
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 1.5px;
@@ -514,7 +514,7 @@
   bottom: -1px;
   left: 25px;
   border-radius: 999px 999px 0 0;
-  background: linear-gradient(90deg, #4f46e5, #0ea5e9);
+  background: linear-gradient(90deg, #a65f36, #b96f43);
   transform: scaleX(0);
   transition: transform 220ms ease;
 }
@@ -540,17 +540,17 @@
 }
 
 .feature-icon.blue {
-  color: #2563eb;
+  color: #7e4325;
   background: #eff6ff;
 }
 
 .feature-icon.green {
-  color: #059669;
-  background: #ecfdf5;
+  color: #a65f36;
+  background: #fbf4ef;
 }
 
 .feature-icon.violet {
-  color: #7c3aed;
+  color: #9b5a35;
   background: #f5f3ff;
 }
 
@@ -608,9 +608,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #4f46e5;
+  color: #a65f36;
   border-radius: 12px;
-  background: #eef2ff;
+  background: #f8eee7;
   font-size: 11px;
   font-weight: 800;
 }

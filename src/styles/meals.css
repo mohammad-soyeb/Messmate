@@ -3,13 +3,13 @@
 ================================== */
 
 .meal-module {
-  --meal-primary: #4f46e5;
-  --meal-secondary: #06b6d4;
-  --meal-accent: #8b5cf6;
+  --meal-primary: #a65f36;
+  --meal-secondary: #c58a65;
+  --meal-accent: #b87850;
   --meal-dark: #0f172a;
   --meal-muted: #64748b;
-  --meal-border: rgba(99, 102, 241, 0.16);
-  --meal-glow: rgba(79, 70, 229, 0.25);
+  --meal-border: rgba(185, 111, 67, 0.16);
+  --meal-glow: rgba(166, 95, 54, 0.25);
 
   width: 100%;
   padding: 28px;
@@ -56,7 +56,7 @@
   right: -60px;
   width: 250px;
   height: 250px;
-  border: 34px solid rgba(79, 70, 229, 0.055);
+  border: 34px solid rgba(166, 95, 54, 0.055);
   border-radius: 50%;
   content: "";
   animation: mealOrbit 10s ease-in-out infinite;
@@ -97,19 +97,19 @@
   color: #ffffff;
   background: linear-gradient(
     135deg,
-    #06b6d4,
-    #4f46e5 55%,
-    #7c3aed
+    #c58a65,
+    #a65f36 55%,
+    #9b5a35
   );
   box-shadow:
-    0 15px 30px rgba(79, 70, 229, 0.32),
+    0 15px 30px rgba(166, 95, 54, 0.32),
     inset 0 1px 1px rgba(255, 255, 255, 0.35);
 }
 
 .meal-module-icon::after {
   position: absolute;
   inset: -5px;
-  border: 1px solid rgba(79, 70, 229, 0.13);
+  border: 1px solid rgba(166, 95, 54, 0.13);
   border-radius: 23px;
   content: "";
   animation: mealPulse 2.8s ease-in-out infinite;
@@ -207,9 +207,9 @@
 }
 
 .meal-submenu-link:hover {
-  color: #4338ca;
-  border-color: #c7d2fe;
-  background: #eef2ff;
+  color: #874827;
+  border-color: #e6cdbd;
+  background: #f8eee7;
   transform: translateY(-2px);
 }
 
@@ -218,12 +218,12 @@
   border-color: rgba(255, 255, 255, 0.16);
   background: linear-gradient(
     135deg,
-    #06b6d4,
-    #4f46e5 55%,
-    #7c3aed
+    #c58a65,
+    #a65f36 55%,
+    #9b5a35
   );
   box-shadow:
-    0 10px 23px rgba(79, 70, 229, 0.3),
+    0 10px 23px rgba(166, 95, 54, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.27);
 }
 
@@ -331,16 +331,16 @@
   min-height: 44px;
   gap: 8px;
   padding: 10px 17px;
-  border: 1px solid #c7d2fe;
+  border: 1px solid #e6cdbd;
   border-radius: 12px;
-  color: #4338ca;
+  color: #874827;
   background: linear-gradient(
     135deg,
-    #eef2ff,
-    #ecfeff
+    #f8eee7,
+    #f8f1ec
   );
   box-shadow: 0 7px 18px
-    rgba(79, 70, 229, 0.08);
+    rgba(166, 95, 54, 0.08);
 }
 
 .meal-today-button:hover {
@@ -348,11 +348,11 @@
   border-color: transparent;
   background: linear-gradient(
     135deg,
-    #06b6d4,
-    #4f46e5
+    #c58a65,
+    #a65f36
   );
   box-shadow: 0 12px 25px
-    rgba(79, 70, 229, 0.27);
+    rgba(166, 95, 54, 0.27);
   transform: translateY(-2px);
 }
 
@@ -364,7 +364,7 @@
 
 button:focus-visible,
 a:focus-visible {
-  outline: 3px solid rgba(79, 70, 229, 0.25);
+  outline: 3px solid rgba(166, 95, 54, 0.25);
   outline-offset: 2px;
 }
 
@@ -383,7 +383,7 @@ a:focus-visible {
   position: relative;
   overflow: hidden;
   padding: 20px;
-  border: 1px solid rgba(99, 102, 241, 0.13);
+  border: 1px solid rgba(185, 111, 67, 0.13);
   border-radius: 18px;
   background:
     linear-gradient(
@@ -408,9 +408,9 @@ a:focus-visible {
   height: 3px;
   background: linear-gradient(
     90deg,
-    #06b6d4,
-    #4f46e5,
-    #8b5cf6
+    #c58a65,
+    #a65f36,
+    #b87850
   );
   content: "";
   transition: width 0.4s ease;
@@ -423,15 +423,15 @@ a:focus-visible {
   width: 95px;
   height: 95px;
   border-radius: 50%;
-  background: rgba(79, 70, 229, 0.07);
+  background: rgba(166, 95, 54, 0.07);
   content: "";
 }
 
 .meal-daily-summary article:hover {
-  border-color: #c7d2fe;
+  border-color: #e6cdbd;
   transform: translateY(-5px);
   box-shadow: 0 17px 36px
-    rgba(79, 70, 229, 0.11);
+    rgba(166, 95, 54, 0.11);
 }
 
 .meal-daily-summary article:hover::before {
@@ -449,7 +449,7 @@ a:focus-visible {
 .meal-daily-summary strong {
   display: block;
   margin-bottom: 5px;
-  color: #4f46e5;
+  color: #a65f36;
   font-size: 30px;
   line-height: 1;
 }
@@ -473,7 +473,7 @@ a:focus-visible {
   max-width: 660px;
   margin: 0 auto 22px;
   padding: 16px 19px;
-  border: 1px solid #c7d2fe;
+  border: 1px solid #e6cdbd;
   border-radius: 20px;
   background:
     radial-gradient(
@@ -483,23 +483,23 @@ a:focus-visible {
     ),
     linear-gradient(
       135deg,
-      #eef2ff,
-      #ecfeff
+      #f8eee7,
+      #f8f1ec
     );
   box-shadow:
-    0 12px 30px rgba(79, 70, 229, 0.1),
+    0 12px 30px rgba(166, 95, 54, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .meal-date-arrow {
   width: 43px;
   height: 43px;
-  border: 1px solid rgba(99, 102, 241, 0.13);
+  border: 1px solid rgba(185, 111, 67, 0.13);
   border-radius: 13px;
-  color: #4f46e5;
+  color: #a65f36;
   background: rgba(255, 255, 255, 0.92);
   box-shadow:
-    0 7px 16px rgba(79, 70, 229, 0.12),
+    0 7px 16px rgba(166, 95, 54, 0.12),
     inset 0 1px 0 #ffffff;
 }
 
@@ -508,11 +508,11 @@ a:focus-visible {
   border-color: transparent;
   background: linear-gradient(
     135deg,
-    #06b6d4,
-    #4f46e5
+    #c58a65,
+    #a65f36
   );
   box-shadow: 0 10px 21px
-    rgba(79, 70, 229, 0.26);
+    rgba(166, 95, 54, 0.26);
   transform: scale(1.07);
 }
 
@@ -543,7 +543,7 @@ a:focus-visible {
 
 .meal-date-content input {
   padding: 6px 10px;
-  border: 1px solid #c7d2fe;
+  border: 1px solid #e6cdbd;
   border-radius: 9px;
   outline: none;
   color: #334155;
@@ -556,9 +556,9 @@ a:focus-visible {
 }
 
 .meal-date-content input:focus {
-  border-color: #6366f1;
+  border-color: #b96f43;
   box-shadow: 0 0 0 3px
-    rgba(99, 102, 241, 0.13);
+    rgba(185, 111, 67, 0.13);
 }
 
 /* ==================================
@@ -617,10 +617,10 @@ a:focus-visible {
   align-items: center;
   gap: 7px;
   padding: 8px 11px;
-  border: 1px solid #c7d2fe;
+  border: 1px solid #e6cdbd;
   border-radius: 10px;
-  color: #4338ca;
-  background: #eef2ff;
+  color: #874827;
+  background: #f8eee7;
   font-size: 10px;
   font-weight: 800;
 }
@@ -655,7 +655,7 @@ a:focus-visible {
   background: linear-gradient(
     135deg,
     #f8fafc,
-    #eef2ff
+    #f8eee7
   );
 }
 
@@ -708,15 +708,15 @@ a:focus-visible {
   background: linear-gradient(
     90deg,
     #f8fafc,
-    #eef2ff
+    #f8eee7
   );
 }
 
 .daily-meal-table tbody tr.current-member-row {
   background: linear-gradient(
     90deg,
-    #ecfeff,
-    #eef2ff
+    #f8f1ec,
+    #f8eee7
   );
 }
 
@@ -741,12 +741,12 @@ a:focus-visible {
   color: #ffffff;
   background: linear-gradient(
     135deg,
-    #06b6d4,
-    #4f46e5 60%,
-    #7c3aed
+    #c58a65,
+    #a65f36 60%,
+    #9b5a35
   );
   box-shadow: 0 8px 18px
-    rgba(79, 70, 229, 0.23);
+    rgba(166, 95, 54, 0.23);
   font-weight: 850;
 }
 
@@ -776,11 +776,11 @@ a:focus-visible {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  border: 1px solid #c7d2fe;
+  border: 1px solid #e6cdbd;
   border-radius: 11px;
   background: #ffffff;
   box-shadow:
-    0 5px 13px rgba(79, 70, 229, 0.07),
+    0 5px 13px rgba(166, 95, 54, 0.07),
     inset 0 1px 0 #ffffff;
 }
 
@@ -791,11 +791,11 @@ a:focus-visible {
   align-items: center;
   justify-content: center;
   border: 0;
-  color: #4f46e5;
+  color: #a65f36;
   background: linear-gradient(
     135deg,
-    #eef2ff,
-    #ecfeff
+    #f8eee7,
+    #f8f1ec
   );
   cursor: pointer;
   transition:
@@ -808,8 +808,8 @@ a:focus-visible {
   color: #ffffff;
   background: linear-gradient(
     135deg,
-    #06b6d4,
-    #4f46e5
+    #c58a65,
+    #a65f36
   );
   transform: scale(1.08);
 }
@@ -846,16 +846,16 @@ a:focus-visible {
   align-items: center;
   justify-content: center;
   padding: 6px 9px;
-  border: 1px solid #c7d2fe;
+  border: 1px solid #e6cdbd;
   border-radius: 9px;
-  color: #4338ca;
+  color: #874827;
   background: linear-gradient(
     135deg,
-    #eef2ff,
-    #ecfeff
+    #f8eee7,
+    #f8f1ec
   );
   box-shadow: 0 4px 11px
-    rgba(79, 70, 229, 0.07);
+    rgba(166, 95, 54, 0.07);
   font-weight: 850;
 }
 
@@ -870,8 +870,8 @@ a:focus-visible {
 }
 
 .meal-access.editable {
-  color: #047857;
-  background: #d1fae5;
+  color: #7e4325;
+  background: #f1dfd2;
 }
 
 .meal-access.locked {
@@ -928,7 +928,7 @@ a:focus-visible {
 }
 
 .meal-sheet-footer > div strong {
-  color: #4f46e5;
+  color: #a65f36;
   font-size: 25px;
 }
 
@@ -940,19 +940,19 @@ a:focus-visible {
   color: #ffffff;
   background: linear-gradient(
     135deg,
-    #06b6d4,
-    #4f46e5 60%,
-    #7c3aed
+    #c58a65,
+    #a65f36 60%,
+    #9b5a35
   );
   box-shadow:
-    0 10px 23px rgba(79, 70, 229, 0.3),
+    0 10px 23px rgba(166, 95, 54, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.28);
 }
 
 .meal-save-button:hover:not(:disabled) {
   transform: translateY(-3px);
   box-shadow:
-    0 16px 30px rgba(79, 70, 229, 0.36),
+    0 16px 30px rgba(166, 95, 54, 0.36),
     0 0 22px rgba(6, 182, 212, 0.12);
 }
 
@@ -971,16 +971,16 @@ a:focus-visible {
   align-items: center;
   gap: 9px;
   padding: 11px 14px;
-  border: 1px solid #c7d2fe;
+  border: 1px solid #e6cdbd;
   border-radius: 13px;
-  color: #4338ca;
+  color: #874827;
   background: linear-gradient(
     135deg,
-    #eef2ff,
-    #ecfeff
+    #f8eee7,
+    #f8f1ec
   );
   box-shadow: 0 7px 17px
-    rgba(79, 70, 229, 0.07);
+    rgba(166, 95, 54, 0.07);
   font-size: 11px;
   font-weight: 800;
 }
@@ -1001,7 +1001,7 @@ a:focus-visible {
 }
 
 .meal-filter-heading svg {
-  color: #4f46e5;
+  color: #a65f36;
 }
 
 .meal-filter-grid {
@@ -1062,9 +1062,9 @@ a:focus-visible {
 
 .meal-filter-control input:focus,
 .meal-filter-field select:focus {
-  border-color: #6366f1;
+  border-color: #b96f43;
   box-shadow: 0 0 0 3px
-    rgba(99, 102, 241, 0.12);
+    rgba(185, 111, 67, 0.12);
 }
 
 .meal-reset-button {
@@ -1099,7 +1099,7 @@ a:focus-visible {
   position: relative;
   overflow: hidden;
   padding: 18px;
-  border: 1px solid rgba(99, 102, 241, 0.13);
+  border: 1px solid rgba(185, 111, 67, 0.13);
   border-radius: 17px;
   background: #ffffff;
   box-shadow: 0 8px 23px
@@ -1112,16 +1112,16 @@ a:focus-visible {
 .meal-history-summary article:hover {
   transform: translateY(-4px);
   box-shadow: 0 14px 29px
-    rgba(79, 70, 229, 0.1);
+    rgba(166, 95, 54, 0.1);
 }
 
 .meal-history-summary article.primary {
   border-color: transparent;
   background: linear-gradient(
     135deg,
-    #06b6d4,
-    #4f46e5 55%,
-    #7c3aed
+    #c58a65,
+    #a65f36 55%,
+    #9b5a35
   );
 }
 
@@ -1134,7 +1134,7 @@ a:focus-visible {
 }
 
 .meal-history-summary strong {
-  color: #4f46e5;
+  color: #a65f36;
   font-size: 25px;
 }
 
@@ -1185,7 +1185,7 @@ a:focus-visible {
   align-items: center;
   gap: 12px;
   padding: 18px;
-  border: 1px solid rgba(99, 102, 241, 0.13);
+  border: 1px solid rgba(185, 111, 67, 0.13);
   border-radius: 17px;
   background: #ffffff;
   box-shadow: 0 8px 23px
@@ -1197,19 +1197,19 @@ a:focus-visible {
 }
 
 .meal-report-summary article:hover {
-  border-color: #c7d2fe;
+  border-color: #e6cdbd;
   transform: translateY(-5px);
   box-shadow: 0 16px 32px
-    rgba(79, 70, 229, 0.11);
+    rgba(166, 95, 54, 0.11);
 }
 
 .meal-report-summary article.total {
   border-color: transparent;
   background: linear-gradient(
     135deg,
-    #06b6d4,
-    #4f46e5 55%,
-    #7c3aed
+    #c58a65,
+    #a65f36 55%,
+    #9b5a35
   );
 }
 
@@ -1234,8 +1234,8 @@ a:focus-visible {
 }
 
 .meal-report-summary-icon.dinner {
-  color: #7c3aed;
-  background: #ede9fe;
+  color: #9b5a35;
+  background: #f3e7df;
 }
 
 .meal-report-summary-icon.total {
@@ -1296,7 +1296,7 @@ a:focus-visible {
 }
 
 .meal-progress-heading svg {
-  color: #4f46e5;
+  color: #a65f36;
 }
 
 .meal-progress-track {
@@ -1316,12 +1316,12 @@ a:focus-visible {
   border-radius: inherit;
   background: linear-gradient(
     90deg,
-    #06b6d4,
-    #4f46e5,
-    #8b5cf6
+    #c58a65,
+    #a65f36,
+    #b87850
   );
   box-shadow: 0 0 13px
-    rgba(79, 70, 229, 0.35);
+    rgba(166, 95, 54, 0.35);
   animation: mealProgress 0.9s ease;
 }
 
@@ -1600,21 +1600,21 @@ a:focus-visible {
 ================================== */
 
 .meal-module {
-  --meal-primary: #059669;
-  --meal-secondary: #10b981;
-  --meal-accent: #0f766e;
+  --meal-primary: #a65f36;
+  --meal-secondary: #c17a4e;
+  --meal-accent: #6f4a37;
   --meal-dark: #0f172a;
   --meal-muted: #64748b;
-  --meal-border: rgba(16, 185, 129, 0.18);
-  --meal-glow: rgba(5, 150, 105, 0.25);
+  --meal-border: rgba(193, 122, 78, 0.18);
+  --meal-glow: rgba(166, 95, 54, 0.25);
 }
 
 .meal-module-banner {
-  border-color: rgba(16, 185, 129, 0.18);
+  border-color: rgba(193, 122, 78, 0.18);
   background:
     radial-gradient(
       circle at 90% 0%,
-      rgba(52, 211, 153, 0.24),
+      rgba(205, 145, 105, 0.24),
       transparent 32%
     ),
     radial-gradient(
@@ -1633,7 +1633,7 @@ a:focus-visible {
 }
 
 .meal-module-banner::before {
-  border-color: rgba(5, 150, 105, 0.055);
+  border-color: rgba(166, 95, 54, 0.055);
 }
 
 .meal-module-banner::after {
@@ -1646,59 +1646,59 @@ a:focus-visible {
 .meal-report-avatar {
   background: linear-gradient(
     135deg,
-    #10b981,
-    #059669 55%,
-    #0f766e
+    #c17a4e,
+    #a65f36 55%,
+    #6f4a37
   );
   box-shadow:
-    0 15px 30px rgba(5, 150, 105, 0.3),
+    0 15px 30px rgba(166, 95, 54, 0.3),
     inset 0 1px 1px rgba(255, 255, 255, 0.35);
 }
 
 .meal-module-icon::after {
-  border-color: rgba(5, 150, 105, 0.15);
+  border-color: rgba(166, 95, 54, 0.15);
 }
 
 .meal-module-label,
 .meal-subpage-eyebrow,
 .meal-filter-heading svg,
 .meal-progress-heading svg {
-  color: #059669;
+  color: #a65f36;
 }
 
 /* Submenu */
 
 .meal-submenu-link:hover {
-  color: #047857;
-  border-color: #a7f3d0;
-  background: #ecfdf5;
+  color: #7e4325;
+  border-color: #e4c7b4;
+  background: #fbf4ef;
 }
 
 .meal-submenu-link.active {
   color: #ffffff;
   background: linear-gradient(
     135deg,
-    #10b981,
-    #059669 55%,
-    #0f766e
+    #c17a4e,
+    #a65f36 55%,
+    #6f4a37
   );
   box-shadow:
-    0 10px 23px rgba(5, 150, 105, 0.3),
+    0 10px 23px rgba(166, 95, 54, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.27);
 }
 
 /* Buttons */
 
 .meal-today-button {
-  color: #047857;
-  border-color: #a7f3d0;
+  color: #7e4325;
+  border-color: #e4c7b4;
   background: linear-gradient(
     135deg,
-    #ecfdf5,
+    #fbf4ef,
     #f0fdfa
   );
   box-shadow: 0 7px 18px
-    rgba(5, 150, 105, 0.09);
+    rgba(166, 95, 54, 0.09);
 }
 
 .meal-today-button:hover,
@@ -1707,26 +1707,26 @@ a:focus-visible {
   border-color: transparent;
   background: linear-gradient(
     135deg,
-    #10b981,
-    #059669 55%,
-    #0f766e
+    #c17a4e,
+    #a65f36 55%,
+    #6f4a37
   );
   box-shadow:
-    0 11px 24px rgba(5, 150, 105, 0.3),
+    0 11px 24px rgba(166, 95, 54, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.28);
 }
 
 .meal-save-button:hover:not(:disabled) {
   box-shadow:
-    0 16px 31px rgba(5, 150, 105, 0.36),
-    0 0 22px rgba(16, 185, 129, 0.14);
+    0 16px 31px rgba(166, 95, 54, 0.36),
+    0 0 22px rgba(193, 122, 78, 0.14);
 }
 
 .meal-date-arrow {
-  color: #059669;
-  border-color: #a7f3d0;
+  color: #a65f36;
+  border-color: #e4c7b4;
   box-shadow: 0 7px 16px
-    rgba(5, 150, 105, 0.12);
+    rgba(166, 95, 54, 0.12);
 }
 
 .meal-date-arrow:hover {
@@ -1734,12 +1734,12 @@ a:focus-visible {
   border-color: transparent;
   background: linear-gradient(
     135deg,
-    #10b981,
-    #059669,
-    #0f766e
+    #c17a4e,
+    #a65f36,
+    #6f4a37
   );
   box-shadow: 0 10px 21px
-    rgba(5, 150, 105, 0.27);
+    rgba(166, 95, 54, 0.27);
 }
 
 /* Summary cards */
@@ -1747,34 +1747,34 @@ a:focus-visible {
 .meal-daily-summary article,
 .meal-history-summary article,
 .meal-report-summary article {
-  border-color: rgba(16, 185, 129, 0.14);
+  border-color: rgba(193, 122, 78, 0.14);
 }
 
 .meal-daily-summary article::before {
   background: linear-gradient(
     90deg,
-    #34d399,
-    #10b981,
-    #0f766e
+    #cd9169,
+    #c17a4e,
+    #6f4a37
   );
 }
 
 .meal-daily-summary article::after {
-  background: rgba(16, 185, 129, 0.075);
+  background: rgba(193, 122, 78, 0.075);
 }
 
 .meal-daily-summary article:hover,
 .meal-history-summary article:hover,
 .meal-report-summary article:hover {
-  border-color: #a7f3d0;
+  border-color: #e4c7b4;
   box-shadow: 0 17px 36px
-    rgba(5, 150, 105, 0.11);
+    rgba(166, 95, 54, 0.11);
 }
 
 .meal-daily-summary strong,
 .meal-history-summary strong,
 .meal-sheet-footer > div strong {
-  color: #059669;
+  color: #a65f36;
 }
 
 .meal-history-summary article.primary,
@@ -1782,9 +1782,9 @@ a:focus-visible {
   border-color: transparent;
   background: linear-gradient(
     135deg,
-    #10b981,
-    #059669 55%,
-    #0f766e
+    #c17a4e,
+    #a65f36 55%,
+    #6f4a37
   );
 }
 
@@ -1795,33 +1795,33 @@ a:focus-visible {
 /* Date section */
 
 .meal-date-card {
-  border-color: #a7f3d0;
+  border-color: #e4c7b4;
   background:
     radial-gradient(
       circle at center,
-      rgba(52, 211, 153, 0.12),
+      rgba(205, 145, 105, 0.12),
       transparent 55%
     ),
     linear-gradient(
       135deg,
-      #ecfdf5,
+      #fbf4ef,
       #f0fdfa
     );
   box-shadow:
-    0 12px 30px rgba(5, 150, 105, 0.1),
+    0 12px 30px rgba(166, 95, 54, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .meal-date-content input {
-  border-color: #a7f3d0;
+  border-color: #e4c7b4;
 }
 
 .meal-date-content input:focus,
 .meal-filter-control input:focus,
 .meal-filter-field select:focus {
-  border-color: #10b981;
+  border-color: #c17a4e;
   box-shadow: 0 0 0 3px
-    rgba(16, 185, 129, 0.13);
+    rgba(193, 122, 78, 0.13);
 }
 
 /* Table */
@@ -1832,7 +1832,7 @@ a:focus-visible {
   background: linear-gradient(
     135deg,
     #f8fafc,
-    #ecfdf5
+    #fbf4ef
   );
 }
 
@@ -1842,7 +1842,7 @@ a:focus-visible {
   background: linear-gradient(
     90deg,
     #f8fafc,
-    #ecfdf5
+    #fbf4ef
   );
 }
 
@@ -1850,24 +1850,24 @@ a:focus-visible {
   background: linear-gradient(
     90deg,
     #f0fdfa,
-    #ecfdf5
+    #fbf4ef
   );
 }
 
 /* Meal counter */
 
 .meal-counter {
-  border-color: #a7f3d0;
+  border-color: #e4c7b4;
   box-shadow:
-    0 5px 13px rgba(5, 150, 105, 0.08),
+    0 5px 13px rgba(166, 95, 54, 0.08),
     inset 0 1px 0 #ffffff;
 }
 
 .meal-counter button {
-  color: #059669;
+  color: #a65f36;
   background: linear-gradient(
     135deg,
-    #ecfdf5,
+    #fbf4ef,
     #f0fdfa
   );
 }
@@ -1876,23 +1876,23 @@ a:focus-visible {
   color: #ffffff;
   background: linear-gradient(
     135deg,
-    #10b981,
-    #059669
+    #c17a4e,
+    #a65f36
   );
 }
 
 .meal-total-badge,
 .meal-row-total,
 .meal-report-total {
-  color: #047857;
-  border-color: #a7f3d0;
+  color: #7e4325;
+  border-color: #e4c7b4;
   background: linear-gradient(
     135deg,
-    #ecfdf5,
+    #fbf4ef,
     #f0fdfa
   );
   box-shadow: 0 4px 11px
-    rgba(5, 150, 105, 0.08);
+    rgba(166, 95, 54, 0.08);
 }
 
 /* History and report */
@@ -1901,31 +1901,31 @@ a:focus-visible {
 .meal-member-count,
 .meal-history-count,
 .meal-report-date {
-  color: #047857;
-  border-color: #a7f3d0;
+  color: #7e4325;
+  border-color: #e4c7b4;
   background: linear-gradient(
     135deg,
-    #ecfdf5,
+    #fbf4ef,
     #f0fdfa
   );
   box-shadow: 0 7px 17px
-    rgba(5, 150, 105, 0.08);
+    rgba(166, 95, 54, 0.08);
 }
 
 .meal-report-date > div strong {
-  color: #065f46;
+  color: #65351f;
 }
 
 .meal-progress-track span {
   background: linear-gradient(
     90deg,
-    #34d399,
-    #10b981,
-    #059669,
-    #0f766e
+    #cd9169,
+    #c17a4e,
+    #a65f36,
+    #6f4a37
   );
   box-shadow: 0 0 14px
-    rgba(5, 150, 105, 0.38);
+    rgba(166, 95, 54, 0.38);
 }
 
 /* Premium focus */
@@ -1934,7 +1934,7 @@ a:focus-visible {
 .meal-module a:focus-visible,
 .meal-module input:focus-visible,
 .meal-module select:focus-visible {
-  outline: 3px solid rgba(16, 185, 129, 0.24);
+  outline: 3px solid rgba(193, 122, 78, 0.24);
   outline-offset: 2px;
 }
 
@@ -2326,5 +2326,205 @@ a:focus-visible {
   .meal-history-table-title,
   .meal-report-table-heading {
     padding: 13px;
+  }
+}
+
+/* =========================================
+   DAILY MEAL SHEET — NO HORIZONTAL SCROLL
+========================================= */
+
+.meal-sheet-card .meal-table-wrapper {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.meal-sheet-card .daily-meal-table {
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+}
+
+.meal-sheet-card .daily-meal-table th,
+.meal-sheet-card .daily-meal-table td {
+  overflow: hidden;
+  padding: 9px 5px;
+  text-overflow: ellipsis;
+}
+
+.meal-sheet-card .daily-meal-table th:first-child,
+.meal-sheet-card .daily-meal-table td:first-child {
+  width: 22%;
+  padding-left: 10px;
+  padding-right: 6px;
+}
+
+.meal-sheet-card .daily-meal-table th:nth-child(2),
+.meal-sheet-card .daily-meal-table td:nth-child(2),
+.meal-sheet-card .daily-meal-table th:nth-child(3),
+.meal-sheet-card .daily-meal-table td:nth-child(3),
+.meal-sheet-card .daily-meal-table th:nth-child(4),
+.meal-sheet-card .daily-meal-table td:nth-child(4) {
+  width: 16%;
+}
+
+.meal-sheet-card .daily-meal-table th:nth-child(5),
+.meal-sheet-card .daily-meal-table td:nth-child(5) {
+  width: 12%;
+}
+
+.meal-sheet-card .daily-meal-table th:nth-child(6),
+.meal-sheet-card .daily-meal-table td:nth-child(6) {
+  width: 18%;
+}
+
+.meal-sheet-card .meal-member {
+  min-width: 0;
+  gap: 6px;
+}
+
+.meal-sheet-card .meal-member > div:last-child {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.meal-sheet-card .meal-member strong,
+.meal-sheet-card .meal-member span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meal-sheet-card .meal-avatar {
+  width: 30px;
+  height: 30px;
+  flex: 0 0 30px;
+  border-radius: 9px;
+}
+
+.meal-sheet-card .meal-counter {
+  grid-template-columns:
+    26px minmax(24px, 36px) 26px;
+  width: min(100%, 88px);
+  min-width: 0;
+  margin-inline: auto;
+}
+
+.meal-sheet-card .meal-counter button {
+  width: 26px;
+  height: 29px;
+}
+
+.meal-sheet-card .meal-counter.read-only {
+  width: min(100%, 48px);
+  min-width: 0;
+}
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 700px) {
+  .meal-sheet-card .daily-meal-table th,
+  .meal-sheet-card .daily-meal-table td {
+    padding: 7px 2px;
+    font-size: 8px;
+  }
+
+  .meal-sheet-card
+    .daily-meal-table
+    th:first-child,
+  .meal-sheet-card
+    .daily-meal-table
+    td:first-child {
+    width: 25%;
+    padding-left: 5px;
+    padding-right: 3px;
+  }
+
+  .meal-sheet-card
+    .daily-meal-table
+    th:nth-child(2),
+  .meal-sheet-card
+    .daily-meal-table
+    td:nth-child(2),
+  .meal-sheet-card
+    .daily-meal-table
+    th:nth-child(3),
+  .meal-sheet-card
+    .daily-meal-table
+    td:nth-child(3),
+  .meal-sheet-card
+    .daily-meal-table
+    th:nth-child(4),
+  .meal-sheet-card
+    .daily-meal-table
+    td:nth-child(4) {
+    width: 18%;
+  }
+
+  .meal-sheet-card
+    .daily-meal-table
+    th:nth-child(5),
+  .meal-sheet-card
+    .daily-meal-table
+    td:nth-child(5) {
+    width: 21%;
+  }
+
+  /* Mobile-এ অপ্রয়োজনীয় Access column hide */
+  .meal-sheet-card
+    .daily-meal-table
+    th:nth-child(6),
+  .meal-sheet-card
+    .daily-meal-table
+    td:nth-child(6) {
+    display: none;
+  }
+
+  .meal-sheet-card .meal-avatar {
+    display: none;
+  }
+
+  .meal-sheet-card .meal-member {
+    display: block;
+  }
+
+  .meal-sheet-card .meal-member strong {
+    font-size: 8px;
+  }
+
+  .meal-sheet-card .meal-member span {
+    font-size: 6px;
+  }
+
+  .meal-sheet-card .meal-counter {
+    grid-template-columns:
+      18px minmax(15px, 1fr) 18px;
+    width: 100%;
+    max-width: 54px;
+    border-radius: 6px;
+  }
+
+  .meal-sheet-card .meal-counter button {
+    width: 18px;
+    height: 25px;
+  }
+
+  .meal-sheet-card .meal-counter button svg {
+    width: 10px;
+    height: 10px;
+  }
+
+  .meal-sheet-card .meal-counter > strong {
+    font-size: 8px;
+  }
+
+  .meal-sheet-card .meal-total-badge,
+  .meal-sheet-card .meal-row-total {
+    min-width: 0;
+    padding: 4px 3px;
+    font-size: 8px;
   }
 }

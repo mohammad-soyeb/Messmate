@@ -10,18 +10,18 @@
   overflow: hidden;
   margin-bottom: 18px;
   padding: 25px;
-  border: 1px solid rgba(16, 185, 129, 0.18);
+  border: 1px solid rgba(193, 122, 78, 0.18);
   border-radius: 22px;
   background:
     radial-gradient(
       circle at top right,
-      rgba(52, 211, 153, 0.2),
+      rgba(205, 145, 105, 0.2),
       transparent 38%
     ),
     linear-gradient(
       135deg,
       #ffffff,
-      #ecfdf5
+      #fbf4ef
     );
   box-shadow: 0 15px 40px
     rgba(6, 95, 70, 0.08);
@@ -34,7 +34,7 @@
   right: -45px;
   width: 180px;
   height: 180px;
-  border: 28px solid rgba(5, 150, 105, 0.06);
+  border: 28px solid rgba(166, 95, 54, 0.06);
   border-radius: 50%;
   content: "";
 }
@@ -58,17 +58,17 @@
   color: #ffffff;
   background: linear-gradient(
     135deg,
-    #059669,
-    #0f766e
+    #a65f36,
+    #6f4a37
   );
   box-shadow: 0 12px 25px
-    rgba(5, 150, 105, 0.28);
+    rgba(166, 95, 54, 0.28);
 }
 
 .bazaar-module-label {
   display: block;
   margin-bottom: 4px;
-  color: #059669;
+  color: #a65f36;
   font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
@@ -130,8 +130,8 @@
 }
 
 .bazaar-submenu-link:hover {
-  color: #047857;
-  background: #ecfdf5;
+  color: #7e4325;
+  background: #fbf4ef;
   transform: translateY(-1px);
 }
 
@@ -139,11 +139,11 @@
   color: #ffffff;
   background: linear-gradient(
     135deg,
-    #059669,
-    #0f766e
+    #a65f36,
+    #6f4a37
   );
   box-shadow: 0 8px 18px
-    rgba(5, 150, 105, 0.25);
+    rgba(166, 95, 54, 0.25);
 }
 
 .bazaar-submenu-icon {
@@ -183,7 +183,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #059669;
+  color: #a65f36;
   font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
@@ -197,10 +197,10 @@
   align-items: center;
   gap: 10px;
   padding: 10px 13px;
-  border: 1px solid #a7f3d0;
+  border: 1px solid #e4c7b4;
   border-radius: 13px;
-  color: #047857;
-  background: #ecfdf5;
+  color: #7e4325;
+  background: #fbf4ef;
 }
 
 .bazaar-current-avatar {
@@ -213,8 +213,8 @@
   color: #ffffff;
   background: linear-gradient(
     135deg,
-    #059669,
-    #0f766e
+    #a65f36,
+    #6f4a37
   );
   font-weight: 800;
 }
@@ -232,7 +232,7 @@
 .bazaar-current-member strong,
 .bazaar-summary-date strong {
   display: block;
-  color: #065f46;
+  color: #65351f;
   font-size: 11px;
 }
 
@@ -295,7 +295,7 @@
 }
 
 .bazaar-form-heading > svg {
-  color: #059669;
+  color: #a65f36;
 }
 
 .bazaar-selected-date,
@@ -306,8 +306,8 @@
   gap: 7px;
   padding: 8px 11px;
   border-radius: 9px;
-  color: #047857;
-  background: #d1fae5;
+  color: #7e4325;
+  background: #f1dfd2;
   font-size: 11px;
   font-weight: 750;
 }
@@ -354,9 +354,9 @@
 .bazaar-entry-table select:focus,
 .bazaar-filter-control input:focus,
 .bazaar-filter-field select:focus {
-  border-color: #10b981;
+  border-color: #c17a4e;
   box-shadow: 0 0 0 3px
-    rgba(16, 185, 129, 0.12);
+    rgba(193, 122, 78, 0.12);
 }
 
 .bazaar-entry-table-wrapper {
@@ -429,7 +429,7 @@
   position: absolute;
   top: 50%;
   left: 11px;
-  color: #059669;
+  color: #a65f36;
   font-weight: 800;
   transform: translateY(-50%);
 }
@@ -490,16 +490,16 @@
 .bazaar-add-item-button {
   min-height: 42px;
   padding: 9px 15px;
-  border: 1px solid #a7f3d0;
+  border: 1px solid #e4c7b4;
   border-radius: 11px;
-  color: #047857;
-  background: #ecfdf5;
+  color: #7e4325;
+  background: #fbf4ef;
 }
 
 .bazaar-add-item-button:hover {
   color: #ffffff;
-  border-color: #059669;
-  background: #059669;
+  border-color: #a65f36;
+  background: #a65f36;
   transform: translateY(-2px);
 }
 
@@ -516,7 +516,7 @@
 }
 
 .bazaar-form-total strong {
-  color: #047857;
+  color: #7e4325;
   font-size: 25px;
 }
 
@@ -527,9 +527,9 @@
   justify-content: center;
   flex-direction: column;
   padding: 24px;
-  border: 2px dashed #a7f3d0;
+  border: 2px dashed #e4c7b4;
   border-radius: 15px;
-  background: #f0fdf4;
+  background: #fcf8f5;
   text-align: center;
   cursor: pointer;
   transition:
@@ -539,8 +539,8 @@
 }
 
 .bazaar-receipt-upload:hover {
-  border-color: #059669;
-  background: #ecfdf5;
+  border-color: #a65f36;
+  background: #fbf4ef;
   transform: translateY(-2px);
 }
 
@@ -552,13 +552,13 @@
   justify-content: center;
   margin-bottom: 11px;
   border-radius: 15px;
-  color: #059669;
-  background: #d1fae5;
+  color: #a65f36;
+  background: #f1dfd2;
 }
 
 .bazaar-receipt-upload strong {
   margin-bottom: 5px;
-  color: #065f46;
+  color: #65351f;
   font-size: 14px;
 }
 
@@ -576,9 +576,9 @@
   align-items: center;
   gap: 14px;
   padding: 14px;
-  border: 1px solid #a7f3d0;
+  border: 1px solid #e4c7b4;
   border-radius: 15px;
-  background: #f0fdf4;
+  background: #fcf8f5;
 }
 
 .bazaar-receipt-preview img {
@@ -598,7 +598,7 @@
   display: block;
   overflow: hidden;
   margin-bottom: 4px;
-  color: #065f46;
+  color: #65351f;
   font-size: 13px;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -628,12 +628,12 @@
   justify-content: space-between;
   gap: 18px;
   padding: 19px 21px;
-  border: 1px solid #a7f3d0;
+  border: 1px solid #e4c7b4;
   border-radius: 18px;
   background: linear-gradient(
     135deg,
-    #f0fdf4,
-    #ecfdf5
+    #fcf8f5,
+    #fbf4ef
   );
 }
 
@@ -646,7 +646,7 @@
 }
 
 .bazaar-submit-card > div strong {
-  color: #065f46;
+  color: #65351f;
   font-size: 17px;
 }
 
@@ -657,17 +657,17 @@
   color: #ffffff;
   background: linear-gradient(
     135deg,
-    #059669,
-    #0f766e
+    #a65f36,
+    #6f4a37
   );
   box-shadow: 0 9px 20px
-    rgba(5, 150, 105, 0.25);
+    rgba(166, 95, 54, 0.25);
 }
 
 .bazaar-save-button:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 13px 25px
-    rgba(5, 150, 105, 0.32);
+    rgba(166, 95, 54, 0.32);
 }
 
 .bazaar-save-button:disabled {
@@ -783,8 +783,8 @@
   border-color: transparent;
   background: linear-gradient(
     135deg,
-    #059669,
-    #0f766e
+    #a65f36,
+    #6f4a37
   );
 }
 
@@ -799,7 +799,7 @@
 .bazaar-history-summary strong {
   display: block;
   margin-bottom: 4px;
-  color: #059669;
+  color: #a65f36;
   font-size: 25px;
 }
 
@@ -869,8 +869,8 @@
   color: #ffffff;
   background: linear-gradient(
     135deg,
-    #059669,
-    #0f766e
+    #a65f36,
+    #6f4a37
   );
   font-weight: 800;
 }
@@ -901,7 +901,7 @@
 }
 
 .bazaar-history-amount strong {
-  color: #047857;
+  color: #7e4325;
   font-size: 19px;
 }
 
@@ -941,8 +941,8 @@
   display: inline-block;
   padding: 5px 8px;
   border-radius: 8px;
-  color: #047857;
-  background: #d1fae5;
+  color: #7e4325;
+  background: #f1dfd2;
   font-size: 9px;
   font-weight: 750;
 }
@@ -969,7 +969,7 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #047857;
+  color: #7e4325;
   font-size: 11px;
   font-weight: 700;
   text-decoration: none;
@@ -1057,8 +1057,8 @@
   border-color: transparent;
   background: linear-gradient(
     135deg,
-    #059669,
-    #0f766e
+    #a65f36,
+    #6f4a37
   );
 }
 
@@ -1075,7 +1075,7 @@
 }
 
 .bazaar-summary-card-icon.entries {
-  color: #2563eb;
+  color: #7e4325;
   background: #dbeafe;
 }
 
@@ -1085,8 +1085,8 @@
 }
 
 .bazaar-summary-card-icon.average {
-  color: #7c3aed;
-  background: #ede9fe;
+  color: #9b5a35;
+  background: #f3e7df;
 }
 
 .bazaar-summary-cards span {
@@ -1135,7 +1135,7 @@
 }
 
 .bazaar-progress-heading svg {
-  color: #059669;
+  color: #a65f36;
 }
 
 .bazaar-progress-track {
@@ -1151,8 +1151,8 @@
   border-radius: inherit;
   background: linear-gradient(
     90deg,
-    #10b981,
-    #0f766e
+    #c17a4e,
+    #6f4a37
   );
   animation: bazaarProgress 0.8s ease;
 }
@@ -1253,8 +1253,8 @@
   display: inline-flex;
   padding: 6px 9px;
   border-radius: 9px;
-  color: #047857;
-  background: #d1fae5;
+  color: #7e4325;
+  background: #f1dfd2;
 }
 
 .bazaar-contribution {
@@ -1278,14 +1278,14 @@
   border-radius: inherit;
   background: linear-gradient(
     90deg,
-    #10b981,
-    #059669
+    #c17a4e,
+    #a65f36
   );
 }
 
 .bazaar-contribution strong {
   min-width: 36px;
-  color: #047857;
+  color: #7e4325;
   font-size: 10px;
 }
 

@@ -5,9 +5,11 @@ import {
 } from "react";
 import {
   CalendarDays,
-  BarChart3,
-  Printer,
-  Search,
+  CheckCircle2,
+  CircleDollarSign,
+  Equal,
+  ShoppingBasket,
+  Sigma,
   Users,
   Utensils,
 } from "lucide-react";
@@ -17,48 +19,19 @@ import { getWorkspaceData } from "../services/dataService";
 import "../styles/reports.css";
 
 const getCurrentMonth = () => {
-  return new Date().toISOString().slice(0, 7);
-};
+  const today = new Date();
 
-const normalizeText = (value = "") => {
-  return String(value).trim().toLowerCase();
+  return `${today.getFullYear()}-${String(
+    today.getMonth() + 1
+  ).padStart(2, "0")}`;
 };
 
 const getMealTotal = (meal) => {
-  /*
-   * নতুন meal structure:
-   * breakfast + lunch + dinner
-   */
-  if (
-    meal.breakfast !== undefined ||
-    meal.lunch !== undefined ||
-    meal.dinner !== undefined
-  ) {
-    return (
-      Number(meal.breakfast || 0) +
-      Number(meal.lunch || 0) +
-      Number(meal.dinner || 0)
-    );
-  }
-
-  /*
-   * পুরোনো quantity structure support
-   */
-  return Number(meal.quantity || 0);
-};
-
-const getBazaarEntryTotal = (entry) => {
-  /*
-   * নতুন structure
-   */
-  if (entry.grandTotal !== undefined) {
-    return Number(entry.grandTotal || 0);
-  }
-
-  /*
-   * পুরোনো structure
-   */
-  return Number(entry.price || 0);
+  return (
+    Number(meal.breakfast || 0) +
+    Number(meal.lunch || 0) +
+    Number(meal.dinner || 0)
+  );
 };
 
 const formatMoney = (amount) => {
@@ -80,62 +53,61 @@ const formatMeal = (amount) => {
 };
 
 const formatMonthName = (monthValue) => {
-  if (!monthValue) {
-    return "";
-  }
+  const [year, month] = monthValue
+    .split("-")
+    .map(Number);
 
-  const [year, month] = monthValue.split("-");
-
-  return new Intl.DateTimeFormat("en-US", {
+  return new Intl.DateTimeFormat("en-GB", {
     month: "long",
     year: "numeric",
-  }).format(
-    new Date(
-      Number(year),
-      Number(month) - 1,
-      1
-    )
-  );
+  }).format(new Date(year, month - 1, 1));
 };
 
 const Reports = () => {
-  const [selectedMonth, setSelectedMonth] =
-    useState(getCurrentMonth());
-
-  const [searchText, setSearchText] =
-    useState("");
-
-  const [sortOption, setSortOption] =
-    useState("meal-high");
-
   const [members, setMembers] = useState([]);
   const [meals, setMeals] = useState([]);
   const [bazaarEntries, setBazaarEntries] =
     useState([]);
+  const [selectedMonth, setSelectedMonth] =
+    useState(getCurrentMonth());
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
 
-    const loadData = async () => {
+    const loadReport = async () => {
+      setLoading(true);
+
       try {
         const data = await getWorkspaceData();
 
-        if (active) {
-          setMembers(data.members);
-          setMeals(data.meals);
-          setBazaarEntries(
-            data.bazaarEntries
-          );
+        if (!active) {
+          return;
         }
+
+        setMembers(data.members || []);
+        setMeals(data.meals || []);
+        setBazaarEntries(
+          data.bazaarEntries || []
+        );
       } catch (error) {
+        console.error(
+          "Unable to load settlement:",
+          error
+        );
+
         toast.error(
           error.message ||
-            "Unable to load report data."
+            "Unable to load monthly settlement."
         );
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
       }
     };
 
-    loadData();
+    loadReport();
 
     return () => {
       active = false;
@@ -148,7 +120,7 @@ const Reports = () => {
     );
   }, [meals, selectedMonth]);
 
-  const monthlyBazaarEntries = useMemo(() => {
+  const monthlyBazaar = useMemo(() => {
     return bazaarEntries.filter((entry) =>
       entry.date?.startsWith(selectedMonth)
     );
@@ -163,234 +135,85 @@ const Reports = () => {
   }, [monthlyMeals]);
 
   const totalBazaar = useMemo(() => {
-    return monthlyBazaarEntries.reduce(
+    return monthlyBazaar.reduce(
       (total, entry) =>
-        total + getBazaarEntryTotal(entry),
+        total +
+        (Number(entry.grandTotal) || 0),
       0
     );
-  }, [monthlyBazaarEntries]);
+  }, [monthlyBazaar]);
 
   const mealRate =
     totalMeals > 0
       ? totalBazaar / totalMeals
       : 0;
 
-  const memberReports = useMemo(() => {
-    return members.map((member) => {
-      const memberMeals = monthlyMeals
-        .filter((meal) => {
-          const sameMemberId =
-            meal.memberId &&
-            meal.memberId === member.id;
+  const calculatedMealCost =
+    totalMeals * mealRate;
 
-          const sameMemberName =
-            !meal.memberId &&
-            normalizeText(
-              meal.memberName || meal.member
-            ) ===
-              normalizeText(member.name);
+  const settlementDifference =
+    totalBazaar - calculatedMealCost;
 
-          return sameMemberId || sameMemberName;
-        })
-        .reduce(
-          (total, meal) =>
-            total + getMealTotal(meal),
-          0
-        );
+  const activeMemberCount = useMemo(() => {
+    const memberIds = new Set();
 
-      const memberBazaar = monthlyBazaarEntries
-        .filter((entry) => {
-          const sameMemberId =
-            entry.memberId &&
-            entry.memberId === member.id;
-
-          const sameMemberName =
-            !entry.memberId &&
-            normalizeText(
-              entry.memberName || entry.member
-            ) ===
-              normalizeText(member.name);
-
-          return sameMemberId || sameMemberName;
-        })
-        .reduce(
-          (total, entry) =>
-            total +
-            getBazaarEntryTotal(entry),
-          0
-        );
-
-      const mealCost =
-        memberMeals * mealRate;
-
-      /*
-       * Member বাজারে যে টাকা দিয়েছে,
-       * সেখান থেকে তার meal cost বাদ।
-       *
-       * Positive = টাকা পাবে
-       * Negative = টাকা দিতে হবে
-       */
-      const balance =
-        memberBazaar - mealCost;
-
-      return {
-        id: member.id,
-        name: member.name,
-        email: member.email || "",
-        role: member.role || "member",
-        totalMeal: memberMeals,
-        mealCost,
-        bazaarPaid: memberBazaar,
-        balance,
-      };
-    });
-  }, [
-    members,
-    monthlyMeals,
-    monthlyBazaarEntries,
-    mealRate,
-  ]);
-
-  const filteredReports = useMemo(() => {
-    const normalizedSearch =
-      normalizeText(searchText);
-
-    const filtered = memberReports.filter(
-      (member) => {
-        if (!normalizedSearch) {
-          return true;
-        }
-
-        return (
-          normalizeText(member.name).includes(
-            normalizedSearch
-          ) ||
-          normalizeText(member.email).includes(
-            normalizedSearch
-          )
-        );
-      }
-    );
-
-    return [...filtered].sort((a, b) => {
-      switch (sortOption) {
-        case "meal-low":
-          return a.totalMeal - b.totalMeal;
-
-        case "name-az":
-          return a.name.localeCompare(b.name);
-
-        case "name-za":
-          return b.name.localeCompare(a.name);
-
-        case "cost-high":
-          return b.mealCost - a.mealCost;
-
-        case "balance-high":
-          return b.balance - a.balance;
-
-        case "meal-high":
-        default:
-          return b.totalMeal - a.totalMeal;
+    monthlyMeals.forEach((meal) => {
+      if (
+        meal.memberId &&
+        getMealTotal(meal) > 0
+      ) {
+        memberIds.add(meal.memberId);
       }
     });
-  }, [
-    memberReports,
-    searchText,
-    sortOption,
-  ]);
 
-  const activeMembers = useMemo(() => {
-    return memberReports.filter(
-      (member) => member.totalMeal > 0
-    ).length;
-  }, [memberReports]);
+    monthlyBazaar.forEach((entry) => {
+      if (entry.memberId) {
+        memberIds.add(entry.memberId);
+      }
+    });
 
-  const averageMeal =
-    activeMembers > 0
-      ? totalMeals / activeMembers
-      : 0;
+    return memberIds.size;
+  }, [monthlyBazaar, monthlyMeals]);
 
-  const highestMeal = useMemo(() => {
-    if (memberReports.length === 0) {
-      return 0;
-    }
+  const bazaarContributorCount =
+    useMemo(() => {
+      return new Set(
+        monthlyBazaar
+          .map((entry) => entry.memberId)
+          .filter(Boolean)
+      ).size;
+    }, [monthlyBazaar]);
 
-    return Math.max(
-      ...memberReports.map(
-        (member) => member.totalMeal
-      )
-    );
-  }, [memberReports]);
+  const hasReportData =
+    totalMeals > 0 || totalBazaar > 0;
 
-  const lowestMeal = useMemo(() => {
-    const membersWithMeals =
-      memberReports.filter(
-        (member) => member.totalMeal > 0
-      );
-
-    if (membersWithMeals.length === 0) {
-      return 0;
-    }
-
-    return Math.min(
-      ...membersWithMeals.map(
-        (member) => member.totalMeal
-      )
-    );
-  }, [memberReports]);
-
-  const totalBalance = useMemo(() => {
-    return memberReports.reduce(
-      (total, member) =>
-        total + member.balance,
-      0
-    );
-  }, [memberReports]);
-
-  const handlePrint = () => {
-    window.print();
-  };
+  const settlementIsBalanced =
+    Math.abs(settlementDifference) < 0.01;
 
   return (
-    <div className="page-container reports-page">
-      <div className="reports-page-header">
+    <div className="monthly-settlement-page">
+      <header className="reports-subpage-header">
         <div>
-          <div className="reports-heading-icon">
-            <BarChart3 size={25} />
-          </div>
+          <span className="reports-subpage-eyebrow">
+            <Sigma size={14} />
+            Monthly overview
+          </span>
 
-          <div>
-            <h1>Monthly Report</h1>
+          <h2>Monthly Settlement</h2>
 
-            <p>
-              Complete meal and bazaar summary
-              for {formatMonthName(selectedMonth)}.
-            </p>
-          </div>
+          <p>
+            Essential meal and bazaar accounting for
+            the selected month.
+          </p>
         </div>
 
-        <div className="reports-header-actions">
-          <button
-            type="button"
-            className="report-print-button"
-            onClick={handlePrint}
-          >
-            <Printer size={17} />
-            Print Report
-          </button>
-        </div>
-      </div>
-
-      <div className="reports-filter-card">
-        <div className="reports-month-field">
-          <label htmlFor="reportMonth">
-            <CalendarDays size={16} />
+        <label className="report-month-control">
+          <span>
+            <CalendarDays size={13} />
             Report month
-          </label>
+          </span>
 
           <input
-            id="reportMonth"
             type="month"
             value={selectedMonth}
             onChange={(event) =>
@@ -399,312 +222,216 @@ const Reports = () => {
               )
             }
           />
-        </div>
+        </label>
+      </header>
 
-        <div className="reports-search-field">
-          <Search size={17} />
+      <section className="report-period-card">
+        <CalendarDays size={17} />
 
-          <input
-            type="text"
-            placeholder="Search member..."
-            value={searchText}
-            onChange={(event) =>
-              setSearchText(event.target.value)
-            }
-          />
-        </div>
+        <div>
+          <span>Settlement period</span>
 
-        <div className="reports-sort-field">
-          <label htmlFor="reportSort">
-            Sort by
-          </label>
-
-          <select
-            id="reportSort"
-            value={sortOption}
-            onChange={(event) =>
-              setSortOption(event.target.value)
-            }
-          >
-            <option value="meal-high">
-              Meal: High to Low
-            </option>
-
-            <option value="meal-low">
-              Meal: Low to High
-            </option>
-
-            <option value="cost-high">
-              Meal Cost: High to Low
-            </option>
-
-            <option value="balance-high">
-              Balance: High to Low
-            </option>
-
-            <option value="name-az">
-              Name: A to Z
-            </option>
-
-            <option value="name-za">
-              Name: Z to A
-            </option>
-          </select>
-        </div>
-      </div>
-
-      <div className="reports-summary-grid">
-        <div className="report-summary-card">
-          <div className="report-card-icon members">
-            <Users size={22} />
-          </div>
-
-          <div>
-            <span>Total Members</span>
-            <strong>{members.length}</strong>
-            <small>
-              {activeMembers} members have meals
-            </small>
-          </div>
-        </div>
-
-        <div className="report-summary-card">
-          <div className="report-card-icon meals">
-            <Utensils size={22} />
-          </div>
-
-          <div>
-            <span>Total Meals</span>
-
-            <strong>
-              {formatMeal(totalMeals)}
-            </strong>
-
-            <small>
-              Monthly meal amount
-            </small>
-          </div>
-        </div>
-
-        <div className="report-summary-card">
-          <div className="report-card-icon bazaar">
-            ৳
-          </div>
-
-          <div>
-            <span>Total Bazaar</span>
-
-            <strong>
-              ৳ {formatMoney(totalBazaar)}
-            </strong>
-
-            <small>
-              Monthly bazaar total
-            </small>
-          </div>
-        </div>
-
-        <div className="report-summary-card featured">
-          <div className="report-card-icon rate">
-            ৳
-          </div>
-
-          <div>
-            <span>Meal Rate</span>
-
-            <strong>
-              ৳ {formatMoney(mealRate)}
-            </strong>
-
-            <small>
-              Bazaar ÷ Total Meal
-            </small>
-          </div>
-        </div>
-      </div>
-
-      <section className="reports-table-card">
-        <div className="reports-table-header">
-          <div>
-            <h2>Member-wise Summary</h2>
-
-            <p>
-              Bazaar paid minus meal cost
-              determines the balance.
-            </p>
-          </div>
-
-          <span>
-            {filteredReports.length}{" "}
-            {filteredReports.length === 1
-              ? "member"
-              : "members"}
-          </span>
-        </div>
-
-        <div className="reports-table-wrapper">
-          <table className="monthly-report-table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Member</th>
-                <th>Total Meal</th>
-                <th>Meal Rate</th>
-                <th>Meal Cost</th>
-                <th>Bazaar Paid</th>
-                <th>Balance</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {filteredReports.length === 0 ? (
-                <tr>
-                  <td
-                    colSpan="7"
-                    className="reports-empty-state"
-                  >
-                    No report data found for
-                    this month.
-                  </td>
-                </tr>
-              ) : (
-                filteredReports.map(
-                  (member, index) => (
-                    <tr key={member.id}>
-                      <td>{index + 1}</td>
-
-                      <td>
-                        <div className="report-member-info">
-                          <div className="report-member-avatar">
-                            {member.name
-                              ?.charAt(0)
-                              .toUpperCase() ||
-                              "M"}
-                          </div>
-
-                          <div>
-                            <strong>
-                              {member.name}
-                            </strong>
-
-                            <span>
-                              {member.role}
-                            </span>
-                          </div>
-                        </div>
-                      </td>
-
-                      <td>
-                        <span className="report-meal-badge">
-                          {formatMeal(
-                            member.totalMeal
-                          )}
-                        </span>
-                      </td>
-
-                      <td>
-                        ৳ {formatMoney(mealRate)}
-                      </td>
-
-                      <td>
-                        <strong>
-                          ৳{" "}
-                          {formatMoney(
-                            member.mealCost
-                          )}
-                        </strong>
-                      </td>
-
-                      <td>
-                        ৳{" "}
-                        {formatMoney(
-                          member.bazaarPaid
-                        )}
-                      </td>
-
-                      <td>
-                        <span
-                          className={
-                            member.balance > 0
-                              ? "report-balance positive"
-                              : member.balance < 0
-                                ? "report-balance negative"
-                                : "report-balance neutral"
-                          }
-                        >
-                          {member.balance > 0
-                            ? "+"
-                            : member.balance < 0
-                              ? "-"
-                              : ""}
-                          ৳{" "}
-                          {formatMoney(
-                            Math.abs(
-                              member.balance
-                            )
-                          )}
-                        </span>
-                      </td>
-                    </tr>
-                  )
-                )
-              )}
-            </tbody>
-          </table>
+          <strong>
+            {formatMonthName(selectedMonth)}
+          </strong>
         </div>
       </section>
 
-      <div className="reports-bottom-summary">
-        <div>
-          <span>Active Members</span>
-          <strong>{activeMembers}</strong>
-        </div>
+      <section className="report-summary-grid">
+        <article>
+          <div className="report-summary-icon members">
+            <Users size={18} />
+          </div>
 
-        <div>
-          <span>Average Meal</span>
+          <div>
+            <span>Active members</span>
+
+            <strong>
+              {loading
+                ? "—"
+                : activeMemberCount}
+            </strong>
+
+            <small>
+              Out of {members.length} members
+            </small>
+          </div>
+        </article>
+
+        <article>
+          <div className="report-summary-icon meals">
+            <Utensils size={18} />
+          </div>
+
+          <div>
+            <span>Total meals</span>
+
+            <strong>
+              {loading
+                ? "—"
+                : formatMeal(totalMeals)}
+            </strong>
+
+            <small>
+              All members combined
+            </small>
+          </div>
+        </article>
+
+        <article>
+          <div className="report-summary-icon bazaar">
+            <ShoppingBasket size={18} />
+          </div>
+
+          <div>
+            <span>Total bazaar</span>
+
+            <strong>
+              {loading
+                ? "—"
+                : `৳${formatMoney(
+                    totalBazaar
+                  )}`}
+            </strong>
+
+            <small>
+              {bazaarContributorCount} contributors
+            </small>
+          </div>
+        </article>
+
+        <article className="featured">
+          <div className="report-summary-icon rate">
+            <CircleDollarSign size={18} />
+          </div>
+
+          <div>
+            <span>Meal rate</span>
+
+            <strong>
+              {loading
+                ? "—"
+                : `৳${formatMoney(
+                    mealRate
+                  )}`}
+            </strong>
+
+            <small>Cost per meal</small>
+          </div>
+        </article>
+      </section>
+
+      {!loading && !hasReportData ? (
+        <section className="settlement-empty-card">
+          <Utensils size={27} />
 
           <strong>
-            {formatMeal(averageMeal)}
+            No settlement data found
           </strong>
-        </div>
 
-        <div>
-          <span>Highest Meal</span>
+          <p>
+            No meal or bazaar records are available
+            for {formatMonthName(selectedMonth)}.
+          </p>
+        </section>
+      ) : (
+        <section className="settlement-calculation-card">
+          <div className="settlement-calculation-heading">
+            <div>
+              <span>Final calculation</span>
 
-          <strong>
-            {formatMeal(highestMeal)}
-          </strong>
-        </div>
+              <h3>Meal Rate Calculation</h3>
+            </div>
 
-        <div>
-          <span>Lowest Meal</span>
+            <div
+              className={`settlement-status ${
+                settlementIsBalanced
+                  ? "balanced"
+                  : "difference"
+              }`}
+            >
+              <CheckCircle2 size={14} />
 
-          <strong>
-            {formatMeal(lowestMeal)}
-          </strong>
-        </div>
+              {settlementIsBalanced
+                ? "Balanced"
+                : "Check difference"}
+            </div>
+          </div>
 
-        <div>
-          <span>Balance Difference</span>
+          <div className="settlement-formula">
+            <div>
+              <ShoppingBasket size={17} />
 
-          <strong
-            className={
-              Math.abs(totalBalance) < 0.01
-                ? "balanced"
-                : "difference"
-            }
-          >
-            ৳ {formatMoney(totalBalance)}
-          </strong>
-        </div>
-      </div>
+              <span>Total Bazaar</span>
 
-      <div className="report-print-footer">
-        <p>
-          MessMate Monthly Report —{" "}
-          {formatMonthName(selectedMonth)}
-        </p>
-      </div>
+              <strong>
+                ৳{formatMoney(totalBazaar)}
+              </strong>
+            </div>
+
+            <span className="formula-symbol">
+              ÷
+            </span>
+
+            <div>
+              <Utensils size={17} />
+
+              <span>Total Meals</span>
+
+              <strong>
+                {formatMeal(totalMeals)}
+              </strong>
+            </div>
+
+            <Equal
+              className="formula-symbol"
+              size={18}
+            />
+
+            <div className="result">
+              <CircleDollarSign size={17} />
+
+              <span>Meal Rate</span>
+
+              <strong>
+                ৳{formatMoney(mealRate)}
+              </strong>
+            </div>
+          </div>
+
+          <div className="settlement-verification">
+            <div>
+              <span>
+                Calculated total meal cost
+              </span>
+
+              <strong>
+                ৳
+                {formatMoney(
+                  calculatedMealCost
+                )}
+              </strong>
+            </div>
+
+            <div>
+              <span>Settlement difference</span>
+
+              <strong
+                className={
+                  settlementIsBalanced
+                    ? "balanced"
+                    : "difference"
+                }
+              >
+                ৳
+                {formatMoney(
+                  settlementDifference
+                )}
+              </strong>
+            </div>
+          </div>
+        </section>
+      )}
     </div>
   );
 };

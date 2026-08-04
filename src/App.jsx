@@ -49,6 +49,11 @@ import MembersLayout from "./pages/members/MembersLayout";
 import AddMember from "./pages/members/AddMember";
 import ManagerControl from "./pages/members/ManagerControl";
 
+// Report sub-pages
+import ReportsLayout from "./pages/reports/ReportsLayout";
+import MemberBalance from "./pages/reports/MemberBalance";
+import ExportReport from "./pages/reports/ExportReport";
+
 // Settings sub-pages
 import SettingsLayout from "./pages/settings/SettingsLayout";
 import DataManagement from "./pages/settings/DataManagement";
@@ -180,10 +185,26 @@ function App() {
                     />
                   </Route>
 
+                  {/* Reports */}
                   <Route
                     path="/reports"
-                    element={<Reports />}
-                  />
+                    element={<ReportsLayout />}
+                  >
+                    <Route
+                      index
+                      element={<Reports />}
+                    />
+
+                    <Route
+                      path="balances"
+                      element={<MemberBalance />}
+                    />
+
+                    <Route
+                      path="export"
+                      element={<ExportReport />}
+                    />
+                  </Route>
 
                   <Route
                     path="/profile"

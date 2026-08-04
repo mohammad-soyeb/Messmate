@@ -5,10 +5,10 @@
 ================================== */
 
 :root {
-  --premium-primary: #059669;
-  --premium-primary-light: #10b981;
-  --premium-primary-dark: #047857;
-  --premium-secondary: #0f766e;
+  --premium-primary: #a65f36;
+  --premium-primary-light: #c17a4e;
+  --premium-primary-dark: #7e4325;
+  --premium-secondary: #6f4a37;
 
   --premium-text: #0f172a;
   --premium-muted: #64748b;
@@ -16,7 +16,7 @@
   --premium-surface: #ffffff;
   --premium-background: #f8fafc;
 
-  --premium-success: #059669;
+  --premium-success: #a65f36;
   --premium-danger: #dc2626;
   --premium-warning: #d97706;
 
@@ -31,7 +31,7 @@
     0 11px 28px rgba(15, 23, 42, 0.07);
 
   --premium-shadow-green:
-    0 11px 24px rgba(5, 150, 105, 0.24);
+    0 11px 24px rgba(166, 95, 54, 0.24);
 }
 
 /* ==================================
@@ -56,7 +56,7 @@ body {
 
 ::selection {
   color: #ffffff;
-  background: rgba(5, 150, 105, 0.85);
+  background: rgba(166, 95, 54, 0.85);
 }
 
 button,
@@ -76,7 +76,7 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 3px solid rgba(16, 185, 129, 0.23);
+  outline: 3px solid rgba(193, 122, 78, 0.23);
   outline-offset: 2px;
 }
 
@@ -87,7 +87,7 @@ textarea:focus-visible {
 * {
   scrollbar-width: thin;
   scrollbar-color:
-    rgba(5, 150, 105, 0.35)
+    rgba(166, 95, 54, 0.35)
     transparent;
 }
 
@@ -105,8 +105,8 @@ textarea:focus-visible {
   border-radius: 20px;
   background:
     linear-gradient(
-      #10b981,
-      #059669
+      #c17a4e,
+      #a65f36
     )
     padding-box;
 }
@@ -114,8 +114,8 @@ textarea:focus-visible {
 *::-webkit-scrollbar-thumb:hover {
   background:
     linear-gradient(
-      #059669,
-      #047857
+      #a65f36,
+      #7e4325
     )
     padding-box;
 }
@@ -129,7 +129,7 @@ textarea:focus-visible {
   background:
     radial-gradient(
       circle at 82% 3%,
-      rgba(52, 211, 153, 0.055),
+      rgba(205, 145, 105, 0.055),
       transparent 25%
     ),
     #f8fafc;
@@ -206,10 +206,10 @@ textarea:focus-visible {
 .report-summary-card:hover,
 .profile-card:hover,
 .settings-card:hover {
-  border-color: #a7f3d0;
+  border-color: #e4c7b4;
   transform: translateY(-3px);
   box-shadow: 0 16px 34px
-    rgba(5, 150, 105, 0.09);
+    rgba(166, 95, 54, 0.09);
 }
 
 /* ==================================
@@ -228,9 +228,9 @@ textarea:focus-visible {
   color: #ffffff;
   background: linear-gradient(
     135deg,
-    #10b981,
-    #059669 58%,
-    #0f766e
+    #c17a4e,
+    #a65f36 58%,
+    #6f4a37
   );
   box-shadow:
     var(--premium-shadow-green),
@@ -285,7 +285,7 @@ textarea:focus-visible {
   filter: saturate(1.08);
   transform: translateY(-2px);
   box-shadow:
-    0 15px 29px rgba(5, 150, 105, 0.31),
+    0 15px 29px rgba(166, 95, 54, 0.31),
     inset 0 1px 0
       rgba(255, 255, 255, 0.26);
 }
@@ -297,10 +297,10 @@ textarea:focus-visible {
 .btn-outline,
 .mess-setup-back-button,
 .profile-actions button:last-child {
-  border: 1px solid #a7f3d0;
+  border: 1px solid #e4c7b4;
   border-radius: var(--premium-radius-small);
-  color: #047857;
-  background: #ecfdf5;
+  color: #7e4325;
+  background: #fbf4ef;
   cursor: pointer;
   transition:
     color 0.2s ease,
@@ -315,10 +315,10 @@ textarea:focus-visible {
 .profile-actions
   button:last-child:hover:not(:disabled) {
   color: #ffffff;
-  border-color: #059669;
-  background: #059669;
+  border-color: #a65f36;
+  background: #a65f36;
   box-shadow: 0 9px 20px
-    rgba(5, 150, 105, 0.22);
+    rgba(166, 95, 54, 0.22);
   transform: translateY(-2px);
 }
 
@@ -394,9 +394,9 @@ input:not([type="checkbox"]):not(
   ):not([type="file"]):focus,
 select:focus,
 textarea:focus {
-  border-color: #10b981;
+  border-color: #c17a4e;
   box-shadow: 0 0 0 3px
-    rgba(16, 185, 129, 0.11);
+    rgba(193, 122, 78, 0.11);
 }
 
 /* Chrome autofill */
@@ -437,7 +437,7 @@ tbody tr:hover {
 ================================== */
 
 .react-hot-toast {
-  border: 1px solid #d1fae5;
+  border: 1px solid #f1dfd2;
   border-radius: 12px;
   box-shadow: 0 13px 30px
     rgba(15, 23, 42, 0.12);
@@ -456,7 +456,7 @@ body.dark .layout {
   background:
     radial-gradient(
       circle at 82% 3%,
-      rgba(16, 185, 129, 0.07),
+      rgba(193, 122, 78, 0.07),
       transparent 26%
     ),
     #0f172a;
@@ -553,4 +553,153 @@ body.dark tbody tr:hover {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* ==================================
+   UNIFIED MESSMATE DESIGN SYSTEM
+================================== */
+
+:root {
+  --brand-50: #fcf8f5;
+  --brand-100: #f6e9df;
+  --brand-200: #e4c7b4;
+  --brand-400: #c17a4e;
+  --brand-500: #a65f36;
+  --brand-600: #874827;
+  --brand-700: #65351f;
+
+  --app-bg: #f7f6f4;
+  --app-surface: #ffffff;
+  --app-surface-soft: #faf9f7;
+  --app-text: #18201c;
+  --app-muted: #6f7872;
+  --app-border: rgba(35, 45, 39, 0.1);
+
+  --premium-primary: var(--brand-500);
+  --premium-primary-light: var(--brand-400);
+  --premium-primary-dark: var(--brand-600);
+  --premium-secondary: #6f4a37;
+  --premium-text: var(--app-text);
+  --premium-muted: var(--app-muted);
+  --premium-border: var(--app-border);
+  --premium-surface: var(--app-surface);
+  --premium-background: var(--app-bg);
+  --premium-shadow-green:
+    0 11px 24px rgba(135, 72, 39, 0.2);
+}
+
+body {
+  color: var(--app-text);
+  background: var(--app-bg);
+  font-family:
+    Inter,
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+.layout {
+  background:
+    radial-gradient(
+      circle at 84% 0%,
+      rgba(193, 122, 78, 0.055),
+      transparent 25%
+    ),
+    var(--app-bg);
+}
+
+::selection {
+  color: #ffffff;
+  background: rgba(166, 95, 54, 0.86);
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline-color: rgba(185, 111, 67, 0.3);
+}
+
+* {
+  scrollbar-color: rgba(166, 95, 54, 0.28) transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background:
+    linear-gradient(
+      var(--brand-400),
+      var(--brand-500)
+    )
+    padding-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background:
+    linear-gradient(
+      var(--brand-500),
+      var(--brand-600)
+    )
+    padding-box;
+}
+
+/* Brand buttons share one finish across every module. */
+.auth-btn,
+.mess-setup-submit-button,
+.save-btn,
+.profile-edit-button,
+.profile-actions button:first-child,
+.btn-primary {
+  background: linear-gradient(
+    135deg,
+    var(--brand-600),
+    var(--brand-500) 58%,
+    var(--brand-400)
+  );
+  box-shadow:
+    0 10px 22px rgba(135, 72, 39, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+/* Semantic colours remain meaningful and are not brand colours. */
+.positive,
+.receive,
+.success,
+.balance-positive,
+.report-balance.positive,
+.mb-balance.positive,
+.print-balance.positive {
+  color: #287052 !important;
+}
+
+.negative,
+.pay,
+.danger,
+.balance-negative,
+.report-balance.negative,
+.mb-balance.negative,
+.print-balance.negative {
+  color: #ad4848 !important;
+}
+
+body.dark {
+  --app-bg: #131714;
+  --app-surface: #1b211d;
+  --app-surface-soft: #202722;
+  --app-text: #edf1ee;
+  --app-muted: #9aa39d;
+  --app-border: rgba(255, 255, 255, 0.09);
+}
+
+body.dark .layout {
+  background:
+    radial-gradient(
+      circle at 84% 0%,
+      rgba(193, 122, 78, 0.07),
+      transparent 25%
+    ),
+    var(--app-bg);
 }

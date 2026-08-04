@@ -3,7 +3,7 @@
     display:flex;
     justify-content:center;
     align-items:center;
-    background:linear-gradient(135deg,#2563eb,#1e40af);
+    background:linear-gradient(135deg,#7e4325,#65351f);
     padding:30px;
 }
 
@@ -52,8 +52,8 @@
 }
 
 .form-group input:focus{
-    border-color:#2563eb;
-    box-shadow:0 0 0 4px rgba(37,99,235,.15);
+    border-color:#7e4325;
+    box-shadow:0 0 0 4px rgba(126, 67, 37,.15);
 }
 
 .auth-btn{
@@ -61,7 +61,7 @@
     padding:15px;
     border:none;
     border-radius:12px;
-    background:#2563eb;
+    background:#7e4325;
     color:#fff;
     font-size:16px;
     font-weight:600;
@@ -86,7 +86,7 @@
 
 .auth-footer a{
     margin-left:6px;
-    color:#2563eb;
+    color:#7e4325;
     text-decoration:none;
     font-weight:600;
 }
