@@ -784,60 +784,56 @@ export const createBazaarEntry =
 
     return savedEntry;
   };
+export const deleteBazaarEntry = async (
+  entryId,
+  receiptPath
+) => {
+  const client = requireSupabase();
 
-export const deleteBazaarEntry =
-  async (
-    entryId,
-    receiptPath
-  ) => {
-    const state =
-      await requireWorkspace();
+  /*
+   * আগে database entry delete হবে।
+   * select("id") দিয়ে নিশ্চিত করা হবে row
+   * সত্যিই delete হয়েছে কি না।
+   */
+  const {
+    data: deletedEntries,
+    error: deleteError,
+  } = await client
+    .from("bazaar_entries")
+    .delete()
+    .eq("id", entryId)
+    .select("id");
 
-    if (
-      state.member.role !==
-      "manager"
-    ) {
-      throw new Error(
-        "Only a manager can delete bazaar data."
+  if (deleteError) {
+    throw deleteError;
+  }
+
+  if (
+    !deletedEntries ||
+    deletedEntries.length === 0
+  ) {
+    throw new Error(
+      "Bazaar entry was not deleted. Manager permission or Supabase delete policy is missing."
+    );
+  }
+
+ 
+  if (receiptPath) {
+    const { error: receiptError } =
+      await client.storage
+        .from("bazaar-receipts")
+        .remove([receiptPath]);
+
+    if (receiptError) {
+      console.warn(
+        "Entry deleted, but receipt cleanup failed:",
+        receiptError
       );
     }
+  }
 
-    const client =
-      requireSupabase();
-
-    if (receiptPath) {
-      const {
-        error: receiptError,
-      } =
-        await client.storage
-          .from(
-            "bazaar-receipts"
-          )
-          .remove([
-            receiptPath,
-          ]);
-
-      if (receiptError) {
-        throw receiptError;
-      }
-    }
-
-    const { error } =
-      await client
-        .from(
-          "bazaar_entries"
-        )
-        .delete()
-        .eq("id", entryId)
-        .eq(
-          "mess_id",
-          state.mess.id
-        );
-
-    if (error) {
-      throw error;
-    }
-  };
+  return deletedEntries[0];
+};
 
 export const resetActivityData =
   async () => {
@@ -869,3 +865,61 @@ export const resetActivityData =
       throw error;
     }
   };
+
+  export const deleteMessWorkspace = async ({
+  messId,
+  confirmationName,
+}) => {
+  const state = await requireWorkspace();
+  const client = requireSupabase();
+
+  const currentMessId = state.mess.id;
+  const currentMessName =
+    state.mess.name?.trim();
+
+  /*
+   * Frontend থেকে অন্য messId পাঠিয়ে অন্য mess
+   * delete করার চেষ্টা এখানে আটকানো হবে।
+   */
+  if (!messId || messId !== currentMessId) {
+    throw new Error(
+      "You can delete only your current mess."
+    );
+  }
+
+  if (
+    !confirmationName ||
+    confirmationName.trim() !== currentMessName
+  ) {
+    throw new Error(
+      "Mess name confirmation does not match."
+    );
+  }
+
+  /*
+   * Supabase RPC আবার server-side manager,
+   * membership, messId এবং confirmation check করবে।
+   */
+  const { data, error } = await client.rpc(
+    "delete_mess_workspace",
+    {
+      p_mess_id: currentMessId,
+      p_confirmation_name:
+        confirmationName.trim(),
+    }
+  );
+
+  if (error) {
+    throw error;
+  }
+
+  /*
+   * Deleted mess যেন localStorage থেকে আবার
+   * selected workspace হিসেবে load না হয়।
+   */
+  localStorage.removeItem(
+    "messmate_current_mess_id"
+  );
+
+  return data;
+};

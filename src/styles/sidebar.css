@@ -911,3 +911,273 @@
     padding: 13px;
   }
 }
+/* ==================================
+   NEUTRAL PROFESSIONAL SIDEBAR
+================================== */
+
+.sidebar {
+  border-right-color: rgba(
+    255,
+    255,
+    255,
+    0.07
+  );
+
+  background:
+    radial-gradient(
+      circle at 10% 0%,
+      rgba(255, 255, 255, 0.055),
+      transparent 30%
+    ),
+    linear-gradient(
+      165deg,
+      #23262b 0%,
+      #191c20 52%,
+      #111316 100%
+    );
+
+  box-shadow:
+    18px 0 55px rgba(0, 0, 0, 0.28),
+    inset -1px 0 0
+      rgba(255, 255, 255, 0.035);
+}
+
+/* Logo */
+
+.logo-circle {
+  color: #1f2937;
+
+  background: linear-gradient(
+    145deg,
+    #ffffff,
+    #e5e7eb
+  );
+
+  box-shadow:
+    0 9px 20px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 #ffffff;
+}
+
+.logo-circle::after {
+  border-color: rgba(
+    255,
+    255,
+    255,
+    0.12
+  );
+}
+
+.sidebar-brand h2 {
+  color: #f8fafc;
+}
+
+.sidebar-brand span {
+  color: #9ca3af;
+}
+
+/* Status */
+
+.sidebar-workspace-status {
+  border-color: rgba(
+    255,
+    255,
+    255,
+    0.07
+  );
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.sidebar-status-dot {
+  background: #a7f3d0;
+  box-shadow: 0 0 10px
+    rgba(167, 243, 208, 0.45);
+}
+
+.sidebar-workspace-status strong {
+  color: #e5e7eb;
+}
+
+.sidebar-workspace-status small {
+  color: #787f89;
+}
+
+/* Normal links */
+
+.sidebar-link {
+  color: #a7adb7;
+}
+
+.sidebar-link-icon {
+  color: #9299a4;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.sidebar-link-content small {
+  color: #6f7680;
+}
+
+.sidebar-link-arrow {
+  color: #626973;
+}
+
+/* Hover */
+
+.sidebar-link:hover {
+  color: #ffffff;
+  border-color: rgba(
+    255,
+    255,
+    255,
+    0.08
+  );
+  background: rgba(255, 255, 255, 0.065);
+}
+
+.sidebar-link:hover .sidebar-link-icon {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.sidebar-link:hover
+  .sidebar-link-content small {
+  color: #a4aab3;
+}
+
+/* Active link */
+
+.sidebar-link.active {
+  color: #111827;
+  border-color: rgba(
+    255,
+    255,
+    255,
+    0.7
+  );
+
+  background: linear-gradient(
+    145deg,
+    #ffffff,
+    #e5e7eb
+  );
+
+  box-shadow:
+    0 9px 22px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 #ffffff;
+}
+
+.sidebar-link.active::before {
+  background: #374151;
+  box-shadow: none;
+}
+
+.sidebar-link.active .sidebar-link-icon {
+  color: #ffffff;
+
+  background: linear-gradient(
+    145deg,
+    #374151,
+    #1f2937
+  );
+
+  box-shadow: 0 6px 14px
+    rgba(0, 0, 0, 0.2);
+}
+
+.sidebar-link.active
+  .sidebar-link-content small {
+  color: #6b7280;
+}
+
+.sidebar-link.active
+  .sidebar-link-arrow {
+  color: #374151;
+}
+
+/* User card */
+
+.sidebar-user-card {
+  border-color: rgba(
+    255,
+    255,
+    255,
+    0.06
+  );
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.sidebar-user-card strong {
+  color: #f3f4f6;
+}
+
+.sidebar-user-card span {
+  color: #777e88;
+}
+
+.sidebar-user-avatar {
+  color: #1f2937;
+
+  background: linear-gradient(
+    145deg,
+    #ffffff,
+    #d1d5db
+  );
+
+  box-shadow: 0 7px 16px
+    rgba(0, 0, 0, 0.2);
+}
+
+/* Close button */
+
+.sidebar-close-button {
+  color: #9ca3af;
+  border-color: rgba(
+    255,
+    255,
+    255,
+    0.07
+  );
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.sidebar-close-button:hover {
+  color: #111827;
+  border-color: #ffffff;
+  background: #ffffff;
+}
+
+/* Neutral decoration */
+
+.sidebar-ambient-one {
+  border-color: rgba(
+    255,
+    255,
+    255,
+    0.025
+  );
+}
+
+.sidebar-ambient-two {
+  background: rgba(
+    255,
+    255,
+    255,
+    0.025
+  );
+}
+
+/* Scrollbar */
+
+.sidebar-menu {
+  scrollbar-color:
+    rgba(255, 255, 255, 0.16)
+    transparent;
+}
+
+.sidebar-menu::-webkit-scrollbar-thumb {
+  background: rgba(
+    255,
+    255,
+    255,
+    0.16
+  );
+}

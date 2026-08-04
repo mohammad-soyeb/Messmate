@@ -664,3 +664,6 @@ from information_schema.columns
 where table_schema = 'public'
   and table_name = 'members'
   and column_name = 'is_active';
+
+
+  

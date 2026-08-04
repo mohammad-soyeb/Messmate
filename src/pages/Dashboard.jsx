@@ -18,36 +18,35 @@ import { useNavigate } from "react-router-dom";
 import { getWorkspaceData } from "../services/dataService";
 import "../styles/dashboard.css";
 
-const getCurrentMonth = () => {
-  return new Date().toISOString().slice(0, 7);
+const getTodayDate = () => {
+  const today = new Date();
+
+  const year = today.getFullYear();
+  const month = String(
+    today.getMonth() + 1
+  ).padStart(2, "0");
+  const day = String(today.getDate()).padStart(
+    2,
+    "0"
+  );
+
+  return `${year}-${month}-${day}`;
 };
 
-const getTodayDate = () => {
-  return new Date().toISOString().split("T")[0];
+const getCurrentMonth = () => {
+  return getTodayDate().substring(0, 7);
 };
 
 const getMealTotal = (meal) => {
-  if (
-    meal.breakfast !== undefined ||
-    meal.lunch !== undefined ||
-    meal.dinner !== undefined
-  ) {
-    return (
-      Number(meal.breakfast || 0) +
-      Number(meal.lunch || 0) +
-      Number(meal.dinner || 0)
-    );
-  }
-
-  return Number(meal.quantity || 0);
+  return (
+    Number(meal.breakfast || 0) +
+    Number(meal.lunch || 0) +
+    Number(meal.dinner || 0)
+  );
 };
 
 const getBazaarTotal = (entry) => {
-  if (entry.grandTotal !== undefined) {
-    return Number(entry.grandTotal || 0);
-  }
-
-  return Number(entry.price || 0);
+  return Number(entry.grandTotal || 0);
 };
 
 const formatMoney = (amount) => {
@@ -81,18 +80,14 @@ const formatDate = (dateString) => {
 };
 
 const formatMonthName = (monthValue) => {
-  const [year, month] = monthValue.split("-");
+  const [year, month] = monthValue
+    .split("-")
+    .map(Number);
 
   return new Intl.DateTimeFormat("en-US", {
     month: "long",
     year: "numeric",
-  }).format(
-    new Date(
-      Number(year),
-      Number(month) - 1,
-      1
-    )
-  );
+  }).format(new Date(year, month - 1, 1));
 };
 
 const Dashboard = () => {
@@ -100,42 +95,48 @@ const Dashboard = () => {
 
   const [selectedMonth, setSelectedMonth] =
     useState(getCurrentMonth());
-
   const [members, setMembers] = useState([]);
   const [meals, setMeals] = useState([]);
   const [bazaarEntries, setBazaarEntries] =
     useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const loadDashboardData = useCallback(async () => {
-    try {
-      const data = await getWorkspaceData();
-      setMembers(data.members);
-      setMeals(data.meals);
-      setBazaarEntries(data.bazaarEntries);
-    } catch (error) {
-      console.error(
-        "Unable to load dashboard:",
-        error
-      );
-    }
-  }, []);
+  const loadDashboardData = useCallback(
+    async () => {
+      setLoading(true);
+
+      try {
+        const data = await getWorkspaceData();
+
+        setMembers(data.members || []);
+        setMeals(data.meals || []);
+        setBazaarEntries(
+          data.bazaarEntries || []
+        );
+      } catch (error) {
+        console.error(
+          "Unable to load dashboard:",
+          error
+        );
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     loadDashboardData();
 
-    const handleWindowFocus = () => {
-      loadDashboardData();
-    };
-
     window.addEventListener(
       "focus",
-      handleWindowFocus
+      loadDashboardData
     );
 
     return () => {
       window.removeEventListener(
         "focus",
-        handleWindowFocus
+        loadDashboardData
       );
     };
   }, [loadDashboardData]);
@@ -199,71 +200,39 @@ const Dashboard = () => {
   }, [bazaarEntries]);
 
   const activeMembers = useMemo(() => {
-    const memberIds = new Set(
+    const activeMemberIds = new Set(
       monthlyMeals
         .filter(
           (meal) => getMealTotal(meal) > 0
         )
-        .map(
-          (meal) =>
-            meal.memberId ||
-            meal.memberName ||
-            meal.member
-        )
+        .map((meal) => meal.memberId)
+        .filter(Boolean)
     );
 
-    return memberIds.size;
+    return activeMemberIds.size;
   }, [monthlyMeals]);
 
   const recentBazaarEntries = useMemo(() => {
     return [...bazaarEntries]
       .sort((firstEntry, secondEntry) => {
-        const dateDifference =
-          new Date(secondEntry.date) -
-          new Date(firstEntry.date);
+        const dateComparison = String(
+          secondEntry.date
+        ).localeCompare(
+          String(firstEntry.date)
+        );
 
-        if (dateDifference !== 0) {
-          return dateDifference;
+        if (dateComparison !== 0) {
+          return dateComparison;
         }
 
-        return (
-          new Date(
-            secondEntry.createdAt || 0
-          ) -
-          new Date(
-            firstEntry.createdAt || 0
-          )
+        return String(
+          secondEntry.createdAt || ""
+        ).localeCompare(
+          String(firstEntry.createdAt || "")
         );
       })
-      .slice(0, 5);
+      .slice(0, 4);
   }, [bazaarEntries]);
-
-  const recentMealEntries = useMemo(() => {
-    return [...meals]
-      .sort((firstMeal, secondMeal) => {
-        const dateDifference =
-          new Date(secondMeal.date) -
-          new Date(firstMeal.date);
-
-        if (dateDifference !== 0) {
-          return dateDifference;
-        }
-
-        return (
-          new Date(
-            secondMeal.updatedAt ||
-              secondMeal.createdAt ||
-              0
-          ) -
-          new Date(
-            firstMeal.updatedAt ||
-              firstMeal.createdAt ||
-              0
-          )
-        );
-      })
-      .slice(0, 5);
-  }, [meals]);
 
   const dashboardStats = [
     {
@@ -293,10 +262,10 @@ const Dashboard = () => {
     {
       id: "bazaar",
       title: "Monthly Bazaar",
-      value: `৳ ${formatMoney(
+      value: `৳${formatMoney(
         totalMonthlyBazaar
       )}`,
-      description: `Today ৳ ${formatMoney(
+      description: `Today ৳${formatMoney(
         todayBazaar
       )}`,
       icon: ShoppingBasket,
@@ -305,8 +274,8 @@ const Dashboard = () => {
     {
       id: "meal-rate",
       title: "Current Meal Rate",
-      value: `৳ ${formatMoney(mealRate)}`,
-      description: "Bazaar ÷ total meal",
+      value: `৳${formatMoney(mealRate)}`,
+      description: "Bazaar ÷ total meals",
       icon: CircleDollarSign,
       className: "rate",
       featured: true,
@@ -318,7 +287,7 @@ const Dashboard = () => {
       <header className="dashboard-header">
         <div>
           <span className="dashboard-label">
-            MESSMATE OVERVIEW
+            Workspace overview
           </span>
 
           <h1>Dashboard</h1>
@@ -328,9 +297,9 @@ const Dashboard = () => {
               "en-BD",
               {
                 weekday: "long",
-                year: "numeric",
-                month: "long",
                 day: "numeric",
+                month: "long",
+                year: "numeric",
               }
             )}
           </p>
@@ -338,7 +307,7 @@ const Dashboard = () => {
 
         <div className="dashboard-month-field">
           <label htmlFor="dashboardMonth">
-            <CalendarDays size={16} />
+            <CalendarDays size={14} />
             Summary month
           </label>
 
@@ -361,21 +330,23 @@ const Dashboard = () => {
 
           return (
             <article
+              key={stat.id}
               className={`dashboard-stat-card ${
                 stat.className
               } ${
                 stat.featured ? "featured" : ""
               }`}
-              key={stat.id}
             >
               <div className="dashboard-stat-icon">
-                <Icon size={23} />
+                <Icon size={18} />
               </div>
 
               <div className="dashboard-stat-content">
                 <span>{stat.title}</span>
 
-                <strong>{stat.value}</strong>
+                <strong>
+                  {loading ? "—" : stat.value}
+                </strong>
 
                 <small>
                   {stat.description}
@@ -386,192 +357,81 @@ const Dashboard = () => {
         })}
       </section>
 
-      <section className="dashboard-content-grid">
-        <article className="dashboard-panel">
-          <div className="dashboard-panel-header">
-            <div>
-              <h2>Recent Bazaar</h2>
+      <section className="dashboard-panel dashboard-bazaar-panel">
+        <div className="dashboard-panel-header">
+          <div>
+            <h2>Recent Bazaar</h2>
 
-              <p>
-                Latest bazaar entries from all
-                members
-              </p>
+            <p>
+              Latest purchases added by mess
+              members.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() =>
+              navigate("/bazaar/history")
+            }
+          >
+            View history
+            <ChevronRight size={14} />
+          </button>
+        </div>
+
+        <div className="dashboard-list">
+          {loading ? (
+            <div className="dashboard-empty-state">
+              Loading recent bazaar...
             </div>
+          ) : recentBazaarEntries.length === 0 ? (
+            <div className="dashboard-empty-state">
+              <ShoppingBasket size={27} />
 
-            <button
-              type="button"
-              onClick={() =>
-                navigate("/bazaar")
-              }
-            >
-              View All
-              <ChevronRight size={16} />
-            </button>
-          </div>
+              <strong>
+                No bazaar records yet
+              </strong>
 
-          <div className="dashboard-list">
-            {recentBazaarEntries.length === 0 ? (
-              <div className="dashboard-empty-state">
-                <ShoppingBasket size={34} />
-
-                <strong>
-                  No bazaar records yet
-                </strong>
-
-                <span>
-                  New bazaar entries will appear
-                  here.
-                </span>
-              </div>
-            ) : (
-              recentBazaarEntries.map(
-                (entry) => (
-                  <div
-                    className="dashboard-list-item"
-                    key={entry.id}
-                  >
-                    <div className="dashboard-list-icon bazaar">
-                      <ShoppingBasket
-                        size={18}
-                      />
-                    </div>
-
-                    <div className="dashboard-list-details">
-                      <strong>
-                        {entry.memberName ||
-                          entry.member ||
-                          "Unknown Member"}
-                      </strong>
-
-                      <span>
-                        {formatDate(
-                          entry.date
-                        )}{" "}
-                        •{" "}
-                        {entry.items?.length ||
-                          1}{" "}
-                        item
-                        {(entry.items?.length ||
-                          1) > 1
-                          ? "s"
-                          : ""}
-                      </span>
-                    </div>
-
-                    <strong className="dashboard-list-amount">
-                      ৳{" "}
-                      {formatMoney(
-                        getBazaarTotal(entry)
-                      )}
-                    </strong>
-                  </div>
-                )
-              )
-            )}
-          </div>
-        </article>
-
-        <article className="dashboard-panel">
-          <div className="dashboard-panel-header">
-            <div>
-              <h2>Recent Meals</h2>
-
-              <p>
-                Latest saved daily meal records
-              </p>
+              <span>
+                New bazaar entries will appear here.
+              </span>
             </div>
-
-            <button
-              type="button"
-              onClick={() =>
-                navigate("/meals")
-              }
-            >
-              View All
-              <ChevronRight size={16} />
-            </button>
-          </div>
-
-          <div className="dashboard-list">
-            {recentMealEntries.length === 0 ? (
-              <div className="dashboard-empty-state">
-                <Utensils size={34} />
-
-                <strong>
-                  No meal records yet
-                </strong>
-
-                <span>
-                  Saved meal entries will appear
-                  here.
-                </span>
-              </div>
-            ) : (
-              recentMealEntries.map((meal) => (
-                <div
-                  className="dashboard-list-item"
-                  key={meal.id}
-                >
-                  <div className="dashboard-list-icon meals">
-                    <Utensils size={18} />
-                  </div>
-
-                  <div className="dashboard-list-details">
-                    <strong>
-                      {meal.memberName ||
-                        meal.member ||
-                        "Unknown Member"}
-                    </strong>
-
-                    <span>
-                      {formatDate(meal.date)}
-                    </span>
-                  </div>
-
-                  <strong className="dashboard-meal-amount">
-                    {formatMeal(
-                      getMealTotal(meal)
-                    )}{" "}
-                    meals
-                  </strong>
+          ) : (
+            recentBazaarEntries.map((entry) => (
+              <div
+                className="dashboard-list-item"
+                key={entry.id}
+              >
+                <div className="dashboard-list-icon">
+                  <ShoppingBasket size={15} />
                 </div>
-              ))
-            )}
-          </div>
-        </article>
-      </section>
 
-      <section className="dashboard-month-summary">
-        <div>
-          <span>Selected Month</span>
+                <div className="dashboard-list-details">
+                  <strong>
+                    {entry.memberName ||
+                      "Unknown member"}
+                  </strong>
 
-          <strong>
-            {formatMonthName(selectedMonth)}
-          </strong>
-        </div>
+                  <span>
+                    {formatDate(entry.date)}
+                    {" · "}
+                    {entry.items?.length || 0}{" "}
+                    {(entry.items?.length || 0) ===
+                    1
+                      ? "item"
+                      : "items"}
+                  </span>
+                </div>
 
-        <div>
-          <span>Total Meals</span>
-
-          <strong>
-            {formatMeal(totalMonthlyMeals)}
-          </strong>
-        </div>
-
-        <div>
-          <span>Total Bazaar</span>
-
-          <strong>
-            ৳ {formatMoney(totalMonthlyBazaar)}
-          </strong>
-        </div>
-
-        <div className="highlight">
-          <span>Meal Rate</span>
-
-          <strong>
-            ৳ {formatMoney(mealRate)}
-          </strong>
+                <strong className="dashboard-list-amount">
+                  ৳
+                  {formatMoney(
+                    getBazaarTotal(entry)
+                  )}
+                </strong>
+              </div>
+            ))
+          )}
         </div>
       </section>
     </div>

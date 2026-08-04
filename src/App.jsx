@@ -3,7 +3,10 @@ import {
   Route,
   Routes,
 } from "react-router-dom";
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+} from "react";
 import { Toaster } from "react-hot-toast";
 
 import Loading from "./components/common/Loading";
@@ -22,7 +25,7 @@ import Register from "./pages/Register";
 // Mess setup
 import MessSetup from "./pages/MessSetup";
 
-// Dashboard pages
+// Main pages
 import Dashboard from "./pages/Dashboard";
 import Meals from "./pages/Meals";
 import Bazaar from "./pages/Bazaar";
@@ -45,6 +48,11 @@ import BazaarSummary from "./pages/bazaar/BazaarSummary";
 import MembersLayout from "./pages/members/MembersLayout";
 import AddMember from "./pages/members/AddMember";
 import ManagerControl from "./pages/members/ManagerControl";
+
+// Settings sub-pages
+import SettingsLayout from "./pages/settings/SettingsLayout";
+import DataManagement from "./pages/settings/DataManagement";
+import DangerZone from "./pages/settings/DangerZone";
 
 // Error page
 import NotFound from "./pages/NotFound";
@@ -81,7 +89,10 @@ function App() {
 
           <Routes>
             {/* Public routes */}
-            <Route path="/" element={<Landing />} />
+            <Route
+              path="/"
+              element={<Landing />}
+            />
 
             <Route
               path="/login"
@@ -111,7 +122,10 @@ function App() {
                     path="/meals"
                     element={<MealsLayout />}
                   >
-                    <Route index element={<Meals />} />
+                    <Route
+                      index
+                      element={<Meals />}
+                    />
 
                     <Route
                       path="history"
@@ -176,10 +190,26 @@ function App() {
                     element={<Profile />}
                   />
 
+                  {/* Settings */}
                   <Route
                     path="/settings"
-                    element={<Settings />}
-                  />
+                    element={<SettingsLayout />}
+                  >
+                    <Route
+                      index
+                      element={<Settings />}
+                    />
+
+                    <Route
+                      path="data"
+                      element={<DataManagement />}
+                    />
+
+                    <Route
+                      path="danger"
+                      element={<DangerZone />}
+                    />
+                  </Route>
                 </Route>
               </Route>
             </Route>
