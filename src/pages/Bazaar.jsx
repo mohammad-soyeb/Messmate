@@ -109,6 +109,8 @@ const Bazaar = () => {
 
   const [members, setMembers] = useState([]);
   const [entries, setEntries] = useState([]);
+  const [selectedMemberId, setSelectedMemberId] =
+    useState("");
   const [bazaarDate, setBazaarDate] =
     useState(getTodayDate());
   const [items, setItems] = useState([
@@ -189,6 +191,50 @@ const Bazaar = () => {
       }) || null
     );
   }, [members, user]);
+
+  const isManager =
+    currentMember?.role === "manager";
+
+  const selectedMember = useMemo(() => {
+    if (!isManager) {
+      return currentMember;
+    }
+
+    return (
+      members.find(
+        (member) =>
+          member.id === selectedMemberId
+      ) || currentMember
+    );
+  }, [
+    currentMember,
+    isManager,
+    members,
+    selectedMemberId,
+  ]);
+
+  useEffect(() => {
+    if (!currentMember) {
+      return;
+    }
+
+    setSelectedMemberId((currentId) => {
+      const selectedMemberStillExists =
+        members.some(
+          (member) => member.id === currentId
+        );
+
+      if (
+        isManager &&
+        currentId &&
+        selectedMemberStillExists
+      ) {
+        return currentId;
+      }
+
+      return currentMember.id;
+    });
+  }, [currentMember, isManager, members]);
 
   const grandTotal = useMemo(() => {
     return items.reduce(
@@ -312,6 +358,13 @@ const Bazaar = () => {
       return false;
     }
 
+    if (!selectedMember) {
+      toast.error(
+        "Please select a member for this bazaar entry."
+      );
+      return false;
+    }
+
     if (!bazaarDate) {
       toast.error(
         "Please select a bazaar date."
@@ -352,13 +405,13 @@ const Bazaar = () => {
 
     const sameDayEntryExists = entries.some(
       (entry) =>
-        entry.memberId === currentMember.id &&
+        entry.memberId === selectedMember.id &&
         entry.date === bazaarDate
     );
 
     if (sameDayEntryExists) {
       const confirmed = window.confirm(
-        "You already added a bazaar entry on this date. Do you want to add another one?"
+        `${selectedMember.name} already has a bazaar entry on this date. Do you want to add another one?`
       );
 
       if (!confirmed) {
@@ -382,7 +435,7 @@ const Bazaar = () => {
       const savedEntry =
         await createBazaarEntry({
           date: bazaarDate,
-          memberId: currentMember.id,
+          memberId: selectedMember.id,
           items: normalizedItems,
           receiptFile,
         });
@@ -433,18 +486,22 @@ const Bazaar = () => {
 
         <div className="bazaar-current-member">
           <div className="bazaar-current-avatar">
-            {currentMember?.name
+            {selectedMember?.name
               ?.charAt(0)
               .toUpperCase() || "M"}
           </div>
 
           <div>
-            <span>Adding as</span>
+            <span>
+              {isManager
+                ? "Adding bazaar for"
+                : "Adding as"}
+            </span>
 
             <strong>
               {loading
                 ? "Loading..."
-                : currentMember?.name ||
+                : selectedMember?.name ||
                   "Member not connected"}
             </strong>
           </div>
@@ -504,6 +561,44 @@ const Bazaar = () => {
               />
             </div>
           </div>
+
+          {isManager && (
+            <div className="bazaar-date-field bazaar-member-field">
+              <label htmlFor="bazaarMember">
+                Add bazaar for member
+              </label>
+
+              <div>
+                <ShoppingBasket size={18} />
+
+                <select
+                  id="bazaarMember"
+                  value={selectedMemberId}
+                  onChange={(event) =>
+                    setSelectedMemberId(
+                      event.target.value
+                    )
+                  }
+                  required
+                >
+                  {members.map((member) => (
+                    <option
+                      key={member.id}
+                      value={member.id}
+                    >
+                      {member.name}
+                      {member.room
+                        ? ` — Room ${member.room}`
+                        : ""}
+                      {member.role === "manager"
+                        ? " (Manager)"
+                        : ""}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
         </section>
 
         <section className="bazaar-form-card">
@@ -745,7 +840,7 @@ const Bazaar = () => {
             disabled={
               saving ||
               loading ||
-              !currentMember
+              !selectedMember
             }
           >
             <Save size={18} />

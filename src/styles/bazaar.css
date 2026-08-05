@@ -1,5 +1,3 @@
-/* Bazaar module */
-
 .bazaar-module {
   width: 100%;
   padding: 28px;
@@ -316,12 +314,38 @@
   max-width: 420px;
 }
 
+.bazaar-member-field {
+  position: relative;
+  margin-top: 18px;
+  padding: 15px;
+  border: 1px solid rgba(166, 95, 54, 0.16);
+  border-radius: 16px;
+  background:
+    radial-gradient(
+      circle at 92% 12%,
+      rgba(193, 122, 78, 0.13),
+      transparent 34%
+    ),
+    linear-gradient(135deg, #fffaf7 0%, #f8eee7 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 10px 24px rgba(87, 52, 32, 0.07);
+}
+
 .bazaar-date-field label {
   display: block;
   margin-bottom: 7px;
   color: #475569;
   font-size: 11px;
   font-weight: 750;
+}
+
+.bazaar-member-field label {
+  color: #7e4325;
+  font-size: 10px;
+  font-weight: 850;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
 }
 
 .bazaar-date-field > div {
@@ -337,7 +361,8 @@
   pointer-events: none;
 }
 
-.bazaar-date-field input {
+.bazaar-date-field input,
+.bazaar-member-field select {
   width: 100%;
   height: 45px;
   padding: 0 13px 0 42px;
@@ -347,6 +372,52 @@
   color: #334155;
   background: #ffffff;
   font-family: inherit;
+}
+
+.bazaar-member-field select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 45px;
+  border-color: rgba(166, 95, 54, 0.25);
+  color: #65351f;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 5px 14px rgba(87, 52, 32, 0.06);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 750;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.bazaar-member-field > div::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: 18px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid #a65f36;
+  border-bottom: 2px solid #a65f36;
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}
+
+.bazaar-member-field svg {
+  color: #a65f36;
+}
+
+.bazaar-member-field select:hover {
+  border-color: rgba(166, 95, 54, 0.5);
+  background-color: #ffffff;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 9px 22px rgba(87, 52, 32, 0.1);
+  transform: translateY(-1px);
 }
 
 .bazaar-date-field input:focus,
@@ -1888,5 +1959,553 @@
   .bazaar-history-summary,
   .bazaar-summary-cards {
     grid-template-columns: 1fr;
+  }
+}
+
+/* ==================================
+   PREMIUM VISUAL POLISH
+   Design-only overrides — no layout
+   structure or application logic changed.
+================================== */
+
+.bazaar-module {
+  --bazaar-ink: #172033;
+  --bazaar-muted: #667085;
+  --bazaar-accent: #a45d32;
+  --bazaar-accent-deep: #67402e;
+  --bazaar-accent-soft: #f7e9df;
+  --bazaar-line: rgba(116, 77, 55, 0.14);
+  --bazaar-surface: rgba(255, 255, 255, 0.94);
+  --bazaar-shadow-sm: 0 8px 24px rgba(42, 30, 22, 0.06);
+  --bazaar-shadow-md: 0 18px 45px rgba(42, 30, 22, 0.09);
+  --bazaar-shadow-lg: 0 24px 60px rgba(42, 30, 22, 0.13);
+  position: relative;
+  isolation: isolate;
+  color: var(--bazaar-ink);
+  background:
+    radial-gradient(circle at 92% 3%, rgba(193, 122, 78, 0.08), transparent 25%),
+    radial-gradient(circle at 8% 95%, rgba(111, 74, 55, 0.05), transparent 24%);
+}
+
+/* Premium hero */
+
+.bazaar-module-banner {
+  isolation: isolate;
+  border-color: rgba(164, 93, 50, 0.18);
+  background:
+    radial-gradient(circle at 88% 16%, rgba(211, 153, 113, 0.25), transparent 28%),
+    linear-gradient(128deg, #fffdfb 0%, #fbf3ed 55%, #f4e2d5 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    var(--bazaar-shadow-md);
+}
+
+.bazaar-module-banner::before {
+  position: absolute;
+  z-index: -1;
+  right: 10%;
+  bottom: -70px;
+  width: 190px;
+  height: 190px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.38);
+  filter: blur(2px);
+  content: "";
+}
+
+.bazaar-module-banner::after {
+  z-index: -1;
+  border-color: rgba(126, 67, 37, 0.07);
+}
+
+.bazaar-module-icon,
+.bazaar-current-avatar,
+.bazaar-history-avatar,
+.bazaar-summary-avatar {
+  background: linear-gradient(145deg, #b86e42 0%, #8d4f2f 48%, #5f3b2b 100%);
+  box-shadow:
+    0 10px 22px rgba(111, 64, 39, 0.25),
+    0 1px 0 rgba(255, 255, 255, 0.25) inset;
+}
+
+.bazaar-module-title h1,
+.bazaar-subpage-header h2,
+.bazaar-form-heading h3,
+.bazaar-summary-table-heading h3 {
+  color: var(--bazaar-ink);
+  letter-spacing: -0.025em;
+}
+
+.bazaar-module-title p,
+.bazaar-subpage-header p,
+.bazaar-form-heading p,
+.bazaar-summary-table-heading p {
+  color: var(--bazaar-muted);
+}
+
+/* Refined navigation */
+
+.bazaar-submenu {
+  border-color: var(--bazaar-line);
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    var(--bazaar-shadow-sm);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+.bazaar-submenu-link {
+  position: relative;
+  overflow: hidden;
+}
+
+.bazaar-submenu-link::after {
+  position: absolute;
+  right: 18%;
+  bottom: 3px;
+  left: 18%;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0;
+  transform: scaleX(0.35);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  content: "";
+}
+
+.bazaar-submenu-link:hover::after {
+  opacity: 0.32;
+  transform: scaleX(1);
+}
+
+.bazaar-submenu-link.active {
+  background: linear-gradient(135deg, #b56b40 0%, #8c4d2d 52%, #65402e 100%);
+  box-shadow:
+    0 9px 20px rgba(111, 64, 39, 0.24),
+    0 1px 0 rgba(255, 255, 255, 0.22) inset;
+}
+
+.bazaar-submenu-link.active::after {
+  display: none;
+}
+
+/* Premium cards */
+
+.bazaar-form-card,
+.bazaar-filter-card,
+.bazaar-month-progress,
+.bazaar-member-summary-card,
+.bazaar-history-card,
+.bazaar-history-summary article,
+.bazaar-summary-cards article,
+.bazaar-empty-state {
+  border-color: var(--bazaar-line);
+  background: var(--bazaar-surface);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.92) inset,
+    var(--bazaar-shadow-sm);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.bazaar-form-card,
+.bazaar-filter-card,
+.bazaar-month-progress,
+.bazaar-member-summary-card {
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.bazaar-form-card:hover,
+.bazaar-filter-card:hover,
+.bazaar-month-progress:hover,
+.bazaar-member-summary-card:hover {
+  border-color: rgba(164, 93, 50, 0.22);
+  box-shadow: var(--bazaar-shadow-md);
+}
+
+.bazaar-history-card:hover,
+.bazaar-summary-cards article:hover {
+  border-color: rgba(164, 93, 50, 0.22);
+  box-shadow: var(--bazaar-shadow-lg);
+}
+
+.bazaar-history-summary article.primary,
+.bazaar-summary-cards article.primary {
+  background:
+    radial-gradient(circle at 88% 10%, rgba(255, 255, 255, 0.2), transparent 30%),
+    linear-gradient(135deg, #b46a3f 0%, #884a2c 50%, #5e3b2a 100%);
+  box-shadow: 0 16px 34px rgba(101, 64, 46, 0.24);
+}
+
+.bazaar-current-member,
+.bazaar-history-count,
+.bazaar-summary-date,
+.bazaar-selected-date,
+.bazaar-item-count,
+.bazaar-member-count {
+  border: 1px solid rgba(164, 93, 50, 0.15);
+  background: linear-gradient(135deg, #fffaf7, #f6e6db);
+  box-shadow: 0 5px 14px rgba(87, 52, 32, 0.06);
+}
+
+/* Inputs and selectors */
+
+.bazaar-date-field input,
+.bazaar-member-field select,
+.bazaar-entry-table input,
+.bazaar-entry-table select,
+.bazaar-filter-control input,
+.bazaar-filter-field select {
+  border-color: rgba(100, 116, 139, 0.23);
+  background-color: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.025);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.bazaar-date-field input:hover,
+.bazaar-member-field select:hover,
+.bazaar-entry-table input:hover,
+.bazaar-entry-table select:hover,
+.bazaar-filter-control input:hover,
+.bazaar-filter-field select:hover {
+  border-color: rgba(164, 93, 50, 0.34);
+  background-color: #ffffff;
+}
+
+.bazaar-date-field input:focus,
+.bazaar-member-field select:focus,
+.bazaar-entry-table input:focus,
+.bazaar-entry-table select:focus,
+.bazaar-filter-control input:focus,
+.bazaar-filter-field select:focus {
+  border-color: var(--bazaar-accent);
+  box-shadow:
+    0 0 0 4px rgba(164, 93, 50, 0.1),
+    0 8px 20px rgba(85, 50, 31, 0.06);
+}
+
+.bazaar-date-field input::placeholder,
+.bazaar-entry-table input::placeholder,
+.bazaar-filter-control input::placeholder {
+  color: #a0a9b8;
+}
+
+/* Tables */
+
+.bazaar-entry-table th,
+.bazaar-item-table th,
+.bazaar-summary-table th {
+  color: #6f574a;
+  background: linear-gradient(180deg, #fbf7f4 0%, #f8f2ed 100%);
+}
+
+.bazaar-entry-table tbody tr,
+.bazaar-item-table tbody tr,
+.bazaar-summary-table tbody tr {
+  transition: background-color 0.18s ease;
+}
+
+.bazaar-entry-table tbody tr:hover,
+.bazaar-item-table tbody tr:hover,
+.bazaar-summary-table tbody tr:hover {
+  background: rgba(247, 233, 223, 0.34);
+}
+
+.bazaar-category-badge,
+.bazaar-member-amount {
+  border: 1px solid rgba(164, 93, 50, 0.1);
+  color: #7b4328;
+  background: linear-gradient(135deg, #f9eee7, #f1ddcf);
+}
+
+/* Receipt and submit area */
+
+.bazaar-receipt-upload {
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(164, 93, 50, 0.3);
+  background:
+    radial-gradient(circle at top right, rgba(193, 122, 78, 0.1), transparent 32%),
+    linear-gradient(145deg, #fffdfb, #faf2ec);
+}
+
+.bazaar-receipt-upload:hover {
+  border-color: var(--bazaar-accent);
+  box-shadow: 0 14px 30px rgba(75, 45, 28, 0.09);
+}
+
+.bazaar-receipt-preview,
+.bazaar-submit-card {
+  border-color: rgba(164, 93, 50, 0.18);
+  background:
+    radial-gradient(circle at 90% 10%, rgba(193, 122, 78, 0.1), transparent 28%),
+    linear-gradient(135deg, #fffdfb, #f8eee7);
+  box-shadow: var(--bazaar-shadow-sm);
+}
+
+/* Premium buttons */
+
+.bazaar-add-item-button,
+.bazaar-save-button,
+.bazaar-reset-button,
+.bazaar-delete-button,
+.bazaar-remove-item {
+  position: relative;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.bazaar-save-button {
+  background: linear-gradient(135deg, #bd7548 0%, #965432 48%, #65402e 100%);
+  box-shadow:
+    0 10px 22px rgba(111, 64, 39, 0.25),
+    0 1px 0 rgba(255, 255, 255, 0.24) inset;
+}
+
+.bazaar-save-button::after {
+  position: absolute;
+  top: -80%;
+  left: -45%;
+  width: 34%;
+  height: 260%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+  transform: rotate(20deg) translateX(-180%);
+  transition: transform 0.55s ease;
+  content: "";
+}
+
+.bazaar-save-button:hover:not(:disabled)::after {
+  transform: rotate(20deg) translateX(520%);
+}
+
+.bazaar-save-button:hover:not(:disabled) {
+  box-shadow:
+    0 16px 30px rgba(111, 64, 39, 0.31),
+    0 1px 0 rgba(255, 255, 255, 0.24) inset;
+}
+
+.bazaar-add-item-button {
+  border-color: rgba(164, 93, 50, 0.22);
+  background: linear-gradient(135deg, #fffaf7, #f3e2d7);
+  box-shadow: 0 6px 15px rgba(75, 45, 28, 0.06);
+}
+
+.bazaar-reset-button {
+  border-color: rgba(100, 116, 139, 0.18);
+  background: linear-gradient(180deg, #ffffff, #f5f7fa);
+}
+
+.bazaar-add-item-button:active,
+.bazaar-save-button:active:not(:disabled),
+.bazaar-reset-button:active,
+.bazaar-delete-button:active,
+.bazaar-remove-item:active {
+  transform: translateY(0) scale(0.98);
+}
+
+.bazaar-submenu-link:focus-visible,
+.bazaar-add-item-button:focus-visible,
+.bazaar-save-button:focus-visible,
+.bazaar-reset-button:focus-visible,
+.bazaar-delete-button:focus-visible,
+.bazaar-remove-item:focus-visible,
+.bazaar-receipt-upload:focus-visible {
+  outline: 3px solid rgba(164, 93, 50, 0.24);
+  outline-offset: 3px;
+}
+
+/* Progress, scrollbar and empty state */
+
+.bazaar-progress-track,
+.bazaar-contribution-track {
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08) inset;
+}
+
+.bazaar-progress-track span,
+.bazaar-contribution-track span {
+  background: linear-gradient(90deg, #c98354 0%, #a45d32 48%, #69412e 100%);
+  box-shadow: 0 0 12px rgba(164, 93, 50, 0.25);
+}
+
+.bazaar-entry-table-wrapper,
+.bazaar-item-table-wrapper,
+.bazaar-summary-table-wrapper {
+  scrollbar-color: rgba(164, 93, 50, 0.35) transparent;
+  scrollbar-width: thin;
+}
+
+.bazaar-entry-table-wrapper::-webkit-scrollbar,
+.bazaar-item-table-wrapper::-webkit-scrollbar,
+.bazaar-summary-table-wrapper::-webkit-scrollbar {
+  height: 6px;
+}
+
+.bazaar-entry-table-wrapper::-webkit-scrollbar-thumb,
+.bazaar-item-table-wrapper::-webkit-scrollbar-thumb,
+.bazaar-summary-table-wrapper::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(164, 93, 50, 0.34);
+}
+
+.bazaar-empty-state {
+  border-color: rgba(164, 93, 50, 0.22);
+  background:
+    radial-gradient(circle at 50% 0%, rgba(193, 122, 78, 0.08), transparent 35%),
+    rgba(255, 255, 255, 0.94);
+}
+
+/* Optional project dark theme support */
+
+.dark .bazaar-module {
+  --bazaar-ink: #f8fafc;
+  --bazaar-muted: #a8b1c1;
+  --bazaar-line: rgba(226, 232, 240, 0.1);
+  --bazaar-surface: rgba(27, 31, 40, 0.92);
+  --bazaar-shadow-sm: 0 10px 28px rgba(0, 0, 0, 0.2);
+  --bazaar-shadow-md: 0 20px 46px rgba(0, 0, 0, 0.28);
+  --bazaar-shadow-lg: 0 24px 60px rgba(0, 0, 0, 0.35);
+  background:
+    radial-gradient(circle at 92% 3%, rgba(193, 122, 78, 0.12), transparent 25%),
+    #11151c;
+}
+
+.dark .bazaar-module-banner {
+  border-color: rgba(211, 153, 113, 0.16);
+  background:
+    radial-gradient(circle at 88% 16%, rgba(193, 122, 78, 0.18), transparent 30%),
+    linear-gradient(128deg, #24202a 0%, #211b1a 58%, #302017 100%);
+}
+
+.dark .bazaar-submenu,
+.dark .bazaar-form-card,
+.dark .bazaar-filter-card,
+.dark .bazaar-month-progress,
+.dark .bazaar-member-summary-card,
+.dark .bazaar-history-card,
+.dark .bazaar-history-summary article,
+.dark .bazaar-summary-cards article,
+.dark .bazaar-empty-state {
+  background: var(--bazaar-surface);
+}
+
+.dark .bazaar-module-title h1,
+.dark .bazaar-subpage-header h2,
+.dark .bazaar-form-heading h3,
+.dark .bazaar-summary-table-heading h3,
+.dark .bazaar-history-member h3,
+.dark .bazaar-summary-member strong,
+.dark .bazaar-progress-heading strong {
+  color: var(--bazaar-ink);
+}
+
+.dark .bazaar-date-field input,
+.dark .bazaar-member-field select,
+.dark .bazaar-entry-table input,
+.dark .bazaar-entry-table select,
+.dark .bazaar-filter-control input,
+.dark .bazaar-filter-field select {
+  border-color: rgba(226, 232, 240, 0.12);
+  color: #e5e7eb;
+  background: rgba(17, 21, 28, 0.86);
+}
+
+.dark .bazaar-member-field {
+  border-color: rgba(211, 153, 113, 0.16);
+  background:
+    radial-gradient(
+      circle at 92% 12%,
+      rgba(211, 153, 113, 0.12),
+      transparent 34%
+    ),
+    linear-gradient(
+      135deg,
+      rgba(164, 93, 50, 0.12),
+      rgba(17, 21, 28, 0.88)
+    );
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.03) inset,
+    0 10px 24px rgba(0, 0, 0, 0.18);
+}
+
+.dark .bazaar-member-field label,
+.dark .bazaar-member-field svg {
+  color: #edc6ae;
+}
+
+.dark .bazaar-member-field > div::after {
+  border-color: #d39971;
+}
+
+.dark .bazaar-entry-table th,
+.dark .bazaar-item-table th,
+.dark .bazaar-summary-table th {
+  color: #d1b6a6;
+  background: rgba(164, 93, 50, 0.1);
+}
+
+.dark .bazaar-entry-table td,
+.dark .bazaar-item-table td,
+.dark .bazaar-summary-table td {
+  border-color: rgba(226, 232, 240, 0.08);
+  color: #d5d9e1;
+}
+
+.dark .bazaar-current-member,
+.dark .bazaar-history-count,
+.dark .bazaar-summary-date,
+.dark .bazaar-selected-date,
+.dark .bazaar-item-count,
+.dark .bazaar-member-count,
+.dark .bazaar-receipt-preview,
+.dark .bazaar-submit-card {
+  border-color: rgba(211, 153, 113, 0.14);
+  color: #edc6ae;
+  background: rgba(164, 93, 50, 0.1);
+}
+
+@media (max-width: 650px) {
+  .bazaar-module {
+    background: transparent;
+  }
+
+  .bazaar-member-field {
+    max-width: none;
+    margin-top: 14px;
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  .bazaar-member-field select {
+    height: 43px;
+    font-size: 12px;
+  }
+
+  .bazaar-module-banner,
+  .bazaar-form-card,
+  .bazaar-filter-card,
+  .bazaar-month-progress,
+  .bazaar-member-summary-card,
+  .bazaar-history-card {
+    box-shadow: 0 10px 28px rgba(42, 30, 22, 0.07);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bazaar-submenu-link::after,
+  .bazaar-save-button::after,
+  .bazaar-form-card,
+  .bazaar-filter-card,
+  .bazaar-month-progress,
+  .bazaar-member-summary-card,
+  .bazaar-entry-table tbody tr,
+  .bazaar-item-table tbody tr,
+  .bazaar-summary-table tbody tr {
+    transition: none;
   }
 }
