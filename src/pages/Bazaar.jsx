@@ -12,6 +12,7 @@ import {
   Save,
   ShoppingBasket,
   Trash2,
+  Wallet,
   X,
 } from "lucide-react";
 import toast from "react-hot-toast";
@@ -22,18 +23,6 @@ import {
   getWorkspaceData,
 } from "../services/dataService";
 import "../styles/bazaar.css";
-
-const CATEGORIES = [
-  "Grocery",
-  "Vegetable",
-  "Meat",
-  "Fish",
-  "Egg",
-  "Dairy",
-  "Fruit",
-  "Snacks",
-  "Others",
-];
 
 const ITEM_SUGGESTIONS = [
   "Rice",
@@ -113,6 +102,8 @@ const Bazaar = () => {
     useState("");
   const [bazaarDate, setBazaarDate] =
     useState(getTodayDate());
+  const [paymentSource, setPaymentSource] =
+    useState("personal");
   const [items, setItems] = useState([
     createEmptyItem(),
   ]);
@@ -346,6 +337,7 @@ const Bazaar = () => {
 
   const resetForm = () => {
     setBazaarDate(getTodayDate());
+    setPaymentSource("personal");
     setItems([createEmptyItem()]);
     removeReceipt();
   };
@@ -436,6 +428,7 @@ const Bazaar = () => {
         await createBazaarEntry({
           date: bazaarDate,
           memberId: selectedMember.id,
+          paymentSource,
           items: normalizedItems,
           receiptFile,
         });
@@ -599,6 +592,82 @@ const Bazaar = () => {
               </div>
             </div>
           )}
+
+          <fieldset className="bazaar-payment-source">
+            <legend>Payment source</legend>
+
+            <div className="bazaar-payment-options">
+              <label
+                className={
+                  paymentSource === "personal"
+                    ? "active"
+                    : ""
+                }
+              >
+                <input
+                  type="radio"
+                  name="paymentSource"
+                  value="personal"
+                  checked={
+                    paymentSource === "personal"
+                  }
+                  onChange={(event) =>
+                    setPaymentSource(
+                      event.target.value
+                    )
+                  }
+                />
+
+                <span className="bazaar-payment-icon">
+                  <Wallet size={18} />
+                </span>
+
+                <span>
+                  <strong>Personal Money</strong>
+                  <small>
+                    Adds this amount to the
+                    member&apos;s Bazaar Paid credit.
+                  </small>
+                </span>
+              </label>
+
+              <label
+                className={
+                  paymentSource === "mess_fund"
+                    ? "active"
+                    : ""
+                }
+              >
+                <input
+                  type="radio"
+                  name="paymentSource"
+                  value="mess_fund"
+                  checked={
+                    paymentSource === "mess_fund"
+                  }
+                  onChange={(event) =>
+                    setPaymentSource(
+                      event.target.value
+                    )
+                  }
+                />
+
+                <span className="bazaar-payment-icon">
+                  <ShoppingBasket size={18} />
+                </span>
+
+                <span>
+                  <strong>
+                    Advance / Mess Fund
+                  </strong>
+                  <small>
+                    Counts as Bazaar expense only;
+                    no personal credit is added.
+                  </small>
+                </span>
+              </label>
+            </div>
+          </fieldset>
         </section>
 
         <section className="bazaar-form-card">
@@ -623,7 +692,6 @@ const Bazaar = () => {
             <table className="bazaar-entry-table">
               <thead>
                 <tr>
-                  <th>Category</th>
                   <th>Item name</th>
                   <th>Quantity</th>
                   <th>Amount</th>
@@ -634,31 +702,10 @@ const Bazaar = () => {
               <tbody>
                 {items.map((item, index) => (
                   <tr key={item.id}>
-                    <td data-label="Category">
-                      <select
-                        value={item.category}
-                        onChange={(event) =>
-                          updateItem(
-                            item.id,
-                            "category",
-                            event.target.value
-                          )
-                        }
-                      >
-                        {CATEGORIES.map(
-                          (category) => (
-                            <option
-                              key={category}
-                              value={category}
-                            >
-                              {category}
-                            </option>
-                          )
-                        )}
-                      </select>
-                    </td>
-
-                    <td data-label="Item name">
+                    <td
+                      className="bazaar-item-name-cell"
+                      data-label="Item name"
+                    >
                       <input
                         type="text"
                         list="bazaarItemSuggestions"

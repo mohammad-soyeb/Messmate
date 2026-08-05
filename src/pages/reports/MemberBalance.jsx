@@ -1,22 +1,64 @@
-import { useEffect, useMemo, useState } from "react";
 import {
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import {
+  ArrowRight,
   CalendarDays,
   CircleDollarSign,
+  Plus,
   Scale,
   ShoppingBasket,
+  Trash2,
   Utensils,
   Users,
+  Wallet,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
-import { getWorkspaceData } from "../../services/dataService";
+import {
+  addMemberDeposit,
+  carryForwardMemberBalances,
+  deleteMemberFinancialEntry,
+  getFinancialEntries,
+  getWorkspaceData,
+  setOpeningBalance,
+} from "../../services/dataService";
 import "../../styles/memberBalance.css";
 
-const getCurrentMonth = () =>
-  new Date().toISOString().slice(0, 7);
+const getCurrentMonth = () => {
+  const today = new Date();
+
+  return `${today.getFullYear()}-${String(
+    today.getMonth() + 1
+  ).padStart(2, "0")}`;
+};
+
+const getNextMonth = (monthValue) => {
+  const [year, month] = monthValue
+    .split("-")
+    .map(Number);
+
+  const nextMonth = new Date(year, month, 1);
+
+  return `${nextMonth.getFullYear()}-${String(
+    nextMonth.getMonth() + 1
+  ).padStart(2, "0")}`;
+};
 
 const normalizeText = (value = "") =>
   String(value).trim().toLowerCase();
+
+const getFullMemberName = (member) => {
+  const fullName =
+    member?.fullName ||
+    member?.full_name ||
+    member?.name ||
+    "";
+
+  return String(fullName).trim() || "Member";
+};
 
 const getMealTotal = (meal) => {
   if (
@@ -42,6 +84,10 @@ const getBazaarTotal = (entry) => {
   return Number(entry.price || 0);
 };
 
+const isPersonalBazaarPayment = (entry) =>
+  !entry.paymentSource ||
+  entry.paymentSource === "personal";
+
 const formatMoney = (value) =>
   new Intl.NumberFormat("en-BD", {
     minimumFractionDigits: 2,
@@ -57,7 +103,9 @@ const formatMeal = (value) => {
 };
 
 const formatMonthName = (monthValue) => {
-  if (!monthValue) return "";
+  if (!monthValue) {
+    return "";
+  }
 
   const [year, month] = monthValue.split("-");
 
@@ -69,32 +117,52 @@ const formatMonthName = (monthValue) => {
   );
 };
 
-/*
- * নাম ছোট হলে full name দেখাবে।
- * নাম বড় হলে শেষের নাম বা surname দেখাবে।
- * Mouse রাখলে title-এর মাধ্যমে full name দেখা যাবে।
- */
-const getDisplayName = (fullName = "") => {
-  const cleanName = String(fullName).trim();
-
-  if (cleanName.length <= 13) {
-    return cleanName || "Member";
+const getSignedClass = (value) => {
+  if (value > 0.005) {
+    return "positive";
   }
 
-  const nameParts = cleanName.split(/\s+/);
+  if (value < -0.005) {
+    return "negative";
+  }
 
-  return nameParts[nameParts.length - 1] || "Member";
+  return "neutral";
+};
+
+const SignedMoney = ({ value }) => {
+  const amount = Number(value) || 0;
+
+  return (
+    <span className={`mb-balance ${getSignedClass(amount)}`}>
+      {amount > 0.005 ? "+" : ""}
+      {amount < -0.005 ? "−" : ""}৳
+      {formatMoney(Math.abs(amount))}
+    </span>
+  );
 };
 
 const MemberBalance = () => {
-  const [selectedMonth, setSelectedMonth] = useState(
-    getCurrentMonth()
-  );
-
+  const [selectedMonth, setSelectedMonth] =
+    useState(getCurrentMonth());
   const [members, setMembers] = useState([]);
   const [meals, setMeals] = useState([]);
-  const [bazaarEntries, setBazaarEntries] = useState([]);
+  const [bazaarEntries, setBazaarEntries] =
+    useState([]);
+  const [financialEntries, setFinancialEntries] =
+    useState([]);
+  const [currentMember, setCurrentMember] =
+    useState(null);
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [transferring, setTransferring] =
+    useState(false);
+  const [entryForm, setEntryForm] = useState({
+    memberId: "",
+    type: "opening_balance",
+    amount: "",
+    date: `${getCurrentMonth()}-01`,
+    note: "",
+  });
 
   useEffect(() => {
     let active = true;
@@ -105,14 +173,32 @@ const MemberBalance = () => {
 
         const data = await getWorkspaceData();
 
-        if (!active) return;
+        if (!active) {
+          return;
+        }
 
-        setMembers(data.members || []);
+        const nextMembers = data.members || [];
+
+        setMembers(nextMembers);
         setMeals(data.meals || []);
-        setBazaarEntries(data.bazaarEntries || []);
+        setBazaarEntries(
+          data.bazaarEntries || []
+        );
+        setFinancialEntries(
+          data.financialEntries || []
+        );
+        setCurrentMember(data.member || null);
+        setEntryForm((current) => ({
+          ...current,
+          memberId:
+            current.memberId ||
+            nextMembers[0]?.id ||
+            "",
+        }));
       } catch (error) {
         toast.error(
-          error.message || "Unable to load member balance."
+          error.message ||
+            "Unable to load member balance."
         );
       } finally {
         if (active) {
@@ -128,84 +214,121 @@ const MemberBalance = () => {
     };
   }, []);
 
-  const monthlyMeals = useMemo(() => {
-    return meals.filter((meal) =>
-      meal.date?.startsWith(selectedMonth)
-    );
-  }, [meals, selectedMonth]);
+  useEffect(() => {
+    setEntryForm((current) => ({
+      ...current,
+      date: `${selectedMonth}-01`,
+    }));
+  }, [selectedMonth]);
 
-  const monthlyBazaar = useMemo(() => {
-    return bazaarEntries.filter((entry) =>
-      entry.date?.startsWith(selectedMonth)
-    );
-  }, [bazaarEntries, selectedMonth]);
+  const monthlyMeals = useMemo(
+    () =>
+      meals.filter((meal) =>
+        meal.date?.startsWith(selectedMonth)
+      ),
+    [meals, selectedMonth]
+  );
 
-  /*
-   * Historical meal অথবা bazaar থাকা former member-কেও
-   * report-এর মধ্যে রাখা হবে।
-   */
+  const monthlyBazaar = useMemo(
+    () =>
+      bazaarEntries.filter((entry) =>
+        entry.date?.startsWith(selectedMonth)
+      ),
+    [bazaarEntries, selectedMonth]
+  );
+
+  const monthlyFinancialEntries = useMemo(
+    () =>
+      financialEntries.filter(
+        (entry) => entry.month === selectedMonth
+      ),
+    [financialEntries, selectedMonth]
+  );
+
   const reportMembers = useMemo(() => {
     const memberMap = new Map();
 
     members.forEach((member) => {
+      const fullName = getFullMemberName(member);
+
       memberMap.set(member.id, {
         id: member.id,
-        name: member.name || "Member",
+        name: fullName,
+        displayName: fullName,
         role: member.role || "member",
         active: member.isActive !== false,
       });
     });
 
-    [...monthlyMeals, ...monthlyBazaar].forEach(
-      (record) => {
-        const recordName =
-          record.memberName || record.member || "";
+    [
+      ...monthlyMeals,
+      ...monthlyBazaar,
+      ...monthlyFinancialEntries,
+    ].forEach((record) => {
+      const fullName =
+        record.memberFullName ||
+        record.memberName ||
+        record.member ||
+        "";
+      const displayName =
+        fullName || "Former member";
+      const recordId =
+        record.memberId ||
+        `name-${normalizeText(displayName)}`;
 
-        const recordId =
-          record.memberId ||
-          `name-${normalizeText(recordName)}`;
-
-        if (!recordId || recordId === "name-") return;
-
-        if (!memberMap.has(recordId)) {
-          memberMap.set(recordId, {
-            id: recordId,
-            name: recordName || "Former member",
-            role: "former",
-            active: false,
-          });
-        }
+      if (!recordId || recordId === "name-") {
+        return;
       }
-    );
 
-    return Array.from(memberMap.values()).sort((a, b) =>
-      a.name.localeCompare(b.name)
-    );
-  }, [members, monthlyMeals, monthlyBazaar]);
+      if (!memberMap.has(recordId)) {
+        memberMap.set(recordId, {
+          id: recordId,
+          name: fullName || displayName,
+          displayName,
+          role: "former",
+          active: false,
+        });
+      }
+    });
 
-  const getRecordMemberId = (record) => {
-    return (
-      record.memberId ||
-      `name-${normalizeText(
-        record.memberName || record.member
-      )}`
+    return Array.from(memberMap.values()).sort(
+      (a, b) =>
+        a.displayName.localeCompare(b.displayName)
     );
-  };
+  }, [
+    members,
+    monthlyMeals,
+    monthlyBazaar,
+    monthlyFinancialEntries,
+  ]);
 
-  const totalMeals = useMemo(() => {
-    return monthlyMeals.reduce(
-      (total, meal) => total + getMealTotal(meal),
-      0
-    );
-  }, [monthlyMeals]);
+  const getRecordMemberId = (record) =>
+    record.memberId ||
+    `name-${normalizeText(
+      record.memberFullName ||
+        record.memberName ||
+        record.member
+    )}`;
 
-  const totalBazaar = useMemo(() => {
-    return monthlyBazaar.reduce(
-      (total, entry) =>
-        total + getBazaarTotal(entry),
-      0
-    );
-  }, [monthlyBazaar]);
+  const totalMeals = useMemo(
+    () =>
+      monthlyMeals.reduce(
+        (total, meal) =>
+          total + getMealTotal(meal),
+        0
+      ),
+    [monthlyMeals]
+  );
+
+  const totalBazaar = useMemo(
+    () =>
+      monthlyBazaar.reduce(
+        (total, entry) =>
+          total + getBazaarTotal(entry),
+        0
+      ),
+    [monthlyBazaar]
+  );
 
   const mealRate =
     totalMeals > 0 ? totalBazaar / totalMeals : 0;
@@ -226,7 +349,8 @@ const MemberBalance = () => {
       const bazaarPaid = monthlyBazaar
         .filter(
           (entry) =>
-            getRecordMemberId(entry) === member.id
+            getRecordMemberId(entry) === member.id &&
+            isPersonalBazaarPayment(entry)
         )
         .reduce(
           (total, entry) =>
@@ -234,12 +358,43 @@ const MemberBalance = () => {
           0
         );
 
+      const memberFinancialEntries =
+        monthlyFinancialEntries.filter(
+          (entry) => entry.memberId === member.id
+        );
+
+      const openingBalance =
+        memberFinancialEntries
+          .filter(
+            (entry) =>
+              entry.type === "opening_balance"
+          )
+          .reduce(
+            (total, entry) =>
+              total + Number(entry.amount || 0),
+            0
+          );
+
+      const deposits = memberFinancialEntries
+        .filter((entry) => entry.type === "deposit")
+        .reduce(
+          (total, entry) =>
+            total + Number(entry.amount || 0),
+          0
+        );
+
       const mealBill = memberMeals * mealRate;
-      const balance = bazaarPaid - mealBill;
+      const balance =
+        openingBalance +
+        deposits +
+        bazaarPaid -
+        mealBill;
 
       return {
         ...member,
         totalMeal: memberMeals,
+        openingBalance,
+        deposits,
         bazaarPaid,
         mealBill,
         balance,
@@ -249,28 +404,217 @@ const MemberBalance = () => {
     reportMembers,
     monthlyMeals,
     monthlyBazaar,
+    monthlyFinancialEntries,
     mealRate,
   ]);
 
-  const totalReceivable = useMemo(() => {
-    return memberBalances.reduce(
-      (total, member) =>
-        member.balance > 0
-          ? total + member.balance
-          : total,
-      0
-    );
-  }, [memberBalances]);
+  const totalOpening = useMemo(
+    () =>
+      memberBalances.reduce(
+        (total, member) =>
+          total + member.openingBalance,
+        0
+      ),
+    [memberBalances]
+  );
 
-  const totalPayable = useMemo(() => {
-    return memberBalances.reduce(
-      (total, member) =>
-        member.balance < 0
-          ? total + Math.abs(member.balance)
-          : total,
-      0
+  const totalDeposits = useMemo(
+    () =>
+      memberBalances.reduce(
+        (total, member) =>
+          total + member.deposits,
+        0
+      ),
+    [memberBalances]
+  );
+
+  const totalFinalBalance = useMemo(
+    () =>
+      memberBalances.reduce(
+        (total, member) =>
+          total + member.balance,
+        0
+      ),
+    [memberBalances]
+  );
+
+  const totalReceivable = useMemo(
+    () =>
+      memberBalances.reduce(
+        (total, member) =>
+          member.balance > 0
+            ? total + member.balance
+            : total,
+        0
+      ),
+    [memberBalances]
+  );
+
+  const totalPayable = useMemo(
+    () =>
+      memberBalances.reduce(
+        (total, member) =>
+          member.balance < 0
+            ? total + Math.abs(member.balance)
+            : total,
+        0
+      ),
+    [memberBalances]
+  );
+
+  const isManager =
+    currentMember?.role === "manager";
+
+  const handleEntryChange = (event) => {
+    const { name, value } = event.target;
+
+    setEntryForm((current) => ({
+      ...current,
+      [name]: value,
+    }));
+  };
+
+  const refreshFinancialEntries = async () => {
+    const entries = await getFinancialEntries();
+    setFinancialEntries(entries);
+  };
+
+  const handleSaveEntry = async (event) => {
+    event.preventDefault();
+
+    if (!entryForm.memberId) {
+      toast.error("Select a member.");
+      return;
+    }
+
+    if (entryForm.amount === "") {
+      toast.error("Enter an amount.");
+      return;
+    }
+
+    if (
+      entryForm.type === "deposit" &&
+      !entryForm.date.startsWith(selectedMonth)
+    ) {
+      toast.error(
+        "Deposit date must be inside the selected month."
+      );
+      return;
+    }
+
+    try {
+      setSaving(true);
+
+      if (entryForm.type === "opening_balance") {
+        await setOpeningBalance({
+          memberId: entryForm.memberId,
+          month: selectedMonth,
+          amount: entryForm.amount,
+          note: entryForm.note,
+        });
+
+        toast.success("Opening balance saved.");
+      } else {
+        await addMemberDeposit({
+          memberId: entryForm.memberId,
+          date: entryForm.date,
+          amount: entryForm.amount,
+          note: entryForm.note,
+        });
+
+        toast.success("Advance deposit added.");
+      }
+
+      await refreshFinancialEntries();
+      setEntryForm((current) => ({
+        ...current,
+        amount: "",
+        note: "",
+      }));
+    } catch (error) {
+      toast.error(
+        error.message || "Unable to save entry."
+      );
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteEntry = async (entry) => {
+    const label =
+      entry.type === "opening_balance"
+        ? "opening balance"
+        : "deposit";
+
+    if (
+      !window.confirm(
+        `Delete this ${label} entry?`
+      )
+    ) {
+      return;
+    }
+
+    try {
+      await deleteMemberFinancialEntry(entry.id);
+      await refreshFinancialEntries();
+      toast.success("Entry deleted.");
+    } catch (error) {
+      toast.error(
+        error.message || "Unable to delete entry."
+      );
+    }
+  };
+
+  const handleCarryForward = async () => {
+    const nextMonth = getNextMonth(selectedMonth);
+
+    if (
+      !window.confirm(
+        `Transfer every current final balance to ${formatMonthName(
+          nextMonth
+        )} as opening balance? Existing opening balances for that month will be replaced.`
+      )
+    ) {
+      return;
+    }
+
+    const activeMemberIds = new Set(
+      members.map((member) => member.id)
     );
-  }, [memberBalances]);
+
+    const balances = memberBalances
+      .filter((member) =>
+        activeMemberIds.has(member.id)
+      )
+      .map((member) => ({
+        memberId: member.id,
+        amount: member.balance,
+      }));
+
+    try {
+      setTransferring(true);
+
+      await carryForwardMemberBalances({
+        sourceMonth: selectedMonth,
+        balances,
+      });
+
+      await refreshFinancialEntries();
+
+      toast.success(
+        `Balances transferred to ${formatMonthName(
+          nextMonth
+        )}.`
+      );
+    } catch (error) {
+      toast.error(
+        error.message ||
+          "Unable to transfer balances."
+      );
+    } finally {
+      setTransferring(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -293,11 +637,9 @@ const MemberBalance = () => {
             <span className="mb-eyebrow">
               Monthly accounting
             </span>
-
             <h1>Member Balance</h1>
-
             <p>
-              Final member-wise settlement for{" "}
+              Final settlement for{" "}
               {formatMonthName(selectedMonth)}.
             </p>
           </div>
@@ -305,7 +647,6 @@ const MemberBalance = () => {
 
         <label className="mb-month-picker">
           <CalendarDays size={17} />
-
           <input
             type="month"
             value={selectedMonth}
@@ -321,7 +662,6 @@ const MemberBalance = () => {
           <div className="mb-card-icon members">
             <Users size={19} />
           </div>
-
           <div>
             <span>Members</span>
             <strong>{reportMembers.length}</strong>
@@ -332,7 +672,6 @@ const MemberBalance = () => {
           <div className="mb-card-icon meals">
             <Utensils size={19} />
           </div>
-
           <div>
             <span>Total Meals</span>
             <strong>{formatMeal(totalMeals)}</strong>
@@ -343,7 +682,6 @@ const MemberBalance = () => {
           <div className="mb-card-icon bazaar">
             <ShoppingBasket size={19} />
           </div>
-
           <div>
             <span>Total Bazaar</span>
             <strong>৳{formatMoney(totalBazaar)}</strong>
@@ -354,7 +692,6 @@ const MemberBalance = () => {
           <div className="mb-card-icon rate">
             <CircleDollarSign size={19} />
           </div>
-
           <div>
             <span>Meal Rate</span>
             <strong>৳{formatMoney(mealRate)}</strong>
@@ -362,128 +699,254 @@ const MemberBalance = () => {
         </article>
       </section>
 
+      {isManager && (
+        <section className="mb-manager-panel">
+          <header className="mb-manager-header">
+            <div>
+              <span className="mb-manager-icon">
+                <Wallet size={18} />
+              </span>
+              <div>
+                <h2>Opening & Advance</h2>
+                <p>
+                  Positive opening means credit;
+                  negative means due.
+                </p>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className="mb-transfer-button"
+              onClick={handleCarryForward}
+              disabled={transferring}
+            >
+              <ArrowRight size={16} />
+              {transferring
+                ? "Transferring..."
+                : "Transfer to next month"}
+            </button>
+          </header>
+
+          <form
+            className="mb-entry-form"
+            onSubmit={handleSaveEntry}
+          >
+            <label>
+              <span>Member</span>
+              <select
+                name="memberId"
+                value={entryForm.memberId}
+                onChange={handleEntryChange}
+              >
+                {members.map((member) => (
+                  <option
+                    key={member.id}
+                    value={member.id}
+                  >
+                    {getFullMemberName(member)}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label>
+              <span>Entry type</span>
+              <select
+                name="type"
+                value={entryForm.type}
+                onChange={handleEntryChange}
+              >
+                <option value="opening_balance">
+                  Opening balance (+/−)
+                </option>
+                <option value="deposit">
+                  Advance deposit
+                </option>
+              </select>
+            </label>
+
+            <label>
+              <span>Amount</span>
+              <input
+                name="amount"
+                type="number"
+                step="0.01"
+                min={
+                  entryForm.type === "deposit"
+                    ? "0.01"
+                    : undefined
+                }
+                value={entryForm.amount}
+                onChange={handleEntryChange}
+                placeholder={
+                  entryForm.type ===
+                  "opening_balance"
+                    ? "Example: -500 or 500"
+                    : "Deposit amount"
+                }
+              />
+            </label>
+
+            {entryForm.type === "deposit" && (
+              <label>
+                <span>Deposit date</span>
+                <input
+                  name="date"
+                  type="date"
+                  value={entryForm.date}
+                  onChange={handleEntryChange}
+                  min={`${selectedMonth}-01`}
+                />
+              </label>
+            )}
+
+            <label className="mb-note-field">
+              <span>Note (optional)</span>
+              <input
+                name="note"
+                value={entryForm.note}
+                onChange={handleEntryChange}
+                placeholder="Short note"
+                maxLength="160"
+              />
+            </label>
+
+            <button
+              type="submit"
+              className="mb-save-entry-button"
+              disabled={saving || !members.length}
+            >
+              <Plus size={16} />
+              {saving ? "Saving..." : "Save entry"}
+            </button>
+          </form>
+
+          {monthlyFinancialEntries.length > 0 && (
+            <div className="mb-entry-list">
+              {monthlyFinancialEntries.map((entry) => (
+                <article key={entry.id}>
+                  <div>
+                    <strong>
+                      {entry.memberName || "Member"}
+                    </strong>
+                    <span>
+                      {entry.type ===
+                      "opening_balance"
+                        ? "Opening balance"
+                        : `Deposit • ${entry.date}`}
+                      {entry.note
+                        ? ` • ${entry.note}`
+                        : ""}
+                    </span>
+                  </div>
+
+                  <SignedMoney value={entry.amount} />
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      handleDeleteEntry(entry)
+                    }
+                    aria-label="Delete entry"
+                    title="Delete entry"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+
       <section className="mb-table-card">
         <header className="mb-table-header">
           <div>
             <h2>Final Member-wise Settlement</h2>
             <p>
-              Bazaar payment minus meal bill determines the
-              final balance.
+              Opening + deposit + bazaar − meal bill.
             </p>
           </div>
-
           <span className="mb-member-count">
             {memberBalances.length} members
           </span>
         </header>
 
-        <div className="report-table-wrapper">
-          <table className="member-balance-table">
+        <div className="mb-table-wrapper">
+          <table className="mb-settlement-table">
             <thead>
               <tr>
                 <th>Member</th>
+                <th>Opening</th>
+                <th>Deposit</th>
                 <th>Meal</th>
                 <th>Bazaar</th>
                 <th>Bill</th>
                 <th>Balance</th>
-                <th>Status</th>
               </tr>
             </thead>
 
             <tbody>
               {memberBalances.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="mb-empty">
-                    No member balance found for this month.
+                  <td colSpan="7" className="mb-empty">
+                    No member balance found for this
+                    month.
                   </td>
                 </tr>
               ) : (
-                memberBalances.map((member) => {
-                  const willReceive =
-                    member.balance > 0.005;
-
-                  const willPay =
-                    member.balance < -0.005;
-
-                  return (
-                    <tr key={member.id}>
-                      <td className="mb-member-cell">
+                memberBalances.map((member) => (
+                  <tr key={member.id}>
+                    <td>
+                      <div className="mb-member-cell">
                         <div
                           className="mb-member-avatar"
                           title={member.name}
                         >
-                          {member.name
+                          {member.displayName
                             ?.charAt(0)
                             .toUpperCase() || "M"}
                         </div>
-
                         <div className="mb-member-details">
                           <strong
-                            className="balance-member-name"
+                            className="mb-settlement-member-name"
                             title={member.name}
                           >
-                            {getDisplayName(member.name)}
+                            {member.name}
                           </strong>
-
                           {!member.active && (
-                            <small>Former</small>
+                            <small>Former member</small>
                           )}
                         </div>
-                      </td>
-
-                      <td>
-                        <span className="mb-meal-value">
-                          {formatMeal(member.totalMeal)}
-                        </span>
-                      </td>
-
-                      <td>
-                        ৳{formatMoney(member.bazaarPaid)}
-                      </td>
-
-                      <td>
-                        ৳{formatMoney(member.mealBill)}
-                      </td>
-
-                      <td>
-                        <strong
-                          className={
-                            willReceive
-                              ? "mb-balance positive"
-                              : willPay
-                              ? "mb-balance negative"
-                              : "mb-balance neutral"
-                          }
-                        >
-                          {willReceive ? "+" : ""}
-                          {willPay ? "−" : ""}
-                          ৳
-                          {formatMoney(
-                            Math.abs(member.balance)
-                          )}
-                        </strong>
-                      </td>
-
-                      <td>
-                        <span
-                          className={
-                            willReceive
-                              ? "mb-status receive"
-                              : willPay
-                              ? "mb-status pay"
-                              : "mb-status settled"
-                          }
-                        >
-                          {willReceive
-                            ? "পাবে"
-                            : willPay
-                            ? "দেবে"
-                            : "সমান"}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })
+                      </div>
+                    </td>
+                    <td>
+                      <SignedMoney
+                        value={member.openingBalance}
+                      />
+                    </td>
+                    <td>
+                      ৳{formatMoney(member.deposits)}
+                    </td>
+                    <td>
+                      <span className="mb-meal-value">
+                        {formatMeal(member.totalMeal)}
+                      </span>
+                    </td>
+                    <td>
+                      ৳{formatMoney(member.bazaarPaid)}
+                    </td>
+                    <td>
+                      ৳{formatMoney(member.mealBill)}
+                    </td>
+                    <td>
+                      <SignedMoney
+                        value={member.balance}
+                      />
+                    </td>
+                  </tr>
+                ))
               )}
             </tbody>
 
@@ -491,10 +954,18 @@ const MemberBalance = () => {
               <tfoot>
                 <tr>
                   <th>Total</th>
+                  <th>
+                    <SignedMoney value={totalOpening} />
+                  </th>
+                  <th>৳{formatMoney(totalDeposits)}</th>
                   <th>{formatMeal(totalMeals)}</th>
                   <th>৳{formatMoney(totalBazaar)}</th>
                   <th>৳{formatMoney(totalBazaar)}</th>
-                  <th colSpan="2">Balanced</th>
+                  <th>
+                    <SignedMoney
+                      value={totalFinalBalance}
+                    />
+                  </th>
                 </tr>
               </tfoot>
             )}
@@ -504,26 +975,19 @@ const MemberBalance = () => {
 
       <section className="mb-final-summary">
         <article>
+          <span>Total advance deposit</span>
+          <strong>৳{formatMoney(totalDeposits)}</strong>
+        </article>
+        <article>
           <span>Total টাকা পাবে</span>
           <strong className="positive">
             ৳{formatMoney(totalReceivable)}
           </strong>
         </article>
-
         <article>
           <span>Total টাকা দেবে</span>
           <strong className="negative">
             ৳{formatMoney(totalPayable)}
-          </strong>
-        </article>
-
-        <article>
-          <span>Difference</span>
-          <strong>
-            ৳
-            {formatMoney(
-              Math.abs(totalReceivable - totalPayable)
-            )}
           </strong>
         </article>
       </section>

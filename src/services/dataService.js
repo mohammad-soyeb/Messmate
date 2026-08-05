@@ -5,8 +5,7 @@ import {
 } from "./messService";
 
 const requireWorkspace = async () => {
-  const state =
-    await getCurrentMessState();
+  const state = await getCurrentMessState();
 
   if (!state) {
     throw new Error(
@@ -17,285 +16,396 @@ const requireWorkspace = async () => {
   return state;
 };
 
-const mapMeal = (meal) => {
-  return {
-    id: meal.id,
-    messId: meal.mess_id,
-    memberId: meal.member_id,
+const mapMeal = (meal) => ({
+  id: meal.id,
+  messId: meal.mess_id,
+  memberId: meal.member_id,
+  memberName: meal.member?.name || "",
+  date: meal.meal_date,
+  breakfast: Number(meal.breakfast) || 0,
+  lunch: Number(meal.lunch) || 0,
+  dinner: Number(meal.dinner) || 0,
+  createdAt: meal.created_at,
+  updatedAt: meal.updated_at,
+});
 
-    memberName:
-      meal.member?.name || "",
+const mapBazaarEntry = (entry) => ({
+  id: entry.id,
+  messId: entry.mess_id,
+  memberId: entry.member_id,
+  memberName: entry.member?.name || "",
+  date: entry.bazaar_date,
+  grandTotal: Number(entry.grand_total) || 0,
+  paymentSource:
+    entry.payment_source || "personal",
+  receipt: entry.receipt_url || null,
+  receiptPath: entry.receipt_path || null,
+  receiptName: entry.receipt_name || "",
+  createdAt: entry.created_at,
+  updatedAt: entry.updated_at,
 
-    date: meal.meal_date,
+  items: (entry.items || []).map((item) => ({
+    id: item.id,
+    category: item.category,
+    itemName: item.item_name,
+    quantity: Number(item.quantity) || 0,
+    amount: Number(item.amount) || 0,
+  })),
+});
 
-    breakfast:
-      Number(meal.breakfast) || 0,
+const mapFinancialEntry = (entry) => ({
+  id: entry.id,
+  messId: entry.mess_id,
+  memberId: entry.member_id,
+  memberName: entry.member?.name || "",
+  month: entry.entry_month
+    ? String(entry.entry_month).slice(0, 7)
+    : "",
+  type: entry.entry_type,
+  amount: Number(entry.amount) || 0,
+  date: entry.transaction_date,
+  note: entry.note || "",
+  createdAt: entry.created_at,
+  updatedAt: entry.updated_at,
+});
 
-    lunch:
-      Number(meal.lunch) || 0,
+const getMembersForMess = async (messId) => {
+  const client = requireSupabase();
 
-    dinner:
-      Number(meal.dinner) || 0,
+  const { data, error } = await client
+    .from("members")
+    .select("*")
+    .eq("mess_id", messId)
+    .eq("is_active", true)
+    .order("joined_at", {
+      ascending: true,
+    });
 
-    createdAt:
-      meal.created_at,
+  if (error) {
+    throw error;
+  }
 
-    updatedAt:
-      meal.updated_at,
-  };
+  return (data || []).map(mapMember);
 };
 
-const mapBazaarEntry = (
-  entry
+const getMealsForMess = async (messId) => {
+  const client = requireSupabase();
+
+  const { data, error } = await client
+    .from("meals")
+    .select(
+      `
+        *,
+        member:members!meals_member_id_fkey(name)
+      `
+    )
+    .eq("mess_id", messId)
+    .order("meal_date", {
+      ascending: false,
+    });
+
+  if (error) {
+    throw error;
+  }
+
+  return (data || []).map(mapMeal);
+};
+
+const getBazaarForMess = async (messId) => {
+  const client = requireSupabase();
+
+  const { data, error } = await client
+    .from("bazaar_entries")
+    .select(
+      `
+        *,
+        member:members!bazaar_entries_member_id_fkey(name),
+        items:bazaar_items(*)
+      `
+    )
+    .eq("mess_id", messId)
+    .order("bazaar_date", {
+      ascending: false,
+    })
+    .order("created_at", {
+      ascending: false,
+    });
+
+  if (error) {
+    throw error;
+  }
+
+  const entries = data || [];
+
+  const paths = entries
+    .map((entry) => entry.receipt_path)
+    .filter(Boolean);
+
+  const signedUrls = new Map();
+
+  await Promise.all(
+    paths.map(async (path) => {
+      const { data: signed, error: signedError } =
+        await client.storage
+          .from("bazaar-receipts")
+          .createSignedUrl(path, 60 * 60);
+
+      if (!signedError && signed?.signedUrl) {
+        signedUrls.set(path, signed.signedUrl);
+      }
+    })
+  );
+
+  return entries.map((entry) =>
+    mapBazaarEntry({
+      ...entry,
+      receipt_url:
+        signedUrls.get(entry.receipt_path) || null,
+    })
+  );
+};
+
+const getFinancialEntriesForMess = async (
+  messId
 ) => {
-  return {
-    id: entry.id,
-    messId: entry.mess_id,
-    memberId: entry.member_id,
+  const client = requireSupabase();
 
-    memberName:
-      entry.member?.name || "",
+  const { data, error } = await client
+    .from("member_financial_entries")
+    .select(
+      `
+        *,
+        member:members!member_financial_entries_member_id_fkey(name)
+      `
+    )
+    .eq("mess_id", messId)
+    .order("entry_month", {
+      ascending: false,
+    })
+    .order("transaction_date", {
+      ascending: false,
+    })
+    .order("created_at", {
+      ascending: false,
+    });
 
-    date:
-      entry.bazaar_date,
+  if (error) {
+    throw error;
+  }
 
-    grandTotal:
-      Number(
-        entry.grand_total
-      ) || 0,
-
-    receipt:
-      entry.receipt_url || null,
-
-    receiptPath:
-      entry.receipt_path || null,
-
-    receiptName:
-      entry.receipt_name || "",
-
-    createdAt:
-      entry.created_at,
-
-    updatedAt:
-      entry.updated_at,
-
-    items: (
-      entry.items || []
-    ).map((item) => ({
-      id: item.id,
-      category: item.category,
-
-      itemName:
-        item.item_name,
-
-      quantity:
-        Number(
-          item.quantity
-        ) || 0,
-
-      amount:
-        Number(
-          item.amount
-        ) || 0,
-    })),
-  };
+  return (data || []).map(mapFinancialEntry);
 };
 
-const getMembersForMess =
-  async (messId) => {
-    const client =
-      requireSupabase();
+export const getWorkspaceData = async () => {
+  const state = await requireWorkspace();
 
-    const { data, error } =
-      await client
-        .from("members")
-        .select("*")
-        .eq("mess_id", messId)
-        .eq("is_active", true)
-        .order("joined_at", {
-          ascending: true,
-        });
-
-    if (error) {
-      throw error;
-    }
-
-    return (data || []).map(
-      mapMember
-    );
-  };
-
-const getMealsForMess =
-  async (messId) => {
-    const client =
-      requireSupabase();
-
-    const { data, error } =
-      await client
-        .from("meals")
-        .select(
-          "*, member:members!meals_member_id_fkey(name)"
-        )
-        .eq("mess_id", messId)
-        .order("meal_date", {
-          ascending: false,
-        });
-
-    if (error) {
-      throw error;
-    }
-
-    return (data || []).map(
-      mapMeal
-    );
-  };
-
-const getBazaarForMess =
-  async (messId) => {
-    const client =
-      requireSupabase();
-
-    const { data, error } =
-      await client
-        .from("bazaar_entries")
-        .select(
-          "*, member:members!bazaar_entries_member_id_fkey(name), items:bazaar_items(*)"
-        )
-        .eq("mess_id", messId)
-        .order("bazaar_date", {
-          ascending: false,
-        })
-        .order("created_at", {
-          ascending: false,
-        });
-
-    if (error) {
-      throw error;
-    }
-
-    const entries = data || [];
-
-    const receiptPaths =
-      entries
-        .map(
-          (entry) =>
-            entry.receipt_path
-        )
-        .filter(Boolean);
-
-    const signedUrls =
-      new Map();
-
-    await Promise.all(
-      receiptPaths.map(
-        async (path) => {
-          const {
-            data: signedData,
-            error: signedError,
-          } =
-            await client.storage
-              .from(
-                "bazaar-receipts"
-              )
-              .createSignedUrl(
-                path,
-                60 * 60
-              );
-
-          if (signedError) {
-            console.error(
-              "Unable to create receipt URL:",
-              signedError
-            );
-
-            return;
-          }
-
-          if (
-            signedData?.signedUrl
-          ) {
-            signedUrls.set(
-              path,
-              signedData.signedUrl
-            );
-          }
-        }
-      )
-    );
-
-    return entries.map(
-      (entry) =>
-        mapBazaarEntry({
-          ...entry,
-
-          receipt_url:
-            signedUrls.get(
-              entry.receipt_path
-            ) || null,
-        })
-    );
-  };
-
-export const getWorkspaceData =
-  async () => {
-    const state =
-      await requireWorkspace();
-
-    const [
-      members,
-      meals,
-      bazaarEntries,
-    ] = await Promise.all([
-      getMembersForMess(
-        state.mess.id
-      ),
-
-      getMealsForMess(
-        state.mess.id
-      ),
-
-      getBazaarForMess(
+  const [
+    members,
+    meals,
+    bazaarEntries,
+    financialEntries,
+  ] = await Promise.all([
+      getMembersForMess(state.mess.id),
+      getMealsForMess(state.mess.id),
+      getBazaarForMess(state.mess.id),
+      getFinancialEntriesForMess(
         state.mess.id
       ),
     ]);
 
-    return {
-      ...state,
-      members,
-      meals,
-      bazaarEntries,
-    };
+  return {
+    ...state,
+    members,
+    meals,
+    bazaarEntries,
+    financialEntries,
   };
+};
 
-export const getMembers =
-  async () => {
-    const state =
-      await requireWorkspace();
+export const getMembers = async () => {
+  const state = await requireWorkspace();
 
-    return getMembersForMess(
-      state.mess.id
+  return getMembersForMess(state.mess.id);
+};
+
+export const getMeals = async () => {
+  const state = await requireWorkspace();
+
+  return getMealsForMess(state.mess.id);
+};
+
+export const getBazaarEntries = async () => {
+  const state = await requireWorkspace();
+
+  return getBazaarForMess(state.mess.id);
+};
+
+export const getFinancialEntries = async () => {
+  const state = await requireWorkspace();
+
+  return getFinancialEntriesForMess(
+    state.mess.id
+  );
+};
+
+export const setOpeningBalance = async ({
+  memberId,
+  month,
+  amount,
+  note = "",
+}) => {
+  if (!memberId || !month) {
+    throw new Error(
+      "Member and month are required."
     );
-  };
+  }
 
-export const getMeals =
-  async () => {
-    const state =
-      await requireWorkspace();
+  const numericAmount = Number(amount);
 
-    return getMealsForMess(
-      state.mess.id
+  if (!Number.isFinite(numericAmount)) {
+    throw new Error(
+      "Enter a valid opening balance."
     );
-  };
+  }
 
-export const getBazaarEntries =
-  async () => {
-    const state =
-      await requireWorkspace();
+  const state = await requireWorkspace();
+  const client = requireSupabase();
 
-    return getBazaarForMess(
-      state.mess.id
+  const { data, error } = await client.rpc(
+    "set_member_opening_balance",
+    {
+      p_mess_id: state.mess.id,
+      p_member_id: memberId,
+      p_month: `${month}-01`,
+      p_amount: numericAmount,
+      p_note: note?.trim() || null,
+    }
+  );
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+};
+
+export const addMemberDeposit = async ({
+  memberId,
+  date,
+  amount,
+  note = "",
+}) => {
+  if (!memberId || !date) {
+    throw new Error(
+      "Member and deposit date are required."
     );
-  };
+  }
+
+  const numericAmount = Number(amount);
+
+  if (
+    !Number.isFinite(numericAmount) ||
+    numericAmount <= 0
+  ) {
+    throw new Error(
+      "Deposit amount must be greater than zero."
+    );
+  }
+
+  const state = await requireWorkspace();
+  const client = requireSupabase();
+
+  const { data, error } = await client
+    .from("member_financial_entries")
+    .insert({
+      mess_id: state.mess.id,
+      member_id: memberId,
+      entry_month: `${date.slice(0, 7)}-01`,
+      entry_type: "deposit",
+      amount: numericAmount,
+      transaction_date: date,
+      note: note?.trim() || null,
+    })
+    .select(
+      `
+        *,
+        member:members!member_financial_entries_member_id_fkey(name)
+      `
+    )
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return mapFinancialEntry(data);
+};
+
+export const deleteMemberFinancialEntry = async (
+  entryId
+) => {
+  const client = requireSupabase();
+
+  const { data, error } = await client
+    .from("member_financial_entries")
+    .delete()
+    .eq("id", entryId)
+    .select("id");
+
+  if (error) {
+    throw error;
+  }
+
+  if (!data?.length) {
+    throw new Error(
+      "Entry was not deleted. Manager permission is required."
+    );
+  }
+};
+
+export const carryForwardMemberBalances = async ({
+  sourceMonth,
+  balances,
+}) => {
+  if (!sourceMonth) {
+    throw new Error("Source month is required.");
+  }
+
+  const validBalances = (balances || [])
+    .filter(
+      (item) =>
+        item.memberId &&
+        Number.isFinite(Number(item.amount))
+    )
+    .map((item) => ({
+      member_id: item.memberId,
+      amount: Number(item.amount),
+    }));
+
+  if (!validBalances.length) {
+    throw new Error(
+      "No member balance is available to transfer."
+    );
+  }
+
+  const state = await requireWorkspace();
+  const client = requireSupabase();
+
+  const { data, error } = await client.rpc(
+    "carry_forward_member_balances",
+    {
+      p_mess_id: state.mess.id,
+      p_source_month: `${sourceMonth}-01`,
+      p_balances: validBalances,
+    }
+  );
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
+};
 
 export const addMember = async ({
   name,
@@ -303,56 +413,26 @@ export const addMember = async ({
   phone,
   room,
 }) => {
-  const state =
-    await requireWorkspace();
+  const state = await requireWorkspace();
+  const client = requireSupabase();
 
-  if (
-    state.member.role !==
-    "manager"
-  ) {
-    throw new Error(
-      "Only a manager can add members."
-    );
-  }
-
-  const cleanName =
-    name?.trim();
-
+  const cleanName = name?.trim();
   if (!cleanName) {
-    throw new Error(
-      "Member name is required."
-    );
+    throw new Error("Member name is required.");
   }
 
-  const client =
-    requireSupabase();
-
-  const { data, error } =
-    await client
-      .from("members")
-      .insert({
-        mess_id:
-          state.mess.id,
-
-        name: cleanName,
-
-        email:
-          email?.trim() ||
-          null,
-
-        phone:
-          phone?.trim() ||
-          null,
-
-        room:
-          room?.trim() ||
-          null,
-
-        role: "member",
-        is_active: true,
-      })
-      .select()
-      .single();
+  const { data, error } = await client
+    .from("members")
+    .insert({
+      mess_id: state.mess.id,
+      name: cleanName,
+      email: email?.trim() || null,
+      phone: phone?.trim() || null,
+      room: room?.trim() || null,
+      role: "member",
+    })
+    .select()
+    .single();
 
   if (error) {
     throw error;
@@ -361,49 +441,16 @@ export const addMember = async ({
   return mapMember(data);
 };
 
-export const updateMember =
-  async (
-    memberId,
-    updates
-  ) => {
-    const state =
-      await requireWorkspace();
+export const updateMember = async (
+  memberId,
+  updates
+) => {
+  const client = requireSupabase();
 
-    const selectedMember =
-      (
-        await getMembersForMess(
-          state.mess.id
-        )
-      ).find(
-        (member) =>
-          member.id === memberId
-      );
+  const payload = {};
 
-    if (!selectedMember) {
-      throw new Error(
-        "Member not found."
-      );
-    }
-
-    const isManager =
-      state.member.role ===
-      "manager";
-
-    const isOwnProfile =
-      selectedMember.userId ===
-      state.member.userId;
-
-    if (
-      !isManager &&
-      !isOwnProfile
-    ) {
-      throw new Error(
-        "You cannot update another member."
-      );
-    }
-
-    const cleanName =
-      updates.name?.trim();
+  if (updates.name !== undefined) {
+    const cleanName = updates.name?.trim();
 
     if (!cleanName) {
       throw new Error(
@@ -411,95 +458,58 @@ export const updateMember =
       );
     }
 
-    const payload = {
-      name: cleanName,
+    payload.name = cleanName;
+  }
 
-      email:
-        updates.email?.trim() ||
-        null,
+  if (updates.email !== undefined) {
+    payload.email =
+      updates.email?.trim() || null;
+  }
 
-      phone:
-        updates.phone?.trim() ||
-        null,
+  if (updates.phone !== undefined) {
+    payload.phone =
+      updates.phone?.trim() || null;
+  }
 
-      room:
-        updates.room?.trim() ||
-        null,
-    };
+  if (updates.room !== undefined) {
+    payload.room =
+      updates.room?.trim() || null;
+  }
 
-    if (
-      updates.role &&
-      isManager
-    ) {
-      payload.role =
-        updates.role;
+  if (updates.role !== undefined) {
+    payload.role = updates.role;
+  }
+
+  payload.updated_at = new Date().toISOString();
+
+  const { data, error } = await client
+    .from("members")
+    .update(payload)
+    .eq("id", memberId)
+    .select()
+    .single();
+
+  if (error) {
+    throw error;
+  }
+
+  return mapMember(data);
+};
+
+export const removeMember = async (memberId) => {
+  const client = requireSupabase();
+
+  const { error } = await client.rpc(
+    "remove_member_from_mess",
+    {
+      p_member_id: memberId,
     }
+  );
 
-    const client =
-      requireSupabase();
-
-    const { data, error } =
-      await client
-        .from("members")
-        .update(payload)
-        .eq("id", memberId)
-        .eq(
-          "mess_id",
-          state.mess.id
-        )
-        .eq(
-          "is_active",
-          true
-        )
-        .select()
-        .single();
-
-    if (error) {
-      throw error;
-    }
-
-    return mapMember(data);
-  };
-
-export const removeMember =
-  async (memberId) => {
-    const state =
-      await requireWorkspace();
-
-    if (
-      state.member.role !==
-      "manager"
-    ) {
-      throw new Error(
-        "Only a manager can remove members."
-      );
-    }
-
-    if (
-      state.member.id ===
-      memberId
-    ) {
-      throw new Error(
-        "You cannot remove yourself. Another manager must approve this action."
-      );
-    }
-
-    const client =
-      requireSupabase();
-
-    const { error } =
-      await client.rpc(
-        "remove_member_from_mess",
-        {
-          p_member_id:
-            memberId,
-        }
-      );
-
-    if (error) {
-      throw error;
-    }
-  };
+  if (error) {
+    throw error;
+  }
+};
 
 export const saveMeal = async ({
   memberId,
@@ -508,74 +518,32 @@ export const saveMeal = async ({
   lunch,
   dinner,
 }) => {
-  const state =
-    await requireWorkspace();
+  const state = await requireWorkspace();
+  const client = requireSupabase();
 
-  const isManager =
-    state.member.role ===
-    "manager";
-
-  const isOwnMeal =
-    state.member.id ===
-    memberId;
-
-  if (
-    !isManager &&
-    !isOwnMeal
-  ) {
-    throw new Error(
-      "You cannot update another member's meal."
-    );
-  }
-
-  if (!date) {
-    throw new Error(
-      "Meal date is required."
-    );
-  }
-
-  const client =
-    requireSupabase();
-
-  const { data, error } =
-    await client
-      .from("meals")
-      .upsert(
-        {
-          mess_id:
-            state.mess.id,
-
-          member_id:
-            memberId,
-
-          meal_date:
-            date,
-
-          breakfast:
-            Number(
-              breakfast
-            ) || 0,
-
-          lunch:
-            Number(
-              lunch
-            ) || 0,
-
-          dinner:
-            Number(
-              dinner
-            ) || 0,
-        },
-
-        {
-          onConflict:
-            "mess_id,member_id,meal_date",
-        }
-      )
-      .select(
-        "*, member:members!meals_member_id_fkey(name)"
-      )
-      .single();
+  const { data, error } = await client
+    .from("meals")
+    .upsert(
+      {
+        mess_id: state.mess.id,
+        member_id: memberId,
+        meal_date: date,
+        breakfast: Number(breakfast) || 0,
+        lunch: Number(lunch) || 0,
+        dinner: Number(dinner) || 0,
+      },
+      {
+        onConflict:
+          "mess_id,member_id,meal_date",
+      }
+    )
+    .select(
+      `
+        *,
+        member:members!meals_member_id_fkey(name)
+      `
+    )
+    .single();
 
   if (error) {
     throw error;
@@ -584,123 +552,69 @@ export const saveMeal = async ({
   return mapMeal(data);
 };
 
-export const createBazaarEntry =
-  async ({
-    date,
-    memberId,
-    items,
-    receiptFile,
-  }) => {
-    const state =
-      await requireWorkspace();
+export const createBazaarEntry = async ({
+  date,
+  memberId,
+  paymentSource = "personal",
+  items,
+  receiptFile,
+}) => {
+  const state = await requireWorkspace();
+  const client = requireSupabase();
 
-    const isManager =
-      state.member.role ===
-      "manager";
+  const validItems = (items || []).filter(
+    (item) =>
+      item.itemName?.trim() &&
+      Number(item.amount) > 0
+  );
 
-    const isOwnEntry =
-      state.member.id ===
-      memberId;
+  if (validItems.length === 0) {
+    throw new Error(
+      "Add at least one bazaar item."
+    );
+  }
 
-    if (
-      !isManager &&
-      !isOwnEntry
-    ) {
-      throw new Error(
-        "You cannot create another member's bazaar entry."
-      );
-    }
+  const grandTotal = validItems.reduce(
+    (total, item) =>
+      total + (Number(item.amount) || 0),
+    0
+  );
 
-    if (!date) {
-      throw new Error(
-        "Bazaar date is required."
-      );
-    }
+  const normalizedPaymentSource =
+    paymentSource === "mess_fund"
+      ? "mess_fund"
+      : "personal";
 
-    if (
-      !Array.isArray(items) ||
-      items.length === 0
-    ) {
-      throw new Error(
-        "At least one bazaar item is required."
-      );
-    }
-
-    const grandTotal =
-      items.reduce(
-        (total, item) =>
-          total +
-          (
-            Number(
-              item.amount
-            ) || 0
-          ),
-        0
-      );
-
-    if (grandTotal <= 0) {
-      throw new Error(
-        "Grand total must be greater than zero."
-      );
-    }
-
-    const client =
-      requireSupabase();
-
-    const {
-      data: entry,
-      error: entryError,
-    } = await client
-      .from(
-        "bazaar_entries"
-      )
+  const { data: entry, error: entryError } =
+    await client
+      .from("bazaar_entries")
       .insert({
-        mess_id:
-          state.mess.id,
-
-        member_id:
-          memberId,
-
-        bazaar_date:
-          date,
-
-        grand_total:
-          grandTotal,
+        mess_id: state.mess.id,
+        member_id: memberId,
+        bazaar_date: date,
+        grand_total: grandTotal,
+        payment_source:
+          normalizedPaymentSource,
       })
       .select()
       .single();
 
-    if (entryError) {
-      throw entryError;
-    }
+  if (entryError) {
+    throw entryError;
+  }
 
-    const {
-      error: itemsError,
-    } = await client
+  try {
+    const { error: itemsError } = await client
       .from("bazaar_items")
       .insert(
-        items.map(
-          (item) => ({
-            entry_id:
-              entry.id,
-
-            category:
-              item.category,
-
-            item_name:
-              item.itemName.trim(),
-
-            quantity:
-              Number(
-                item.quantity
-              ) || 0,
-
-            amount:
-              Number(
-                item.amount
-              ) || 0,
-          })
-        )
+        validItems.map((item) => ({
+          entry_id: entry.id,
+          category: item.category,
+          item_name: item.itemName.trim(),
+          quantity:
+            Number(item.quantity) || 0,
+          amount: Number(item.amount) || 0,
+        }))
       );
 
     if (itemsError) {
@@ -708,35 +622,24 @@ export const createBazaarEntry =
     }
 
     if (receiptFile) {
-      const safeFileName =
-        receiptFile.name
-          .toLowerCase()
-          .replace(
-            /[^a-z0-9._-]+/g,
-            "-"
-          );
+      const safeName = receiptFile.name
+        .toLowerCase()
+        .replace(/[^a-z0-9._-]+/g, "-");
 
       const receiptPath =
         `${state.mess.id}/` +
         `${memberId}/` +
-        `${entry.id}-` +
-        `${safeFileName}`;
+        `${entry.id}-${safeName}`;
 
-      const {
-        error: uploadError,
-      } =
+      const { error: uploadError } =
         await client.storage
-          .from(
-            "bazaar-receipts"
-          )
+          .from("bazaar-receipts")
           .upload(
             receiptPath,
             receiptFile,
             {
               upsert: false,
-
-              contentType:
-                receiptFile.type,
+              contentType: receiptFile.type,
             }
           );
 
@@ -744,182 +647,110 @@ export const createBazaarEntry =
         throw uploadError;
       }
 
-      const {
-        error: updateError,
-      } = await client
-        .from(
-          "bazaar_entries"
-        )
-        .update({
-          receipt_path:
-            receiptPath,
-
-          receipt_name:
-            receiptFile.name,
-        })
-        .eq("id", entry.id);
+      const { error: updateError } =
+        await client
+          .from("bazaar_entries")
+          .update({
+            receipt_path: receiptPath,
+            receipt_name: receiptFile.name,
+            updated_at:
+              new Date().toISOString(),
+          })
+          .eq("id", entry.id);
 
       if (updateError) {
         throw updateError;
       }
     }
 
-    const entries =
-      await getBazaarForMess(
-        state.mess.id
-      );
+    const entries = await getBazaarForMess(
+      state.mess.id
+    );
 
-    const savedEntry =
-      entries.find(
-        (savedItem) =>
-          savedItem.id ===
-          entry.id
-      );
+    return entries.find(
+      (savedEntry) =>
+        savedEntry.id === entry.id
+    );
+  } catch (error) {
+    await client
+      .from("bazaar_entries")
+      .delete()
+      .eq("id", entry.id);
 
-    if (!savedEntry) {
-      throw new Error(
-        "Bazaar entry was saved but could not be loaded."
-      );
-    }
+    throw error;
+  }
+};
 
-    return savedEntry;
-  };
 export const deleteBazaarEntry = async (
   entryId,
   receiptPath
 ) => {
   const client = requireSupabase();
 
-  /*
-   * আগে database entry delete হবে।
-   * select("id") দিয়ে নিশ্চিত করা হবে row
-   * সত্যিই delete হয়েছে কি না।
-   */
-  const {
-    data: deletedEntries,
-    error: deleteError,
-  } = await client
-    .from("bazaar_entries")
-    .delete()
-    .eq("id", entryId)
-    .select("id");
+  const { data: deletedRows, error } =
+    await client
+      .from("bazaar_entries")
+      .delete()
+      .eq("id", entryId)
+      .select("id");
 
-  if (deleteError) {
-    throw deleteError;
+  if (error) {
+    throw error;
   }
 
-  if (
-    !deletedEntries ||
-    deletedEntries.length === 0
-  ) {
+  if (!deletedRows?.length) {
     throw new Error(
-      "Bazaar entry was not deleted. Manager permission or Supabase delete policy is missing."
+      "Bazaar entry was not deleted. Manager permission may be required."
     );
   }
 
- 
   if (receiptPath) {
-    const { error: receiptError } =
+    const { error: storageError } =
       await client.storage
         .from("bazaar-receipts")
         .remove([receiptPath]);
 
-    if (receiptError) {
-      console.warn(
-        "Entry deleted, but receipt cleanup failed:",
-        receiptError
+    if (storageError) {
+      console.error(
+        "Receipt removal failed:",
+        storageError
       );
     }
   }
-
-  return deletedEntries[0];
 };
 
-export const resetActivityData =
-  async () => {
-    const state =
-      await requireWorkspace();
-
-    if (
-      state.member.role !==
-      "manager"
-    ) {
-      throw new Error(
-        "Only a manager can reset activity data."
-      );
-    }
-
-    const client =
-      requireSupabase();
-
-    const { error } =
-      await client.rpc(
-        "reset_mess_activity",
-        {
-          p_mess_id:
-            state.mess.id,
-        }
-      );
-
-    if (error) {
-      throw error;
-    }
-  };
-
-  export const deleteMessWorkspace = async ({
-  messId,
-  confirmationName,
-}) => {
+export const resetActivityData = async () => {
   const state = await requireWorkspace();
   const client = requireSupabase();
 
-  const currentMessId = state.mess.id;
-  const currentMessName =
-    state.mess.name?.trim();
-
-  /*
-   * Frontend থেকে অন্য messId পাঠিয়ে অন্য mess
-   * delete করার চেষ্টা এখানে আটকানো হবে।
-   */
-  if (!messId || messId !== currentMessId) {
-    throw new Error(
-      "You can delete only your current mess."
-    );
-  }
-
-  if (
-    !confirmationName ||
-    confirmationName.trim() !== currentMessName
-  ) {
-    throw new Error(
-      "Mess name confirmation does not match."
-    );
-  }
-
-  /*
-   * Supabase RPC আবার server-side manager,
-   * membership, messId এবং confirmation check করবে।
-   */
-  const { data, error } = await client.rpc(
-    "delete_mess_workspace",
+  const { error } = await client.rpc(
+    "reset_mess_activity",
     {
-      p_mess_id: currentMessId,
-      p_confirmation_name:
-        confirmationName.trim(),
+      p_mess_id: state.mess.id,
     }
   );
 
   if (error) {
     throw error;
   }
+};
 
-  /*
-   * Deleted mess যেন localStorage থেকে আবার
-   * selected workspace হিসেবে load না হয়।
-   */
-  localStorage.removeItem(
-    "messmate_current_mess_id"
+export const deleteMessWorkspace = async (
+  confirmationName
+) => {
+  const state = await requireWorkspace();
+  const client = requireSupabase();
+
+  const { error } = await client.rpc(
+    "delete_mess_workspace",
+    {
+      p_mess_id: state.mess.id,
+      p_confirmation_name:
+        confirmationName?.trim(),
+    }
   );
 
-  return data;
+  if (error) {
+    throw error;
+  }
 };

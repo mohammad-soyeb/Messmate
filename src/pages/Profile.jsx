@@ -15,7 +15,9 @@ import {
   Save,
   ShoppingBasket,
   ShieldCheck,
+  UserRound,
   UtensilsCrossed,
+  Wallet,
   X,
 } from "lucide-react";
 import toast from "react-hot-toast";
@@ -59,13 +61,16 @@ const getBazaarTotal = (entry) => {
   return Number(entry.price || 0);
 };
 
+const isPersonalBazaarPayment = (entry) =>
+  !entry.paymentSource ||
+  entry.paymentSource === "personal";
+
 const formatNumber = (value) => {
   const amount = Number(value) || 0;
 
   return new Intl.NumberFormat("en-BD", {
-    minimumFractionDigits: Number.isInteger(amount)
-      ? 0
-      : 2,
+    minimumFractionDigits:
+      Number.isInteger(amount) ? 0 : 2,
     maximumFractionDigits: 2,
   }).format(amount);
 };
@@ -77,7 +82,9 @@ const formatMoney = (value) =>
   }).format(Number(value) || 0);
 
 const formatDate = (dateValue) => {
-  if (!dateValue) return "Not available";
+  if (!dateValue) {
+    return "Not available";
+  }
 
   const date = new Date(dateValue);
 
@@ -116,7 +123,10 @@ const Profile = () => {
     room: accountUser?.room || "",
   });
 
-  const [user, setUser] = useState(createUserState);
+  const [user, setUser] = useState(
+    createUserState
+  );
+
   const [originalUser, setOriginalUser] =
     useState(createUserState);
 
@@ -133,6 +143,8 @@ const Profile = () => {
     totalMeal: 0,
     mealRate: 0,
     mealBill: 0,
+    openingBalance: 0,
+    deposits: 0,
     bazaarPaid: 0,
     balance: 0,
   });
@@ -140,15 +152,13 @@ const Profile = () => {
   const currentMonth = getCurrentMonth();
 
   useEffect(() => {
-    const nextUser = {
+    setUser((currentUser) => ({
+      ...currentUser,
       name: accountUser?.name || "",
       email: accountUser?.email || "",
       phone: accountUser?.phone || "",
       room: accountUser?.room || "",
-    };
-
-    setUser(nextUser);
-    setOriginalUser(nextUser);
+    }));
   }, [accountUser]);
 
   useEffect(() => {
@@ -160,7 +170,9 @@ const Profile = () => {
 
         const data = await getWorkspaceData();
 
-        if (!active) return;
+        if (!active) {
+          return;
+        }
 
         const currentMember =
           data.member ||
@@ -173,13 +185,17 @@ const Profile = () => {
               accountUser?.email &&
               member.email &&
               normalizeText(member.email) ===
-                normalizeText(accountUser.email);
+                normalizeText(
+                  accountUser.email
+                );
 
             const sameName =
               accountUser?.name &&
               member.name &&
               normalizeText(member.name) ===
-                normalizeText(accountUser.name);
+                normalizeText(
+                  accountUser.name
+                );
 
             return sameEmail || sameName;
           }) ||
@@ -195,21 +211,29 @@ const Profile = () => {
             entry.date?.startsWith(currentMonth)
           );
 
-        const messTotalMeals = monthlyMeals.reduce(
-          (total, meal) =>
-            total + getMealTotal(meal),
-          0
-        );
+        const monthlyFinancialEntries =
+          (data.financialEntries || []).filter(
+            (entry) => entry.month === currentMonth
+          );
 
-        const messTotalBazaar = monthlyBazaar.reduce(
-          (total, entry) =>
-            total + getBazaarTotal(entry),
-          0
-        );
+        const messTotalMeals =
+          monthlyMeals.reduce(
+            (total, meal) =>
+              total + getMealTotal(meal),
+            0
+          );
+
+        const messTotalBazaar =
+          monthlyBazaar.reduce(
+            (total, entry) =>
+              total + getBazaarTotal(entry),
+            0
+          );
 
         const mealRate =
           messTotalMeals > 0
-            ? messTotalBazaar / messTotalMeals
+            ? messTotalBazaar /
+              messTotalMeals
             : 0;
 
         const memberId = currentMember?.id;
@@ -217,7 +241,8 @@ const Profile = () => {
         const myMeals = memberId
           ? monthlyMeals
               .filter(
-                (meal) => meal.memberId === memberId
+                (meal) =>
+                  meal.memberId === memberId
               )
               .reduce(
                 (total, meal) =>
@@ -230,17 +255,74 @@ const Profile = () => {
           ? monthlyBazaar
               .filter(
                 (entry) =>
-                  entry.memberId === memberId
+                  entry.memberId === memberId &&
+                  isPersonalBazaarPayment(entry)
               )
               .reduce(
                 (total, entry) =>
-                  total + getBazaarTotal(entry),
+                  total +
+                  getBazaarTotal(entry),
                 0
               )
           : 0;
 
+        const myFinancialEntries = memberId
+          ? monthlyFinancialEntries.filter(
+              (entry) =>
+                entry.memberId === memberId
+            )
+          : [];
+
+        const openingBalance =
+          myFinancialEntries
+            .filter(
+              (entry) =>
+                entry.type === "opening_balance"
+            )
+            .reduce(
+              (total, entry) =>
+                total + Number(entry.amount || 0),
+              0
+            );
+
+        const deposits = myFinancialEntries
+          .filter(
+            (entry) => entry.type === "deposit"
+          )
+          .reduce(
+            (total, entry) =>
+              total + Number(entry.amount || 0),
+            0
+          );
+
         const mealBill = myMeals * mealRate;
-        const balance = myBazaar - mealBill;
+        const balance =
+          openingBalance +
+          deposits +
+          myBazaar -
+          mealBill;
+
+        const nextUser = {
+          name:
+            accountUser?.name ||
+            currentMember?.name ||
+            "",
+          email:
+            accountUser?.email ||
+            currentMember?.email ||
+            "",
+          phone:
+            accountUser?.phone ||
+            currentMember?.phone ||
+            "",
+          room:
+            accountUser?.room ||
+            currentMember?.room ||
+            "",
+        };
+
+        setUser(nextUser);
+        setOriginalUser(nextUser);
 
         setWorkspace({
           mess: data.mess || null,
@@ -251,6 +333,8 @@ const Profile = () => {
           totalMeal: myMeals,
           mealRate,
           mealBill,
+          openingBalance,
+          deposits,
           bazaarPaid: myBazaar,
           balance,
         });
@@ -284,8 +368,14 @@ const Profile = () => {
     accountUser?.id,
     accountUser?.email,
     accountUser?.name,
+    accountUser?.phone,
+    accountUser?.room,
     currentMonth,
   ]);
+
+  const displayName = useMemo(() => {
+    return user.name?.trim() || "Member";
+  }, [user.name]);
 
   const balanceStatus = useMemo(() => {
     if (stats.balance > 0.005) {
@@ -351,21 +441,31 @@ const Profile = () => {
     try {
       setSaving(true);
 
-      const savedUser = await updateProfile(
-        updatedUser
-      );
+      const savedAccount = await updateProfile({
+        name: updatedUser.name,
+        email: updatedUser.email,
+        phone: updatedUser.phone,
+        room: updatedUser.room,
+      });
 
       const nextUser = {
-        name: savedUser?.name || updatedUser.name,
+        name:
+          savedAccount?.name ||
+          updatedUser.name,
         email:
-          savedUser?.email || updatedUser.email,
+          savedAccount?.email ||
+          updatedUser.email,
         phone:
-          savedUser?.phone || updatedUser.phone,
-        room: savedUser?.room || updatedUser.room,
+          savedAccount?.phone ||
+          updatedUser.phone,
+        room:
+          savedAccount?.room ||
+          updatedUser.room,
       };
 
       setUser(nextUser);
       setOriginalUser(nextUser);
+
       setEditing(false);
 
       toast.success(
@@ -385,6 +485,7 @@ const Profile = () => {
     return (
       <div className="profile-loading">
         <div className="profile-loader" />
+
         <span>Loading your profile...</span>
       </div>
     );
@@ -398,7 +499,7 @@ const Profile = () => {
           <h1>Profile</h1>
 
           <p>
-            Personal details and your current monthly
+            Personal details and current monthly
             statement.
           </p>
         </div>
@@ -418,21 +519,27 @@ const Profile = () => {
       <section className="profile-card">
         <div className="profile-top">
           <div className="profile-avatar">
-            {user.name
-              ? user.name.charAt(0).toUpperCase()
-              : "U"}
+            {displayName
+              .charAt(0)
+              .toUpperCase()}
           </div>
 
           <div className="profile-identity">
             <span>
-              {workspace.member?.role === "manager"
+              {workspace.member?.role ===
+              "manager"
                 ? "Mess manager"
                 : "Mess member"}
             </span>
 
             <h2>{user.name || "Your name"}</h2>
 
-            <p>{user.email || "Email unavailable"}</p>
+            <div className="profile-identity-meta">
+              <p>
+                {user.email ||
+                  "Email unavailable"}
+              </p>
+            </div>
           </div>
 
           <div
@@ -441,7 +548,9 @@ const Profile = () => {
             <CheckCircle2 size={15} />
 
             <div>
-              <span>{balanceStatus.label}</span>
+              <span>
+                {balanceStatus.label}
+              </span>
 
               <strong>
                 {balanceStatus.shortLabel}
@@ -504,13 +613,26 @@ const Profile = () => {
           <div className="profile-info">
             <article className="info-box">
               <div className="profile-info-icon">
+                <UserRound size={15} />
+              </div>
+
+              <div>
+                <h4>Display name</h4>
+                <p>{displayName}</p>
+              </div>
+            </article>
+
+            <article className="info-box">
+              <div className="profile-info-icon">
                 <Phone size={15} />
               </div>
 
               <div>
                 <h4>Phone number</h4>
+
                 <p>
-                  {user.phone || "Not added yet"}
+                  {user.phone ||
+                    "Not added yet"}
                 </p>
               </div>
             </article>
@@ -522,7 +644,11 @@ const Profile = () => {
 
               <div>
                 <h4>Room</h4>
-                <p>{user.room || "Not added yet"}</p>
+
+                <p>
+                  {user.room ||
+                    "Not added yet"}
+                </p>
               </div>
             </article>
 
@@ -533,7 +659,11 @@ const Profile = () => {
 
               <div>
                 <h4>Email</h4>
-                <p>{user.email || "Not available"}</p>
+
+                <p>
+                  {user.email ||
+                    "Not available"}
+                </p>
               </div>
             </article>
 
@@ -544,8 +674,10 @@ const Profile = () => {
 
               <div>
                 <h4>Role</h4>
+
                 <p>
-                  {workspace.member?.role === "manager"
+                  {workspace.member?.role ===
+                  "manager"
                     ? "Manager"
                     : "Member"}
                 </p>
@@ -559,6 +691,7 @@ const Profile = () => {
 
               <div>
                 <h4>Mess</h4>
+
                 <p>
                   {workspace.mess?.name ||
                     "Not available"}
@@ -573,6 +706,7 @@ const Profile = () => {
 
               <div>
                 <h4>Joined</h4>
+
                 <p>
                   {formatDate(
                     workspace.member?.joinedAt
@@ -588,15 +722,51 @@ const Profile = () => {
         <div>
           <span>Current statement</span>
 
-          <h2>{formatMonthName(currentMonth)}</h2>
+          <h2>
+            {formatMonthName(currentMonth)}
+          </h2>
         </div>
 
         <small>
-          Meal rate: ৳{formatMoney(stats.mealRate)}
+          Meal rate: ৳
+          {formatMoney(stats.mealRate)}
         </small>
       </div>
 
       <section className="profile-stats">
+        <article className="stat-box">
+          <span className="profile-stat-icon bill">
+            <Wallet size={19} />
+          </span>
+
+          <div>
+            <span>Opening balance</span>
+
+            <h2>
+              {stats.openingBalance > 0 ? "+" : ""}
+              {stats.openingBalance < 0 ? "−" : ""}
+              ৳
+              {formatMoney(
+                Math.abs(stats.openingBalance)
+              )}
+            </h2>
+          </div>
+        </article>
+
+        <article className="stat-box">
+          <span className="profile-stat-icon balance">
+            <CircleDollarSign size={19} />
+          </span>
+
+          <div>
+            <span>Advance deposit</span>
+
+            <h2>
+              ৳{formatMoney(stats.deposits)}
+            </h2>
+          </div>
+        </article>
+
         <article className="stat-box">
           <span className="profile-stat-icon meals">
             <UtensilsCrossed size={19} />
@@ -604,7 +774,10 @@ const Profile = () => {
 
           <div>
             <span>My total meals</span>
-            <h2>{formatNumber(stats.totalMeal)}</h2>
+
+            <h2>
+              {formatNumber(stats.totalMeal)}
+            </h2>
           </div>
         </article>
 
@@ -615,7 +788,10 @@ const Profile = () => {
 
           <div>
             <span>My meal bill</span>
-            <h2>৳{formatMoney(stats.mealBill)}</h2>
+
+            <h2>
+              ৳{formatMoney(stats.mealBill)}
+            </h2>
           </div>
         </article>
 
@@ -625,7 +801,9 @@ const Profile = () => {
           </span>
 
           <div>
-            <span>My bazaar contribution</span>
+            <span>
+              My bazaar contribution
+            </span>
 
             <h2>
               ৳{formatMoney(stats.bazaarPaid)}
@@ -641,7 +819,9 @@ const Profile = () => {
           </span>
 
           <div>
-            <span>Current month balance</span>
+            <span>
+              Current month balance
+            </span>
 
             <h2>
               {stats.balance > 0 ? "+" : ""}
@@ -652,7 +832,9 @@ const Profile = () => {
               )}
             </h2>
 
-            <small>{balanceStatus.shortLabel}</small>
+            <small>
+              {balanceStatus.shortLabel}
+            </small>
           </div>
         </article>
       </section>
@@ -666,7 +848,9 @@ const Profile = () => {
           >
             <Save size={16} />
 
-            {saving ? "Saving..." : "Save changes"}
+            {saving
+              ? "Saving..."
+              : "Save changes"}
           </button>
 
           <button

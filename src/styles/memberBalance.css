@@ -200,6 +200,224 @@
   color: #fff;
 }
 
+.mb-manager-panel {
+  margin-bottom: 14px;
+  padding: 14px;
+  border: 1px solid rgba(188, 116, 71, 0.18);
+  border-radius: 15px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 250, 246, 0.96),
+      rgba(255, 255, 255, 0.94)
+    );
+  box-shadow: 0 12px 32px rgba(68, 45, 31, 0.055);
+}
+
+.mb-manager-header,
+.mb-manager-header > div {
+  display: flex;
+  align-items: center;
+}
+
+.mb-manager-header {
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.mb-manager-header > div {
+  gap: 10px;
+}
+
+.mb-manager-icon {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+  place-items: center;
+  border-radius: 10px;
+  color: var(--mb-accent-dark);
+  background: rgba(188, 116, 71, 0.12);
+}
+
+.mb-manager-header h2 {
+  margin: 0;
+  color: var(--mb-text);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.mb-manager-header p {
+  margin: 3px 0 0;
+  color: var(--mb-muted);
+  font-size: 9.5px;
+}
+
+.mb-transfer-button,
+.mb-save-entry-button {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
+  color: #fff;
+  font: inherit;
+  font-size: 10px;
+  font-weight: 800;
+  cursor: pointer;
+  background: linear-gradient(
+    135deg,
+    var(--mb-accent-dark),
+    var(--mb-accent)
+  );
+  box-shadow: 0 8px 18px rgba(142, 78, 45, 0.18);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.mb-transfer-button {
+  color: var(--mb-accent-dark);
+  border: 1px solid rgba(188, 116, 71, 0.22);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: none;
+}
+
+.mb-transfer-button:hover:not(:disabled),
+.mb-save-entry-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(142, 78, 45, 0.2);
+}
+
+.mb-transfer-button:disabled,
+.mb-save-entry-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.mb-entry-form {
+  display: grid;
+  grid-template-columns:
+    minmax(130px, 1.15fr)
+    minmax(145px, 1.15fr)
+    minmax(120px, 0.9fr)
+    minmax(125px, 0.9fr)
+    minmax(150px, 1.35fr)
+    auto;
+  align-items: end;
+  gap: 8px;
+}
+
+.mb-entry-form label {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+}
+
+.mb-entry-form label > span {
+  color: var(--mb-muted);
+  font-size: 8.5px;
+  font-weight: 800;
+}
+
+.mb-entry-form input,
+.mb-entry-form select {
+  width: 100%;
+  min-height: 38px;
+  padding: 0 10px;
+  border: 1px solid var(--mb-border);
+  border-radius: 10px;
+  outline: 0;
+  color: var(--mb-text);
+  font: inherit;
+  font-size: 10px;
+  font-weight: 650;
+  background: rgba(255, 255, 255, 0.9);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.mb-entry-form input:focus,
+.mb-entry-form select:focus {
+  border-color: rgba(188, 116, 71, 0.55);
+  box-shadow: 0 0 0 3px rgba(188, 116, 71, 0.1);
+}
+
+.mb-entry-list {
+  display: grid;
+  gap: 6px;
+  max-height: 172px;
+  margin-top: 11px;
+  padding-top: 10px;
+  overflow-y: auto;
+  border-top: 1px solid var(--mb-border);
+}
+
+.mb-entry-list article {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 9px;
+  border: 1px solid rgba(38, 48, 43, 0.07);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.mb-entry-list article > div {
+  min-width: 0;
+}
+
+.mb-entry-list strong,
+.mb-entry-list span {
+  display: block;
+}
+
+.mb-entry-list strong {
+  overflow: hidden;
+  color: var(--mb-text);
+  font-size: 9.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mb-entry-list article > div span {
+  margin-top: 2px;
+  overflow: hidden;
+  color: var(--mb-muted);
+  font-size: 8px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mb-entry-list button {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 0;
+  border-radius: 8px;
+  color: #a54848;
+  cursor: pointer;
+  background: rgba(180, 82, 82, 0.09);
+  transition:
+    color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.mb-entry-list button:hover {
+  color: #fff;
+  background: #b45252;
+  transform: translateY(-1px);
+}
+
 .mb-table-card {
   overflow: hidden;
   border: 1px solid var(--mb-border);
@@ -240,22 +458,22 @@
   background: rgba(188, 116, 71, 0.1);
 }
 
-/* Horizontal scroll বন্ধ থাকবে */
-.report-table-wrapper {
+/* Settlement table stays inside the page without inheriting report-page CSS. */
+.mb-table-wrapper {
   width: 100%;
   max-width: 100%;
-  overflow-x: visible;
+  overflow-x: hidden;
 }
 
-.member-balance-table {
+.mb-settlement-table {
   width: 100%;
   min-width: 0 !important;
   table-layout: fixed;
   border-collapse: collapse;
 }
 
-.member-balance-table th,
-.member-balance-table td {
+.mb-settlement-table th,
+.mb-settlement-table td {
   overflow: hidden;
   padding: 9px 4px;
   border-bottom: 1px solid rgba(38, 48, 43, 0.07);
@@ -267,7 +485,7 @@
   white-space: nowrap;
 }
 
-.member-balance-table thead th {
+.mb-settlement-table thead th {
   color: #77716d;
   font-size: 8.5px;
   font-weight: 850;
@@ -276,51 +494,58 @@
   background: #faf8f6;
 }
 
-/* Name column */
-.member-balance-table th:first-child,
-.member-balance-table td:first-child {
-  width: 18%;
+/* Member column */
+.mb-settlement-table th:first-child,
+.mb-settlement-table td:first-child {
+  width: 32%;
   padding-left: 8px;
+  overflow: visible;
   text-align: left;
 }
 
+/* Opening column */
+.mb-settlement-table th:nth-child(2),
+.mb-settlement-table td:nth-child(2) {
+  width: 12%;
+}
+
+/* Deposit column */
+.mb-settlement-table th:nth-child(3),
+.mb-settlement-table td:nth-child(3) {
+  width: 11%;
+}
+
 /* Meal column */
-.member-balance-table th:nth-child(2),
-.member-balance-table td:nth-child(2) {
-  width: 10%;
+.mb-settlement-table th:nth-child(4),
+.mb-settlement-table td:nth-child(4) {
+  width: 7%;
 }
 
 /* Bazaar column */
-.member-balance-table th:nth-child(3),
-.member-balance-table td:nth-child(3) {
-  width: 18%;
+.mb-settlement-table th:nth-child(5),
+.mb-settlement-table td:nth-child(5) {
+  width: 11%;
 }
 
 /* Bill column */
-.member-balance-table th:nth-child(4),
-.member-balance-table td:nth-child(4) {
-  width: 17%;
+.mb-settlement-table th:nth-child(6),
+.mb-settlement-table td:nth-child(6) {
+  width: 11%;
 }
 
 /* Balance column */
-.member-balance-table th:nth-child(5),
-.member-balance-table td:nth-child(5) {
-  width: 20%;
+.mb-settlement-table th:nth-child(7),
+.mb-settlement-table td:nth-child(7) {
+  width: 16%;
 }
 
-/* Status column */
-.member-balance-table th:nth-child(6),
-.member-balance-table td:nth-child(6) {
-  width: 17%;
-}
-
-.member-balance-table tbody tr {
+.mb-settlement-table tbody tr {
   transition:
     background 0.18s ease,
     transform 0.18s ease;
 }
 
-.member-balance-table tbody tr:hover {
+.mb-settlement-table tbody tr:hover {
   background: rgba(188, 116, 71, 0.045);
 }
 
@@ -347,20 +572,21 @@
 
 .mb-member-details {
   min-width: 0;
-  overflow: hidden;
+  overflow: visible;
 }
 
-.balance-member-name {
+.mb-settlement-member-name {
   display: block;
-  width: 100%;
-  overflow: hidden;
+  width: max-content;
+  max-width: none;
+  overflow: visible;
   color: var(--mb-text);
-  font-size: 10.5px;
+  font-size: clamp(7px, 0.85vw, 10.5px);
   font-weight: 780;
   line-height: 1.2;
-  text-overflow: ellipsis;
+  overflow-wrap: normal;
+  text-overflow: clip;
   white-space: nowrap;
-  cursor: help;
 }
 
 .mb-member-details small {
@@ -384,8 +610,12 @@
 }
 
 .mb-balance {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-size: 10px;
   font-weight: 850;
+  white-space: nowrap;
 }
 
 .mb-balance.positive,
@@ -430,7 +660,7 @@
   background: rgba(90, 98, 93, 0.09);
 }
 
-.member-balance-table tfoot th {
+.mb-settlement-table tfoot th {
   padding: 10px 4px;
   border-bottom: 0;
   color: var(--mb-text);
@@ -507,20 +737,26 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .member-balance-table th,
-  .member-balance-table td {
+  .mb-entry-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mb-save-entry-button {
+    width: 100%;
+  }
+
+  .mb-settlement-table th,
+  .mb-settlement-table td {
     padding: 8px 3px;
     font-size: 9px;
   }
 
-  .balance-member-name {
-    font-size: 9px;
+  .mb-settlement-member-name {
+    font-size: clamp(6.8px, 1vw, 9px);
   }
 
   .mb-member-avatar {
-    width: 22px;
-    height: 22px;
-    flex-basis: 22px;
+    display: none;
   }
 }
 
@@ -557,6 +793,27 @@
   }
 
   .mb-summary-grid {
+    gap: 7px;
+  }
+
+  .mb-manager-panel {
+    padding: 10px;
+  }
+
+  .mb-manager-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .mb-transfer-button {
+    width: 100%;
+  }
+
+  .mb-entry-form {
+    grid-template-columns: 1fr;
+  }
+
+  .mb-entry-list article {
     gap: 7px;
   }
 
@@ -598,22 +855,49 @@
     display: none;
   }
 
-  .member-balance-table th,
-  .member-balance-table td {
+  .mb-settlement-table th,
+  .mb-settlement-table td {
     padding: 7px 2px;
     font-size: 7.5px;
     letter-spacing: -0.12px;
   }
 
-  .member-balance-table thead th {
+  .mb-settlement-table thead th {
     font-size: 6.8px;
     letter-spacing: 0;
   }
 
-  .member-balance-table th:first-child,
-  .member-balance-table td:first-child {
-    width: 18%;
+  .mb-settlement-table th:first-child,
+  .mb-settlement-table td:first-child {
+    width: 34%;
     padding-left: 3px;
+  }
+
+  .mb-settlement-table th:nth-child(2),
+  .mb-settlement-table td:nth-child(2) {
+    width: 11%;
+  }
+
+  .mb-settlement-table th:nth-child(3),
+  .mb-settlement-table td:nth-child(3) {
+    width: 10%;
+  }
+
+  .mb-settlement-table th:nth-child(4),
+  .mb-settlement-table td:nth-child(4) {
+    width: 6%;
+  }
+
+  .mb-settlement-table th:nth-child(5),
+  .mb-settlement-table td:nth-child(5),
+  .mb-settlement-table th:nth-child(6),
+  .mb-settlement-table td:nth-child(6) {
+    width: 10%;
+  }
+
+  .mb-settlement-table th:nth-child(7),
+  .mb-settlement-table td:nth-child(7) {
+    width: 19%;
   }
 
   .mb-member-cell {
@@ -624,8 +908,8 @@
     display: none;
   }
 
-  .balance-member-name {
-    font-size: 7.8px;
+  .mb-settlement-member-name {
+    font-size: clamp(6.2px, 1.7vw, 7.8px);
   }
 
   .mb-member-details small {
@@ -639,7 +923,7 @@
   }
 
   .mb-balance {
-    font-size: 7.2px;
+    font-size: 6.8px;
   }
 
   .mb-status {
@@ -650,7 +934,7 @@
     font-size: 6.8px;
   }
 
-  .member-balance-table tfoot th {
+  .mb-settlement-table tfoot th {
     padding: 8px 2px;
     font-size: 7px;
   }
@@ -701,7 +985,10 @@
 
   .mb-summary-card,
   .mb-month-picker,
-  .member-balance-table tbody tr {
+  .mb-transfer-button,
+  .mb-save-entry-button,
+  .mb-entry-list button,
+  .mb-settlement-table tbody tr {
     transition: none;
   }
 }

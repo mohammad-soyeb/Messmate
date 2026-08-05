@@ -4,7 +4,6 @@ import {
   useRef,
   useState,
 } from "react";
-
 import {
   CalendarDays,
   Download,
@@ -16,11 +15,20 @@ import toast from "react-hot-toast";
 import { getWorkspaceData } from "../../services/dataService";
 import "../../styles/exportReport.css";
 
-const getCurrentMonth = () =>
-  new Date().toISOString().slice(0, 7);
+const getCurrentMonth = () => {
+  const today = new Date();
+
+  return `${today.getFullYear()}-${String(
+    today.getMonth() + 1
+  ).padStart(2, "0")}`;
+};
 
 const normalizeText = (value = "") =>
   String(value).trim().toLowerCase();
+
+const getDisplayName = (member) => {
+  return member?.name?.trim() || "Member";
+};
 
 const getMealTotal = (meal) => {
   if (
@@ -46,6 +54,10 @@ const getBazaarTotal = (entry) => {
   return Number(entry.price || 0);
 };
 
+const isPersonalBazaarPayment = (entry) =>
+  !entry.paymentSource ||
+  entry.paymentSource === "personal";
+
 const formatMeal = (value) => {
   const amount = Number(value) || 0;
 
@@ -61,7 +73,9 @@ const formatMoney = (value) =>
   }).format(Number(value) || 0);
 
 const formatMonthName = (monthValue) => {
-  if (!monthValue) return "";
+  if (!monthValue) {
+    return "";
+  }
 
   const [year, month] = monthValue.split("-");
 
@@ -74,58 +88,70 @@ const formatMonthName = (monthValue) => {
 };
 
 const getMonthDates = (monthValue) => {
-  if (!monthValue) return [];
+  if (!monthValue) {
+    return [];
+  }
 
   const [year, month] = monthValue
     .split("-")
     .map(Number);
 
-  const totalDays = new Date(year, month, 0).getDate();
+  const totalDays = new Date(
+    year,
+    month,
+    0
+  ).getDate();
 
-  return Array.from({ length: totalDays }, (_, index) => {
-    const day = index + 1;
+  return Array.from(
+    { length: totalDays },
+    (_, index) => {
+      const day = index + 1;
 
-    const date = `${year}-${String(month).padStart(
-      2,
-      "0"
-    )}-${String(day).padStart(2, "0")}`;
+      const date =
+        `${year}-` +
+        `${String(month).padStart(2, "0")}-` +
+        `${String(day).padStart(2, "0")}`;
 
-    const dateObject = new Date(year, month - 1, day);
+      const dateObject = new Date(
+        year,
+        month - 1,
+        day
+      );
 
-    return {
-      date,
-      day,
-      weekday: new Intl.DateTimeFormat("en-US", {
-        weekday: "short",
-      }).format(dateObject),
-    };
-  });
-};
-
-const getDisplayName = (fullName = "") => {
-  const cleanName = String(fullName).trim();
-
-  if (cleanName.length <= 12) {
-    return cleanName || "Member";
-  }
-
-  const nameParts = cleanName.split(/\s+/);
-
-  return nameParts[nameParts.length - 1] || "Member";
+      return {
+        date,
+        day,
+        weekday:
+          new Intl.DateTimeFormat("en-US", {
+            weekday: "short",
+          }).format(dateObject),
+      };
+    }
+  );
 };
 
 const ExportReport = () => {
   const reportRef = useRef(null);
 
-  const [selectedMonth, setSelectedMonth] = useState(
-    getCurrentMonth()
-  );
+  const [selectedMonth, setSelectedMonth] =
+    useState(getCurrentMonth());
 
   const [mess, setMess] = useState(null);
   const [members, setMembers] = useState([]);
   const [meals, setMeals] = useState([]);
-  const [bazaarEntries, setBazaarEntries] = useState([]);
-  const [loading, setLoading] = useState(true);
+
+  const [
+    bazaarEntries,
+    setBazaarEntries,
+  ] = useState([]);
+
+  const [
+    financialEntries,
+    setFinancialEntries,
+  ] = useState([]);
+
+  const [loading, setLoading] =
+    useState(true);
 
   useEffect(() => {
     let active = true;
@@ -136,15 +162,23 @@ const ExportReport = () => {
 
         const data = await getWorkspaceData();
 
-        if (!active) return;
+        if (!active) {
+          return;
+        }
 
         setMess(data.mess || null);
         setMembers(data.members || []);
         setMeals(data.meals || []);
-        setBazaarEntries(data.bazaarEntries || []);
+        setBazaarEntries(
+          data.bazaarEntries || []
+        );
+        setFinancialEntries(
+          data.financialEntries || []
+        );
       } catch (error) {
         toast.error(
-          error.message || "Unable to load export report."
+          error.message ||
+            "Unable to load export report."
         );
       } finally {
         if (active) {
@@ -172,6 +206,14 @@ const ExportReport = () => {
     );
   }, [bazaarEntries, selectedMonth]);
 
+  const monthlyFinancialEntries = useMemo(
+    () =>
+      financialEntries.filter(
+        (entry) => entry.month === selectedMonth
+      ),
+    [financialEntries, selectedMonth]
+  );
+
   const reportMembers = useMemo(() => {
     const memberMap = new Map();
 
@@ -179,35 +221,61 @@ const ExportReport = () => {
       memberMap.set(member.id, {
         id: member.id,
         name: member.name || "Member",
+        displayName: getDisplayName(member),
         active: member.isActive !== false,
       });
     });
 
-    [...monthlyMeals, ...monthlyBazaar].forEach(
+    [
+      ...monthlyMeals,
+      ...monthlyBazaar,
+      ...monthlyFinancialEntries,
+    ].forEach(
       (record) => {
-        const memberName =
-          record.memberName || record.member || "";
+        const fullName =
+          record.memberFullName ||
+          record.memberName ||
+          record.member ||
+          "";
+
+        const displayName =
+          fullName ||
+          record.memberName ||
+          "Former member";
 
         const memberId =
           record.memberId ||
-          `name-${normalizeText(memberName)}`;
+          `name-${normalizeText(
+            fullName || displayName
+          )}`;
 
-        if (!memberId || memberId === "name-") return;
+        if (!memberId || memberId === "name-") {
+          return;
+        }
 
         if (!memberMap.has(memberId)) {
           memberMap.set(memberId, {
             id: memberId,
-            name: memberName || "Former member",
+            name: fullName || displayName,
+            displayName,
             active: false,
           });
         }
       }
     );
 
-    return Array.from(memberMap.values()).sort((a, b) =>
-      a.name.localeCompare(b.name)
+    return Array.from(memberMap.values()).sort(
+      (a, b) =>
+        a.displayName.localeCompare(
+          b.displayName
+        )
     );
-  }, [members, monthlyMeals, monthlyBazaar]);
+  }, [
+    members,
+    monthlyMeals,
+    monthlyBazaar,
+    monthlyFinancialEntries,
+  ]);
 
   const monthDates = useMemo(
     () => getMonthDates(selectedMonth),
@@ -218,7 +286,9 @@ const ExportReport = () => {
     return (
       record.memberId ||
       `name-${normalizeText(
-        record.memberName || record.member
+        record.memberFullName ||
+          record.memberName ||
+          record.member
       )}`
     );
   };
@@ -227,12 +297,16 @@ const ExportReport = () => {
     const matrix = new Map();
 
     monthlyMeals.forEach((meal) => {
-      const memberId = getRecordMemberId(meal);
-      const key = `${meal.date}-${memberId}`;
+      const memberId =
+        getRecordMemberId(meal);
+
+      const key =
+        `${meal.date}-${memberId}`;
 
       matrix.set(
         key,
-        (matrix.get(key) || 0) + getMealTotal(meal)
+        (matrix.get(key) || 0) +
+          getMealTotal(meal)
       );
     });
 
@@ -241,7 +315,8 @@ const ExportReport = () => {
 
   const totalMeals = useMemo(() => {
     return monthlyMeals.reduce(
-      (total, meal) => total + getMealTotal(meal),
+      (total, meal) =>
+        total + getMealTotal(meal),
       0
     );
   }, [monthlyMeals]);
@@ -255,14 +330,17 @@ const ExportReport = () => {
   }, [monthlyBazaar]);
 
   const mealRate =
-    totalMeals > 0 ? totalBazaar / totalMeals : 0;
+    totalMeals > 0
+      ? totalBazaar / totalMeals
+      : 0;
 
   const settlementRows = useMemo(() => {
     return reportMembers.map((member) => {
       const memberMeals = monthlyMeals
         .filter(
           (meal) =>
-            getRecordMemberId(meal) === member.id
+            getRecordMemberId(meal) ===
+            member.id
         )
         .reduce(
           (total, meal) =>
@@ -273,7 +351,9 @@ const ExportReport = () => {
       const bazaarPaid = monthlyBazaar
         .filter(
           (entry) =>
-            getRecordMemberId(entry) === member.id
+            getRecordMemberId(entry) ===
+              member.id &&
+            isPersonalBazaarPayment(entry)
         )
         .reduce(
           (total, entry) =>
@@ -281,12 +361,45 @@ const ExportReport = () => {
           0
         );
 
-      const mealBill = memberMeals * mealRate;
-      const balance = bazaarPaid - mealBill;
+      const mealBill =
+        memberMeals * mealRate;
+
+      const memberFinancialEntries =
+        monthlyFinancialEntries.filter(
+          (entry) => entry.memberId === member.id
+        );
+
+      const openingBalance =
+        memberFinancialEntries
+          .filter(
+            (entry) =>
+              entry.type === "opening_balance"
+          )
+          .reduce(
+            (total, entry) =>
+              total + Number(entry.amount || 0),
+            0
+          );
+
+      const deposits = memberFinancialEntries
+        .filter((entry) => entry.type === "deposit")
+        .reduce(
+          (total, entry) =>
+            total + Number(entry.amount || 0),
+          0
+        );
+
+      const balance =
+        openingBalance +
+        deposits +
+        bazaarPaid -
+        mealBill;
 
       return {
         ...member,
         memberMeals,
+        openingBalance,
+        deposits,
         bazaarPaid,
         mealBill,
         balance,
@@ -296,8 +409,26 @@ const ExportReport = () => {
     reportMembers,
     monthlyMeals,
     monthlyBazaar,
+    monthlyFinancialEntries,
     mealRate,
   ]);
+
+  const settlementTotals = useMemo(() => {
+    return settlementRows.reduce(
+      (totals, member) => ({
+        opening:
+          totals.opening + member.openingBalance,
+        deposits:
+          totals.deposits + member.deposits,
+        balance: totals.balance + member.balance,
+      }),
+      {
+        opening: 0,
+        deposits: 0,
+        balance: 0,
+      }
+    );
+  }, [settlementRows]);
 
   const totalReceivable = useMemo(() => {
     return settlementRows.reduce(
@@ -313,176 +444,93 @@ const ExportReport = () => {
     return settlementRows.reduce(
       (total, member) =>
         member.balance < 0
-          ? total + Math.abs(member.balance)
+          ? total +
+            Math.abs(member.balance)
           : total,
       0
     );
   }, [settlementRows]);
 
   const handlePrint = () => {
-  if (!reportMembers.length) {
-    toast.error("No report data available.");
-    return;
-  }
+    if (!reportMembers.length) {
+      toast.error(
+        "No report data available."
+      );
+      return;
+    }
 
-  if (!reportRef.current) {
-    toast.error("Report is not ready.");
-    return;
-  }
+    if (!reportRef.current) {
+      toast.error("Report is not ready.");
+      return;
+    }
 
-  const printWindow = window.open(
-    "",
-    "_blank",
-    "width=1250,height=850"
-  );
-
-  if (!printWindow) {
-    toast.error(
-      "Print window was blocked. Please allow popups."
+    const printWindow = window.open(
+      "",
+      "_blank",
+      "width=1250,height=850"
     );
-    return;
-  }
 
-  const reportContent = reportRef.current.outerHTML;
+    if (!printWindow) {
+      toast.error(
+        "Please allow popups to print."
+      );
+      return;
+    }
 
-  const documentStyles = Array.from(
-    document.querySelectorAll(
-      'link[rel="stylesheet"], style'
+    const reportContent =
+      reportRef.current.outerHTML;
+
+    const documentStyles = Array.from(
+      document.querySelectorAll(
+        'link[rel="stylesheet"], style'
+      )
     )
-  )
-    .map((styleElement) => styleElement.outerHTML)
-    .join("");
+      .map(
+        (styleElement) =>
+          styleElement.outerHTML
+      )
+      .join("");
 
-  printWindow.document.open();
+    printWindow.document.open();
 
-  printWindow.document.write(`
-    <!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <meta charset="UTF-8" />
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="UTF-8" />
 
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1.0"
-        />
+          <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+          />
 
-        <title>
-          ${mess?.name || "MessMate"} -
-          ${formatMonthName(selectedMonth)}
-        </title>
+          <title>
+            ${mess?.name || "MessMate"} -
+            ${formatMonthName(selectedMonth)}
+          </title>
 
-        ${documentStyles}
+          ${documentStyles}
 
-        <style>
-          @page {
-            size: A4 landscape;
-            margin: 6mm;
-          }
+          <style>
+            @page {
+              size: A4 landscape;
+              margin: 6mm;
+            }
 
-          * {
-            box-sizing: border-box;
-          }
+            * {
+              box-sizing: border-box;
+            }
 
-          html,
-          body {
-            width: 100%;
-            height: auto;
-            min-height: 0;
-            margin: 0;
-            padding: 0;
-            overflow: visible;
-            color: #000;
-            background: #fff;
-          }
-
-          body * {
-            visibility: visible !important;
-          }
-
-          .print-report-sheet,
-          .print-report-sheet * {
-            visibility: visible !important;
-          }
-
-          .print-report-sheet {
-            position: static !important;
-            display: block !important;
-            width: 100% !important;
-            height: auto !important;
-            min-height: 0 !important;
-            max-height: none !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            overflow: visible !important;
-            border: 0 !important;
-            border-radius: 0 !important;
-            box-shadow: none !important;
-            transform: none !important;
-          }
-
-          .no-print,
-          .floating-print-button {
-            display: none !important;
-          }
-
-          .export-meal-table-wrapper,
-          .print-settlement-wrapper {
-            width: 100% !important;
-            max-width: 100% !important;
-            overflow: visible !important;
-          }
-
-          .export-meal-table,
-          .print-settlement-table {
-            width: 100% !important;
-            min-width: 0 !important;
-            max-width: 100% !important;
-            table-layout: fixed !important;
-          }
-
-          .export-meal-table th,
-          .export-meal-table td {
-            min-width: 0 !important;
-            height: auto !important;
-            padding: 1.1mm 0.35mm !important;
-            font-size: 5pt !important;
-          }
-
-          .export-meal-table th:first-child,
-          .export-meal-table td:first-child {
-            width: 14mm !important;
-          }
-
-          .export-meal-table th:last-child,
-          .export-meal-table td:last-child {
-            width: 12mm !important;
-          }
-
-          .export-member-column {
-            width: auto !important;
-            max-width: none !important;
-          }
-
-          .print-settlement-table th,
-          .print-settlement-table td {
-            padding: 1.2mm 0.7mm !important;
-            font-size: 5.5pt !important;
-          }
-
-          .print-summary-grid,
-          .print-section-heading,
-          .print-settlement-wrapper,
-          .print-verification-grid,
-          .print-report-footer {
-            break-inside: avoid;
-          }
-
-          @media print {
             html,
             body {
-              width: 100% !important;
-              height: auto !important;
-              overflow: visible !important;
+              width: 100%;
+              height: auto;
+              min-height: 0;
+              margin: 0;
+              padding: 0;
+              overflow: visible;
+              color: #000;
+              background: #fff;
             }
 
             body * {
@@ -491,34 +539,115 @@ const ExportReport = () => {
 
             .print-report-sheet {
               position: static !important;
+              display: block !important;
               width: 100% !important;
+              height: auto !important;
+              min-height: 0 !important;
+              max-height: none !important;
+              margin: 0 !important;
+              padding: 0 !important;
+              overflow: visible !important;
+              border: 0 !important;
+              border-radius: 0 !important;
+              box-shadow: none !important;
+              transform: none !important;
+            }
+
+            .no-print,
+            .floating-print-button {
+              display: none !important;
+            }
+
+            .export-meal-table-wrapper,
+            .print-settlement-wrapper {
+              width: 100% !important;
+              max-width: 100% !important;
               overflow: visible !important;
             }
-          }
-        </style>
-      </head>
 
-      <body>
-        ${reportContent}
-      </body>
-    </html>
-  `);
+            .export-meal-table,
+            .print-settlement-table {
+              width: 100% !important;
+              min-width: 0 !important;
+              max-width: 100% !important;
+              table-layout: fixed !important;
+            }
 
-  printWindow.document.close();
+            .export-meal-table th,
+            .export-meal-table td {
+              min-width: 0 !important;
+              height: auto !important;
+              padding: 1.1mm 0.35mm !important;
+              font-size: 5pt !important;
+            }
 
-  const startPrint = () => {
-    setTimeout(() => {
-      printWindow.focus();
-      printWindow.print();
-    }, 500);
+            .export-meal-table th:first-child,
+            .export-meal-table td:first-child {
+              width: 14mm !important;
+            }
+
+            .export-meal-table th:last-child,
+            .export-meal-table td:last-child {
+              width: 12mm !important;
+            }
+
+            .export-member-column {
+              width: auto !important;
+              max-width: none !important;
+            }
+
+            .print-settlement-table th,
+            .print-settlement-table td {
+              padding: 1.2mm 0.7mm !important;
+              font-size: 5.5pt !important;
+            }
+
+            .print-summary-grid,
+            .print-section-heading,
+            .print-settlement-wrapper,
+            .print-verification-grid,
+            .print-report-footer {
+              break-inside: avoid;
+            }
+          </style>
+        </head>
+
+        <body>
+          ${reportContent}
+        </body>
+      </html>
+    `);
+
+    printWindow.document.close();
+
+    const startPrint = () => {
+      setTimeout(() => {
+        printWindow.focus();
+        printWindow.print();
+      }, 500);
+    };
+
+    if (
+      printWindow.document.readyState ===
+      "complete"
+    ) {
+      startPrint();
+    } else {
+      printWindow.onload = startPrint;
+    }
   };
 
-  if (printWindow.document.readyState === "complete") {
-    startPrint();
-  } else {
-    printWindow.onload = startPrint;
+  if (loading) {
+    return (
+      <div className="export-loading">
+        <div className="export-loader" />
+
+        <span>
+          Preparing export report...
+        </span>
+      </div>
+    );
   }
-};
 
   return (
     <div className="export-report-page">
@@ -532,7 +661,7 @@ const ExportReport = () => {
           <h1>Print & Export</h1>
 
           <p>
-            Daily meal sheet and complete monthly
+            Daily meal sheet and monthly
             settlement.
           </p>
         </div>
@@ -545,7 +674,9 @@ const ExportReport = () => {
               type="month"
               value={selectedMonth}
               onChange={(event) =>
-                setSelectedMonth(event.target.value)
+                setSelectedMonth(
+                  event.target.value
+                )
               }
             />
           </label>
@@ -562,46 +693,68 @@ const ExportReport = () => {
       </header>
 
       <main
-  ref={reportRef}
-  className="print-report-sheet"
->
+        ref={reportRef}
+        className="print-report-sheet"
+      >
         <header className="print-report-header">
           <div>
             <span className="print-report-label">
               MessMate monthly statement
             </span>
 
-            <h2>{mess?.name || "Mess Report"}</h2>
+            <h2>
+              {mess?.name || "Mess Report"}
+            </h2>
 
-            <p>{formatMonthName(selectedMonth)}</p>
+            <p>
+              {formatMonthName(
+                selectedMonth
+              )}
+            </p>
           </div>
 
           <div className="print-report-meta">
             <span>Total members</span>
-            <strong>{reportMembers.length}</strong>
+
+            <strong>
+              {reportMembers.length}
+            </strong>
           </div>
         </header>
 
         <section className="print-summary-grid">
           <article>
             <span>Total Meals</span>
-            <strong>{formatMeal(totalMeals)}</strong>
+
+            <strong>
+              {formatMeal(totalMeals)}
+            </strong>
           </article>
 
           <article>
             <span>Total Bazaar</span>
-            <strong>৳{formatMoney(totalBazaar)}</strong>
+
+            <strong>
+              ৳{formatMoney(totalBazaar)}
+            </strong>
           </article>
 
           <article>
             <span>Meal Rate</span>
-            <strong>৳{formatMoney(mealRate)}</strong>
+
+            <strong>
+              ৳{formatMoney(mealRate)}
+            </strong>
           </article>
 
           <article>
-            <span>Month</span>
+            <span>Advance Deposit</span>
+
             <strong>
-              {formatMonthName(selectedMonth)}
+              ৳
+              {formatMoney(
+                settlementTotals.deposits
+              )}
             </strong>
           </article>
         </section>
@@ -609,10 +762,13 @@ const ExportReport = () => {
         <div className="print-section-heading">
           <div>
             <span>01</span>
+
             <h3>Daily Meal Sheet</h3>
           </div>
 
-          <p>Every member&apos;s daily total meal</p>
+          <p>
+            Every member&apos;s daily total meal
+          </p>
         </div>
 
         <div className="export-meal-table-wrapper">
@@ -623,17 +779,19 @@ const ExportReport = () => {
                   Date
                 </th>
 
-                {reportMembers.map((member) => (
-                  <th
-                    key={member.id}
-                    className="export-member-column"
-                    title={member.name}
-                  >
-                    <span>
-                      {getDisplayName(member.name)}
-                    </span>
-                  </th>
-                ))}
+                {reportMembers.map(
+                  (member) => (
+                    <th
+                      key={member.id}
+                      className="export-member-column"
+                      title={member.name}
+                    >
+                      <span>
+                        {member.displayName}
+                      </span>
+                    </th>
+                  )
+                )}
 
                 <th className="export-total-column">
                   Total
@@ -643,40 +801,52 @@ const ExportReport = () => {
 
             <tbody>
               {monthDates.map((dateItem) => {
-                const dailyTotal = reportMembers.reduce(
-                  (total, member) =>
-                    total +
-                    (mealMatrix.get(
-                      `${dateItem.date}-${member.id}`
-                    ) || 0),
-                  0
-                );
+                const dailyTotal =
+                  reportMembers.reduce(
+                    (total, member) =>
+                      total +
+                      (mealMatrix.get(
+                        `${dateItem.date}-${member.id}`
+                      ) || 0),
+                    0
+                  );
 
                 return (
                   <tr key={dateItem.date}>
                     <td className="export-date-cell">
-                      <strong>{dateItem.day}</strong>
-                      <span>{dateItem.weekday}</span>
+                      <strong>
+                        {dateItem.day}
+                      </strong>
+
+                      <span>
+                        {dateItem.weekday}
+                      </span>
                     </td>
 
-                    {reportMembers.map((member) => {
-                      const amount =
-                        mealMatrix.get(
-                          `${dateItem.date}-${member.id}`
-                        ) || 0;
+                    {reportMembers.map(
+                      (member) => {
+                        const amount =
+                          mealMatrix.get(
+                            `${dateItem.date}-${member.id}`
+                          ) || 0;
 
-                      return (
-                        <td key={member.id}>
-                          {amount > 0
-                            ? formatMeal(amount)
-                            : "—"}
-                        </td>
-                      );
-                    })}
+                        return (
+                          <td key={member.id}>
+                            {amount > 0
+                              ? formatMeal(
+                                  amount
+                                )
+                              : "—"}
+                          </td>
+                        );
+                      }
+                    )}
 
                     <td className="export-daily-total">
                       {dailyTotal > 0
-                        ? formatMeal(dailyTotal)
+                        ? formatMeal(
+                            dailyTotal
+                          )
                         : "—"}
                     </td>
                   </tr>
@@ -688,20 +858,28 @@ const ExportReport = () => {
               <tr>
                 <th>Monthly</th>
 
-                {reportMembers.map((member) => {
-                  const memberTotal =
-                    settlementRows.find(
-                      (row) => row.id === member.id
-                    )?.memberMeals || 0;
+                {reportMembers.map(
+                  (member) => {
+                    const memberTotal =
+                      settlementRows.find(
+                        (row) =>
+                          row.id ===
+                          member.id
+                      )?.memberMeals || 0;
 
-                  return (
-                    <th key={member.id}>
-                      {formatMeal(memberTotal)}
-                    </th>
-                  );
-                })}
+                    return (
+                      <th key={member.id}>
+                        {formatMeal(
+                          memberTotal
+                        )}
+                      </th>
+                    );
+                  }
+                )}
 
-                <th>{formatMeal(totalMeals)}</th>
+                <th>
+                  {formatMeal(totalMeals)}
+                </th>
               </tr>
             </tfoot>
           </table>
@@ -710,10 +888,14 @@ const ExportReport = () => {
         <div className="print-section-heading settlement-heading">
           <div>
             <span>02</span>
+
             <h3>Monthly Settlement</h3>
           </div>
 
-          <p>Bazaar, meal bill and final balance</p>
+          <p>
+            Opening, deposit, bazaar, meal bill and
+            final balance
+          </p>
         </div>
 
         <div className="print-settlement-wrapper">
@@ -721,6 +903,8 @@ const ExportReport = () => {
             <thead>
               <tr>
                 <th>Member</th>
+                <th>Opening</th>
+                <th>Deposit</th>
                 <th>Meal</th>
                 <th>Bazaar</th>
                 <th>Bill</th>
@@ -729,71 +913,159 @@ const ExportReport = () => {
             </thead>
 
             <tbody>
-              {settlementRows.map((member) => {
-                const willReceive =
-                  member.balance > 0.005;
+              {settlementRows.map(
+                (member) => {
+                  const willReceive =
+                    member.balance > 0.005;
 
-                const willPay =
-                  member.balance < -0.005;
+                  const willPay =
+                    member.balance < -0.005;
 
-                return (
-                  <tr key={member.id}>
-                    <td
-                      className="print-member-name"
-                      title={member.name}
-                    >
-                      <strong>
-                        {getDisplayName(member.name)}
-                      </strong>
-
-                      {!member.active && (
-                        <small>Former</small>
-                      )}
-                    </td>
-
-                    <td>
-                      {formatMeal(member.memberMeals)}
-                    </td>
-
-                    <td>
-                      ৳{formatMoney(member.bazaarPaid)}
-                    </td>
-
-                    <td>
-                      ৳{formatMoney(member.mealBill)}
-                    </td>
-
-                    <td>
-                      <strong
-                        className={
-                          willReceive
-                            ? "print-balance positive"
-                            : willPay
-                            ? "print-balance negative"
-                            : "print-balance neutral"
-                        }
+                  return (
+                    <tr key={member.id}>
+                      <td
+                        className="print-member-name"
+                        title={member.name}
                       >
-                        {willReceive ? "+" : ""}
-                        {willPay ? "−" : ""}
+                        <strong>
+                          {
+                            member.displayName
+                          }
+                        </strong>
+
+                        {!member.active && (
+                          <small>
+                            Former
+                          </small>
+                        )}
+                      </td>
+
+                      <td>
+                        {member.openingBalance > 0.005
+                          ? "+"
+                          : member.openingBalance <
+                              -0.005
+                            ? "−"
+                            : ""}
                         ৳
                         {formatMoney(
-                          Math.abs(member.balance)
+                          Math.abs(
+                            member.openingBalance
+                          )
                         )}
-                      </strong>
-                    </td>
+                      </td>
 
-                  </tr>
-                );
-              })}
+                      <td>
+                        ৳
+                        {formatMoney(
+                          member.deposits
+                        )}
+                      </td>
+
+                      <td>
+                        {formatMeal(
+                          member.memberMeals
+                        )}
+                      </td>
+
+                      <td>
+                        ৳
+                        {formatMoney(
+                          member.bazaarPaid
+                        )}
+                      </td>
+
+                      <td>
+                        ৳
+                        {formatMoney(
+                          member.mealBill
+                        )}
+                      </td>
+
+                      <td>
+                        <strong
+                          className={
+                            willReceive
+                              ? "print-balance positive"
+                              : willPay
+                                ? "print-balance negative"
+                                : "print-balance neutral"
+                          }
+                        >
+                          {willReceive
+                            ? "+"
+                            : ""}
+
+                          {willPay
+                            ? "−"
+                            : ""}
+
+                          ৳
+                          {formatMoney(
+                            Math.abs(
+                              member.balance
+                            )
+                          )}
+                        </strong>
+                      </td>
+                    </tr>
+                  );
+                }
+              )}
             </tbody>
 
             <tfoot>
               <tr>
                 <th>Total</th>
-                <th>{formatMeal(totalMeals)}</th>
-                <th>৳{formatMoney(totalBazaar)}</th>
-                <th>৳{formatMoney(totalBazaar)}</th>
-                <th>Balanced</th>
+
+                <th>
+                  {settlementTotals.opening > 0.005
+                    ? "+"
+                    : settlementTotals.opening <
+                        -0.005
+                      ? "−"
+                      : ""}
+                  ৳
+                  {formatMoney(
+                    Math.abs(
+                      settlementTotals.opening
+                    )
+                  )}
+                </th>
+
+                <th>
+                  ৳
+                  {formatMoney(
+                    settlementTotals.deposits
+                  )}
+                </th>
+
+                <th>
+                  {formatMeal(totalMeals)}
+                </th>
+
+                <th>
+                  ৳{formatMoney(totalBazaar)}
+                </th>
+
+                <th>
+                  ৳{formatMoney(totalBazaar)}
+                </th>
+
+                <th>
+                  {settlementTotals.balance > 0.005
+                    ? "+"
+                    : settlementTotals.balance <
+                        -0.005
+                      ? "−"
+                      : ""}
+                  ৳
+                  {formatMoney(
+                    Math.abs(
+                      settlementTotals.balance
+                    )
+                  )}
+                </th>
               </tr>
             </tfoot>
           </table>
@@ -802,15 +1074,23 @@ const ExportReport = () => {
         <section className="print-verification-grid">
           <article>
             <span>Total টাকা পাবে</span>
+
             <strong className="positive">
-              ৳{formatMoney(totalReceivable)}
+              ৳
+              {formatMoney(
+                totalReceivable
+              )}
             </strong>
           </article>
 
           <article>
             <span>Total টাকা দেবে</span>
+
             <strong className="negative">
-              ৳{formatMoney(totalPayable)}
+              ৳
+              {formatMoney(
+                totalPayable
+              )}
             </strong>
           </article>
         </section>
@@ -818,12 +1098,14 @@ const ExportReport = () => {
         <footer className="print-report-footer">
           <p>
             Generated from MessMate •{" "}
-            {new Date().toLocaleDateString("en-BD")}
+            {new Date().toLocaleDateString(
+              "en-BD"
+            )}
           </p>
 
           <p>
-            Positive balance means টাকা পাবে; negative
-            balance means টাকা দেবে।
+            Positive balance means টাকা পাবে;
+            negative balance means টাকা দেবে।
           </p>
         </footer>
       </main>
