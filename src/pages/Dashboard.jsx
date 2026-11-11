@@ -213,7 +213,7 @@ const Dashboard = () => {
   }, [monthlyMeals]);
 
   const recentBazaarEntries = useMemo(() => {
-    return [...bazaarEntries]
+    return [...monthlyBazaarEntries]
       .sort((firstEntry, secondEntry) => {
         const dateComparison = String(
           secondEntry.date
@@ -232,7 +232,7 @@ const Dashboard = () => {
         );
       })
       .slice(0, 4);
-  }, [bazaarEntries]);
+  }, [monthlyBazaarEntries]);
 
   const dashboardStats = [
     {
@@ -363,8 +363,8 @@ const Dashboard = () => {
             <h2>Recent Bazaar</h2>
 
             <p>
-              Latest purchases added by mess
-              members.
+              Latest purchases for{" "}
+              {formatMonthName(selectedMonth)}.
             </p>
           </div>
 
@@ -389,11 +389,12 @@ const Dashboard = () => {
               <ShoppingBasket size={27} />
 
               <strong>
-                No bazaar records yet
+                No bazaar records this month
               </strong>
 
               <span>
-                New bazaar entries will appear here.
+                No purchases recorded for{" "}
+                {formatMonthName(selectedMonth)}.
               </span>
             </div>
           ) : (
