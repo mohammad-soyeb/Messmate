@@ -166,11 +166,9 @@ const DangerZone = () => {
     setDeleting(true);
 
     try {
-      await deleteMessWorkspace({
-        messId: mess.id,
-        confirmationName:
-          confirmation.trim(),
-      });
+      await deleteMessWorkspace(
+        confirmation.trim()
+      );
 
       toast.success(
         "Mess workspace permanently deleted."
