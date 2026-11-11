@@ -1,6 +1,7 @@
 import { requireSupabase } from "../lib/supabase";
 import {
   getCurrentMessState,
+  leaveCurrentMessSession,
   mapMember,
 } from "./messService";
 
@@ -719,9 +720,69 @@ export const deleteBazaarEntry = async (
   }
 };
 
+const removeWorkspaceReceipts = async (
+  state,
+  confirmationName = null
+) => {
+  if (state.member.role !== "manager") {
+    throw new Error(
+      "Only a manager can clear mess data."
+    );
+  }
+
+  const client = requireSupabase();
+  const { data: cleanup, error: prepareError } =
+    await client.rpc("prepare_mess_cleanup", {
+      p_mess_id: state.mess.id,
+      p_confirmation_name: confirmationName,
+    });
+
+  if (prepareError) {
+    throw prepareError;
+  }
+
+  if (
+    cleanup?.mess_id !== state.mess.id ||
+    !Array.isArray(cleanup.receipt_paths)
+  ) {
+    throw new Error(
+      "Unable to prepare mess receipt cleanup."
+    );
+  }
+
+  const prefix = `${state.mess.id}/`;
+  const paths = [...new Set(cleanup.receipt_paths)];
+
+  if (
+    paths.some(
+      (path) =>
+        typeof path !== "string" ||
+        !path.startsWith(prefix)
+    )
+  ) {
+    throw new Error(
+      "Receipt cleanup returned a path outside this mess."
+    );
+  }
+
+  for (let offset = 0; offset < paths.length; offset += 1000) {
+    const { error } = await client.storage
+      .from("bazaar-receipts")
+      .remove(paths.slice(offset, offset + 1000));
+
+    if (error) {
+      throw new Error(
+        `Unable to delete mess receipts: ${error.message}`
+      );
+    }
+  }
+};
+
 export const resetActivityData = async () => {
   const state = await requireWorkspace();
   const client = requireSupabase();
+
+  await removeWorkspaceReceipts(state);
 
   const { error } = await client.rpc(
     "reset_mess_activity",
@@ -740,17 +801,30 @@ export const deleteMessWorkspace = async (
 ) => {
   const state = await requireWorkspace();
   const client = requireSupabase();
+  const cleanName =
+    typeof confirmationName === "string"
+      ? confirmationName.trim()
+      : "";
+
+  if (!cleanName || cleanName !== state.mess.name.trim()) {
+    throw new Error(
+      "Enter the exact mess name to continue."
+    );
+  }
+
+  await removeWorkspaceReceipts(state, cleanName);
 
   const { error } = await client.rpc(
     "delete_mess_workspace",
     {
       p_mess_id: state.mess.id,
-      p_confirmation_name:
-        confirmationName?.trim(),
+      p_confirmation_name: cleanName,
     }
   );
 
   if (error) {
     throw error;
   }
+
+  leaveCurrentMessSession();
 };
