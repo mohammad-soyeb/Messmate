@@ -1,7 +1,5 @@
 /* ==================================
    MESSMATE GLOBAL PREMIUM LAYER
-   Component design stays inside its
-   own CSS file.
 ================================== */
 
 :root {
@@ -24,19 +22,12 @@
   --premium-radius-medium: 14px;
   --premium-radius-large: 19px;
 
-  --premium-shadow-small:
-    0 6px 16px rgba(15, 23, 42, 0.05);
-
-  --premium-shadow-medium:
-    0 11px 28px rgba(15, 23, 42, 0.07);
-
-  --premium-shadow-green:
-    0 11px 24px rgba(166, 95, 54, 0.24);
+  --premium-shadow-small: 0 6px 16px rgba(15, 23, 42, 0.05);
+  --premium-shadow-medium: 0 11px 28px rgba(15, 23, 42, 0.07);
+  --premium-shadow-green: 0 11px 24px rgba(166, 95, 54, 0.24);
 }
 
-/* ==================================
-   GLOBAL BASICS
-================================== */
+/* GLOBAL BASICS */
 
 * {
   box-sizing: border-box;
@@ -80,15 +71,11 @@ textarea:focus-visible {
   outline-offset: 2px;
 }
 
-/* ==================================
-   SCROLLBAR
-================================== */
+/* SCROLLBAR */
 
 * {
   scrollbar-width: thin;
-  scrollbar-color:
-    rgba(166, 95, 54, 0.35)
-    transparent;
+  scrollbar-color: rgba(166, 95, 54, 0.35) transparent;
 }
 
 *::-webkit-scrollbar {
@@ -103,26 +90,14 @@ textarea:focus-visible {
 *::-webkit-scrollbar-thumb {
   border: 2px solid transparent;
   border-radius: 20px;
-  background:
-    linear-gradient(
-      #c17a4e,
-      #a65f36
-    )
-    padding-box;
+  background: linear-gradient(#c17a4e, #a65f36) padding-box;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background:
-    linear-gradient(
-      #a65f36,
-      #7e4325
-    )
-    padding-box;
+  background: linear-gradient(#a65f36, #7e4325) padding-box;
 }
 
-/* ==================================
-   APPLICATION LAYOUT
-================================== */
+/* APPLICATION LAYOUT */
 
 .layout {
   min-height: 100vh;
@@ -147,8 +122,7 @@ textarea:focus-visible {
 
 .layout-content > * {
   animation: premiumPageEnter 0.42s
-    cubic-bezier(0.22, 1, 0.36, 1)
-    both;
+    cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .profile-page,
@@ -156,14 +130,7 @@ textarea:focus-visible {
   padding: 22px;
 }
 
-/*
- * Sidebar এবং Navbar এখানে style করা হয়নি।
- * তাদের design sidebar.css ও navbar.css থেকে আসবে।
- */
-
-/* ==================================
-   SHARED SURFACES
-================================== */
+/* SHARED SURFACES */
 
 .dashboard,
 .reports-page,
@@ -208,13 +175,10 @@ textarea:focus-visible {
 .settings-card:hover {
   border-color: #e4c7b4;
   transform: translateY(-3px);
-  box-shadow: 0 16px 34px
-    rgba(166, 95, 54, 0.09);
+  box-shadow: 0 16px 34px rgba(166, 95, 54, 0.09);
 }
 
-/* ==================================
-   PREMIUM PRIMARY BUTTONS
-================================== */
+/* PRIMARY BUTTONS */
 
 .auth-btn,
 .mess-setup-submit-button,
@@ -234,8 +198,7 @@ textarea:focus-visible {
   );
   box-shadow:
     var(--premium-shadow-green),
-    inset 0 1px 0
-      rgba(255, 255, 255, 0.24);
+    inset 0 1px 0 rgba(255, 255, 255, 0.24);
   cursor: pointer;
   transition:
     filter 0.2s ease,
@@ -279,20 +242,16 @@ textarea:focus-visible {
 .mess-setup-submit-button:hover:not(:disabled),
 .save-btn:hover:not(:disabled),
 .profile-edit-button:hover:not(:disabled),
-.profile-actions
-  button:first-child:hover:not(:disabled),
+.profile-actions button:first-child:hover:not(:disabled),
 .btn-primary:hover:not(:disabled) {
   filter: saturate(1.08);
   transform: translateY(-2px);
   box-shadow:
     0 15px 29px rgba(166, 95, 54, 0.31),
-    inset 0 1px 0
-      rgba(255, 255, 255, 0.26);
+    inset 0 1px 0 rgba(255, 255, 255, 0.26);
 }
 
-/* ==================================
-   SECONDARY BUTTONS
-================================== */
+/* SECONDARY BUTTONS */
 
 .btn-outline,
 .mess-setup-back-button,
@@ -312,19 +271,15 @@ textarea:focus-visible {
 
 .btn-outline:hover:not(:disabled),
 .mess-setup-back-button:hover:not(:disabled),
-.profile-actions
-  button:last-child:hover:not(:disabled) {
+.profile-actions button:last-child:hover:not(:disabled) {
   color: #ffffff;
   border-color: #a65f36;
   background: #a65f36;
-  box-shadow: 0 9px 20px
-    rgba(166, 95, 54, 0.22);
+  box-shadow: 0 9px 20px rgba(166, 95, 54, 0.22);
   transform: translateY(-2px);
 }
 
-/* ==================================
-   DANGER BUTTONS
-================================== */
+/* DANGER BUTTONS */
 
 .reset-btn,
 .btn-danger {
@@ -344,17 +299,10 @@ textarea:focus-visible {
 .btn-danger:hover:not(:disabled) {
   color: #ffffff;
   border-color: #dc2626;
-  background: linear-gradient(
-    135deg,
-    #ef4444,
-    #dc2626
-  );
-  box-shadow: 0 9px 20px
-    rgba(220, 38, 38, 0.22);
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  box-shadow: 0 9px 20px rgba(220, 38, 38, 0.22);
   transform: translateY(-2px);
 }
-
-/* Button interaction */
 
 button:active:not(:disabled),
 .btn-primary:active:not(:disabled),
@@ -368,9 +316,7 @@ button:disabled {
   cursor: not-allowed;
 }
 
-/* ==================================
-   INPUTS
-================================== */
+/* INPUTS */
 
 input,
 select,
@@ -378,9 +324,7 @@ textarea {
   accent-color: var(--premium-primary);
 }
 
-input:not([type="checkbox"]):not(
-    [type="radio"]
-  ):not([type="file"]),
+input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
 select,
 textarea {
   transition:
@@ -389,31 +333,22 @@ textarea {
     background 0.2s ease;
 }
 
-input:not([type="checkbox"]):not(
-    [type="radio"]
-  ):not([type="file"]):focus,
+input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus,
 select:focus,
 textarea:focus {
   border-color: #c17a4e;
-  box-shadow: 0 0 0 3px
-    rgba(193, 122, 78, 0.11);
+  box-shadow: 0 0 0 3px rgba(193, 122, 78, 0.11);
 }
-
-/* Chrome autofill */
 
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus {
   -webkit-text-fill-color: #334155;
-  box-shadow: 0 0 0 1000px
-    #ffffff inset;
-  transition:
-    background-color 9999s ease-in-out 0s;
+  box-shadow: 0 0 0 1000px #ffffff inset;
+  transition: background-color 9999s ease-in-out 0s;
 }
 
-/* ==================================
-   TABLES
-================================== */
+/* TABLES */
 
 table {
   border-spacing: 0;
@@ -424,28 +359,18 @@ tbody tr {
 }
 
 tbody tr:hover {
-  background-color: rgba(
-    236,
-    253,
-    245,
-    0.45
-  );
+  background-color: rgba(236, 253, 245, 0.45);
 }
 
-/* ==================================
-   TOAST
-================================== */
+/* TOAST */
 
 .react-hot-toast {
   border: 1px solid #f1dfd2;
   border-radius: 12px;
-  box-shadow: 0 13px 30px
-    rgba(15, 23, 42, 0.12);
+  box-shadow: 0 13px 30px rgba(15, 23, 42, 0.12);
 }
 
-/* ==================================
-   DARK MODE
-================================== */
+/* DARK MODE */
 
 body.dark {
   color: #e2e8f0;
@@ -479,22 +404,14 @@ body.dark input:-webkit-autofill,
 body.dark input:-webkit-autofill:hover,
 body.dark input:-webkit-autofill:focus {
   -webkit-text-fill-color: #e2e8f0;
-  box-shadow: 0 0 0 1000px
-    #1e293b inset;
+  box-shadow: 0 0 0 1000px #1e293b inset;
 }
 
 body.dark tbody tr:hover {
-  background-color: rgba(
-    16,
-    185,
-    129,
-    0.055
-  );
+  background-color: rgba(16, 185, 129, 0.055);
 }
 
-/* ==================================
-   RESPONSIVE
-================================== */
+/* RESPONSIVE */
 
 @media (max-width: 992px) {
   .profile-page,
@@ -510,15 +427,7 @@ body.dark tbody tr:hover {
   }
 }
 
-/*
- * কোনো responsive sidebar width বা text hiding
- * rule এখানে নেই। Sidebar সব screen size-এ
- * sidebar.css অনুযায়ী full drawer থাকবে।
- */
-
-/* ==================================
-   ACCESSIBILITY
-================================== */
+/* ACCESSIBILITY */
 
 @media (prefers-reduced-motion: reduce) {
   html {
@@ -539,9 +448,7 @@ body.dark tbody tr:hover {
   }
 }
 
-/* ==================================
-   ANIMATIONS
-================================== */
+/* ANIMATIONS */
 
 @keyframes premiumPageEnter {
   from {
@@ -555,9 +462,7 @@ body.dark tbody tr:hover {
   }
 }
 
-/* ==================================
-   UNIFIED MESSMATE DESIGN SYSTEM
-================================== */
+/* UNIFIED DESIGN SYSTEM */
 
 :root {
   --brand-50: #fcf8f5;
@@ -584,8 +489,7 @@ body.dark tbody tr:hover {
   --premium-border: var(--app-border);
   --premium-surface: var(--app-surface);
   --premium-background: var(--app-bg);
-  --premium-shadow-green:
-    0 11px 24px rgba(135, 72, 39, 0.2);
+  --premium-shadow-green: 0 11px 24px rgba(135, 72, 39, 0.2);
 }
 
 body {
@@ -630,23 +534,16 @@ textarea:focus-visible {
 
 *::-webkit-scrollbar-thumb {
   background:
-    linear-gradient(
-      var(--brand-400),
-      var(--brand-500)
-    )
+    linear-gradient(var(--brand-400), var(--brand-500))
     padding-box;
 }
 
 *::-webkit-scrollbar-thumb:hover {
   background:
-    linear-gradient(
-      var(--brand-500),
-      var(--brand-600)
-    )
+    linear-gradient(var(--brand-500), var(--brand-600))
     padding-box;
 }
 
-/* Brand buttons share one finish across every module. */
 .auth-btn,
 .mess-setup-submit-button,
 .save-btn,
@@ -664,7 +561,8 @@ textarea:focus-visible {
     inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
-/* Semantic colours remain meaningful and are not brand colours. */
+/* SEMANTIC COLOURS */
+
 .positive,
 .receive,
 .success,
@@ -702,4 +600,381 @@ body.dark .layout {
       transparent 25%
     ),
     var(--app-bg);
+}
+
+/* Screen theme; printed reports retain their light styling. */
+
+@media screen {
+  body.dark {
+    --premium-text: var(--app-text);
+    --premium-muted: var(--app-muted);
+    --premium-border: var(--app-border);
+    --premium-surface: var(--app-surface);
+    --premium-background: var(--app-bg);
+    --theme-accent: #e5b18e;
+  }
+
+  body.dark .meal-module {
+    --meal-dark: var(--app-text);
+    --meal-muted: var(--app-muted);
+    --meal-border: var(--app-border);
+  }
+
+  body.dark :is(.auth-container, .loading-screen) {
+    color: var(--app-text);
+    background: var(--app-bg);
+  }
+
+  body.dark :is(
+    .meal-module-banner,
+    .meal-submenu,
+    .meal-daily-summary article,
+    .meal-history-summary article:not(.primary),
+    .meal-report-summary article:not(.total),
+    .meal-sheet-card,
+    .meal-history-table-card,
+    .meal-report-table-card,
+    .meal-filter-card,
+    .meal-progress-card,
+    .members-module-banner,
+    .members-submenu,
+    .mess-code-card,
+    .member-summary-grid article,
+    .manager-summary-grid article:not(.primary),
+    .member-filter-card,
+    .member-directory-card,
+    .add-member-form-card,
+    .manager-list-card,
+    .members-access-card,
+    .member-edit-modal
+  ) {
+    border-color: var(--app-border);
+    background: var(--app-surface);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+  }
+
+  body.dark :is(
+    .meal-date-card,
+    .meal-sheet-header,
+    .meal-history-table-title,
+    .meal-report-table-heading,
+    .meal-sheet-footer,
+    .member-profile-card,
+    .manager-member-card,
+    .member-contact-list,
+    .add-member-info,
+    .manager-rule-card,
+    .add-member-role-note,
+    .add-member-form-footer,
+    .member-edit-note
+  ) {
+    border-color: var(--app-border);
+    background: var(--app-surface-soft);
+  }
+
+  body.dark :is(
+    .member-profile-card.current,
+    .manager-member-card.manager
+  ) {
+    border-color: rgba(229, 177, 142, 0.4);
+  }
+
+  body.dark .members-module :is(h1, h2, h3, h4) {
+    color: var(--app-text);
+  }
+
+  body.dark :is(
+    .meal-date-content strong,
+    .meal-sheet-header h3,
+    .meal-history-table-title h3,
+    .meal-report-table-heading h3,
+    .meal-member strong,
+    .meal-history-member strong,
+    .meal-report-member strong,
+    .meal-counter > strong,
+    .meal-filter-heading,
+    .meal-report-summary article:not(.total) strong,
+    .meal-progress-heading strong,
+    .member-form-field > span,
+    .member-edit-modal label > span,
+    .manager-rule-card ul
+  ) {
+    color: var(--app-text);
+  }
+
+  body.dark :is(
+    .members-module p,
+    .member-summary-grid span,
+    .manager-summary-grid article:not(.primary) > div > span,
+    .mess-code-information span,
+    .member-list-count span,
+    .members-manager-badge span,
+    .member-contact-list > div,
+    .member-account-status small,
+    .meal-daily-summary span,
+    .meal-daily-summary small,
+    .meal-date-content span,
+    .meal-sheet-header p,
+    .meal-history-table-title p,
+    .meal-report-table-heading p,
+    .meal-sheet-footer > div span,
+    .meal-filter-field > span,
+    .meal-history-summary article:not(.primary) span,
+    .meal-report-date > div span,
+    .meal-report-summary article:not(.total) span,
+    .meal-progress-heading span,
+    .meal-progress-card p,
+    .meal-date-cell
+  ) {
+    color: var(--app-muted);
+  }
+
+  body.dark :is(
+    .meal-module-label,
+    .meal-subpage-eyebrow,
+    .meal-daily-summary strong,
+    .meal-history-summary article:not(.primary) strong,
+    .meal-sheet-footer > div strong,
+    .meal-report-date > div strong,
+    .members-module-label,
+    .members-subpage-eyebrow,
+    .member-summary-grid strong,
+    .manager-summary-grid article:not(.primary) strong,
+    .mess-code-information strong,
+    .member-list-count strong,
+    .members-manager-badge strong,
+    .add-member-info strong,
+    .manager-rule-card strong,
+    .add-member-role-note strong,
+    .member-account-status .connected,
+    .manager-member-status .connected,
+    .member-edit-heading span
+  ) {
+    color: var(--theme-accent);
+  }
+
+  body.dark :is(
+    .meal-submenu-link,
+    .members-submenu-link
+  ):not(.active) {
+    color: var(--app-muted);
+  }
+
+  body.dark :is(
+    .meal-submenu-link,
+    .members-submenu-link
+  ):not(.active):hover {
+    border-color: var(--app-border);
+    color: var(--theme-accent);
+    background: var(--app-surface-soft);
+  }
+
+  body.dark :is(
+    .meal-date-content input,
+    .meal-filter-control input,
+    .meal-filter-field select,
+    .member-search-control input,
+    .member-filter-card select,
+    .member-input-control input,
+    .member-edit-modal input,
+    .meal-counter,
+    .meal-counter.read-only
+  ) {
+    border-color: var(--app-border);
+    color: var(--app-text);
+    background: var(--app-bg);
+  }
+
+  body.dark :is(
+    .meal-today-button,
+    .meal-date-arrow,
+    .meal-counter button,
+    .meal-total-badge,
+    .meal-row-total,
+    .meal-report-total,
+    .meal-entry-count,
+    .meal-member-count,
+    .meal-history-count,
+    .meal-report-date,
+    .meal-access.editable,
+    .member-list-count,
+    .members-manager-badge,
+    .member-readonly-label,
+    .manager-list-heading > span,
+    .member-profile-title > div:first-child span,
+    .manager-member-name span,
+    .mess-code-regenerate,
+    .member-edit-button
+  ) {
+    border-color: rgba(229, 177, 142, 0.22);
+    color: var(--theme-accent);
+    background: rgba(193, 122, 78, 0.12);
+  }
+
+  body.dark :is(
+    .meal-access.locked,
+    .meal-reset-button,
+    .member-normal-role,
+    .member-role-badge,
+    .member-clear-button,
+    .member-modal-cancel,
+    .member-edit-heading button
+  ) {
+    border-color: var(--app-border);
+    color: var(--app-muted);
+    background: var(--app-surface-soft);
+  }
+
+  body.dark :is(
+    .meal-counter button:disabled,
+    .meal-progress-track
+  ) {
+    color: var(--app-muted);
+    background: var(--app-surface-soft);
+  }
+
+  body.dark :is(
+    .daily-meal-table,
+    .meal-history-table,
+    .meal-report-table
+  ) thead {
+    background: var(--app-surface-soft);
+  }
+
+  body.dark :is(
+    .daily-meal-table,
+    .meal-history-table,
+    .meal-report-table
+  ) :is(th, td) {
+    border-color: var(--app-border);
+    color: var(--app-text);
+  }
+
+  body.dark :is(
+    .daily-meal-table,
+    .meal-history-table,
+    .meal-report-table
+  ) tbody tr:hover,
+  body.dark .daily-meal-table tbody tr.current-member-row {
+    background: rgba(193, 122, 78, 0.1);
+  }
+
+  body.dark :is(
+    .meal-warning,
+    .member-manager-role,
+    .manager-role-badge
+  ) {
+    border-color: rgba(245, 203, 125, 0.24);
+    color: #f5cb7d;
+    background: rgba(180, 120, 40, 0.14);
+  }
+
+  body.dark :is(
+    .member-remove-button,
+    .manager-demote-button
+  ) {
+    border-color: rgba(253, 164, 175, 0.24);
+    color: #fda4af;
+    background: rgba(190, 60, 80, 0.14);
+  }
+
+  body.dark .member-balance-page {
+    --mb-text: var(--app-text);
+    --mb-muted: var(--app-muted);
+    --mb-border: var(--app-border);
+    --mb-surface: var(--app-surface);
+    --mb-soft: var(--app-surface-soft);
+  }
+
+  body.dark :is(
+    .mb-heading-icon,
+    .mb-manager-panel,
+    .mb-entry-list article
+  ) {
+    background: var(--app-surface);
+  }
+
+  body.dark :is(
+    .mb-entry-form input,
+    .mb-entry-form select,
+    .mb-transfer-button
+  ) {
+    border-color: var(--app-border);
+    color: var(--app-text);
+    background: var(--app-bg);
+  }
+
+  body.dark .mb-settlement-table thead th {
+    color: var(--app-muted);
+    background: var(--app-surface-soft);
+  }
+
+  body.dark :is(
+    .mb-eyebrow,
+    .mb-heading-icon,
+    .mb-manager-icon,
+    .mb-member-count,
+    .mb-member-avatar,
+    .mb-month-picker
+  ),
+  body.dark .mb-summary-card:not(.featured) .mb-card-icon {
+    color: var(--theme-accent);
+  }
+
+  body.dark .mb-meal-value,
+  body.dark .mb-summary-card:not(.featured) .mb-card-icon.meals {
+    color: #c9b5ef;
+  }
+
+  body.dark .mb-status.receive {
+    color: #8ed9b6;
+  }
+
+  body.dark .mb-status.pay {
+    color: #fda4af;
+  }
+
+  body.dark .mb-status.settled {
+    color: var(--app-muted);
+  }
+
+  body.dark .export-report-page {
+    --export-text: var(--app-text);
+    --export-muted: var(--app-muted);
+    --export-border: var(--app-border);
+    --export-surface: var(--app-surface);
+    --export-soft: var(--app-surface-soft);
+  }
+
+  body.dark :is(.export-eyebrow, .export-month-field) {
+    color: var(--theme-accent);
+  }
+
+  body.dark .print-report-sheet {
+    --export-text: #1d2521;
+    --export-muted: #727a75;
+    --export-border: rgba(43, 52, 47, 0.11);
+    --export-surface: rgba(255, 255, 255, 0.94);
+    --export-soft: #f8f5f2;
+    color: var(--export-text);
+    color-scheme: light;
+  }
+
+  body.dark :is(
+    .balance-positive,
+    .report-balance.positive,
+    .mb-balance.positive,
+    .mb-final-summary .positive
+  ) {
+    color: #8ed9b6 !important;
+  }
+
+  body.dark :is(
+    .balance-negative,
+    .report-balance.negative,
+    .mb-balance.negative,
+    .mb-final-summary .negative
+  ) {
+    color: #fda4af !important;
+  }
 }
