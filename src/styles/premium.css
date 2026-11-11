@@ -19,23 +19,15 @@ body {
   background: rgba(166, 95, 54, 0.85);
 }
 
-button,
-input,
-select,
-textarea {
+button, input, select, textarea {
   font: inherit;
 }
 
-button,
-a {
+button, a {
   -webkit-tap-highlight-color: transparent;
 }
 
-button:focus-visible,
-a:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
   outline: 3px solid rgba(193, 122, 78, 0.23);
   outline-offset: 2px;
 }
@@ -57,22 +49,16 @@ textarea:focus-visible {
 *::-webkit-scrollbar-thumb {
   border: 2px solid transparent;
   border-radius: 20px;
-  background: linear-gradient(#c17a4e, #a65f36) padding-box;
+  background: linear-gradient( #c17a4e, #a65f36 ) padding-box;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(#a65f36, #7e4325) padding-box;
+  background: linear-gradient( #a65f36, #7e4325 ) padding-box;
 }
 
 .layout {
   min-height: 100vh;
-  background:
-    radial-gradient(
-      circle at 82% 3%,
-      rgba(205, 145, 105, 0.055),
-      transparent 25%
-    ),
-    #f8fafc;
+  background: radial-gradient( circle at 82% 3%, rgba(205, 145, 105, 0.055), transparent 25% ), #f8fafc;
 }
 
 .layout-main {
@@ -86,151 +72,81 @@ textarea:focus-visible {
 }
 
 .layout-content > * {
-  animation: premiumPageEnter 0.42s
-    cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: premiumPageEnter 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.profile-page,
-.settings-page {
+.profile-page, .settings-page {
   padding: 22px;
 }
 
-.dashboard,
-.reports-page,
-.profile-page,
-.settings-page {
+.dashboard, .reports-page, .profile-page, .settings-page {
   background: transparent;
 }
 
-.dashboard-panel,
-.dashboard-stat-card,
-.report-summary-card,
-.reports-filter-card,
-.reports-table-card,
-.profile-card,
-.settings-card {
+.dashboard-panel, .dashboard-stat-card, .report-summary-card, .reports-filter-card, .reports-table-card, .profile-card, .settings-card {
   border-color: rgba(35, 45, 39, 0.1);
   box-shadow: 0 11px 28px rgba(15, 23, 42, 0.07);
 }
 
-.dashboard-panel,
-.reports-filter-card,
-.reports-table-card,
-.profile-card,
-.settings-card {
+.dashboard-panel, .reports-filter-card, .reports-table-card, .profile-card, .settings-card {
   overflow: hidden;
   border-radius: 19px;
 }
 
-.dashboard-stat-card,
-.report-summary-card,
-.profile-card,
-.settings-card {
-  transition:
-    border-color 0.22s ease,
-    transform 0.22s ease,
-    box-shadow 0.22s ease;
+.dashboard-stat-card, .report-summary-card, .profile-card, .settings-card {
+  transition: border-color 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
 }
 
-.dashboard-stat-card:hover,
-.report-summary-card:hover,
-.profile-card:hover,
-.settings-card:hover {
+.dashboard-stat-card:hover, .report-summary-card:hover, .profile-card:hover, .settings-card:hover {
   border-color: #e4c7b4;
   transform: translateY(-3px);
   box-shadow: 0 16px 34px rgba(166, 95, 54, 0.09);
 }
 
-.auth-btn,
-.mess-setup-submit-button,
-.save-btn,
-.profile-edit-button,
-.profile-actions button:first-child,
-.btn-primary {
+.auth-btn, .mess-setup-submit-button, .save-btn, .profile-edit-button, .profile-actions button:first-child, .btn-primary {
   position: relative;
   overflow: hidden;
   border: 0;
   color: #ffffff;
-  background: linear-gradient(
-    135deg,
-    #c17a4e,
-    #a65f36 58%,
-    #6f4a37
-  );
-  box-shadow:
-    0 11px 24px rgba(135, 72, 39, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.24);
+  background: linear-gradient( 135deg, #c17a4e, #a65f36 58%, #6f4a37 );
+  box-shadow: 0 11px 24px rgba(135, 72, 39, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.24);
   cursor: pointer;
-  transition:
-    filter 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: filter 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.auth-btn::after,
-.mess-setup-submit-button::after,
-.save-btn::after,
-.profile-edit-button::after,
-.profile-actions button:first-child::after,
-.btn-primary::after {
+.auth-btn::after, .mess-setup-submit-button::after, .save-btn::after, .profile-edit-button::after, .profile-actions button:first-child::after, .btn-primary::after {
   position: absolute;
   top: -40%;
   left: -65%;
   width: 34%;
   height: 190%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.37),
-    transparent
-  );
+  background: linear-gradient( 90deg, transparent, rgba(255, 255, 255, 0.37), transparent );
   content: "";
   pointer-events: none;
   transform: rotate(18deg);
   transition: left 0.55s ease;
 }
 
-.auth-btn:hover::after,
-.mess-setup-submit-button:hover::after,
-.save-btn:hover::after,
-.profile-edit-button:hover::after,
-.profile-actions button:first-child:hover::after,
-.btn-primary:hover::after {
+.auth-btn:hover::after, .mess-setup-submit-button:hover::after, .save-btn:hover::after, .profile-edit-button:hover::after, .profile-actions button:first-child:hover::after, .btn-primary:hover::after {
   left: 135%;
 }
 
-.auth-btn:hover:not(:disabled),
-.mess-setup-submit-button:hover:not(:disabled),
-.save-btn:hover:not(:disabled),
-.profile-edit-button:hover:not(:disabled),
-.profile-actions button:first-child:hover:not(:disabled),
-.btn-primary:hover:not(:disabled) {
+.auth-btn:hover:not(:disabled), .mess-setup-submit-button:hover:not(:disabled), .save-btn:hover:not(:disabled), .profile-edit-button:hover:not(:disabled), .profile-actions button:first-child:hover:not(:disabled), .btn-primary:hover:not(:disabled) {
   filter: saturate(1.08);
   transform: translateY(-2px);
-  box-shadow:
-    0 15px 29px rgba(166, 95, 54, 0.31),
-    inset 0 1px 0 rgba(255, 255, 255, 0.26);
+  box-shadow: 0 15px 29px rgba(166, 95, 54, 0.31), inset 0 1px 0 rgba(255, 255, 255, 0.26);
 }
 
-.btn-outline,
-.mess-setup-back-button,
-.profile-actions button:last-child {
+.btn-outline, .mess-setup-back-button, .profile-actions button:last-child {
   border: 1px solid #e4c7b4;
   border-radius: 10px;
   color: #7e4325;
   background: #fbf4ef;
   cursor: pointer;
-  transition:
-    color 0.2s ease,
-    border-color 0.2s ease,
-    background 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.btn-outline:hover:not(:disabled),
-.mess-setup-back-button:hover:not(:disabled),
-.profile-actions button:last-child:hover:not(:disabled) {
+.btn-outline:hover:not(:disabled), .mess-setup-back-button:hover:not(:disabled), .profile-actions button:last-child:hover:not(:disabled) {
   color: #ffffff;
   border-color: #a65f36;
   background: #a65f36;
@@ -238,33 +154,23 @@ textarea:focus-visible {
   transform: translateY(-2px);
 }
 
-.reset-btn,
-.btn-danger {
+.reset-btn, .btn-danger {
   border: 1px solid #fecaca;
   color: #dc2626;
   background: #fff1f2;
   cursor: pointer;
-  transition:
-    color 0.2s ease,
-    border-color 0.2s ease,
-    background 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.reset-btn:hover:not(:disabled),
-.btn-danger:hover:not(:disabled) {
+.reset-btn:hover:not(:disabled), .btn-danger:hover:not(:disabled) {
   color: #ffffff;
   border-color: #dc2626;
-  background: linear-gradient(135deg, #ef4444, #dc2626);
+  background: linear-gradient( 135deg, #ef4444, #dc2626 );
   box-shadow: 0 9px 20px rgba(220, 38, 38, 0.22);
   transform: translateY(-2px);
 }
 
-button:active:not(:disabled),
-.btn-primary:active:not(:disabled),
-.btn-outline:active:not(:disabled),
-.btn-danger:active:not(:disabled) {
+button:active:not(:disabled), .btn-primary:active:not(:disabled), .btn-outline:active:not(:disabled), .btn-danger:active:not(:disabled) {
   transform: translateY(0) scale(0.97);
 }
 
@@ -273,31 +179,20 @@ button:disabled {
   cursor: not-allowed;
 }
 
-input,
-select,
-textarea {
+input, select, textarea {
   accent-color: #a65f36;
 }
 
-input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
-select,
-textarea {
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    background 0.2s ease;
+input:not([type="checkbox"]):not( [type="radio"] ):not([type="file"]), select, textarea {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
-input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):focus,
-select:focus,
-textarea:focus {
+input:not([type="checkbox"]):not( [type="radio"] ):not([type="file"]):focus, select:focus, textarea:focus {
   border-color: #c17a4e;
   box-shadow: 0 0 0 3px rgba(193, 122, 78, 0.11);
 }
 
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus {
+input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus {
   -webkit-text-fill-color: #334155;
   box-shadow: 0 0 0 1000px #ffffff inset;
   transition: background-color 9999s ease-in-out 0s;
@@ -312,7 +207,7 @@ tbody tr {
 }
 
 tbody tr:hover {
-  background-color: rgba(236, 253, 245, 0.45);
+  background-color: rgba( 236, 253, 245, 0.45 );
 }
 
 .react-hot-toast {
@@ -327,49 +222,36 @@ body.dark {
 }
 
 body.dark .layout {
-  background:
-    radial-gradient(
-      circle at 82% 3%,
-      rgba(193, 122, 78, 0.07),
-      transparent 26%
-    ),
-    #0f172a;
+  background: radial-gradient( circle at 82% 3%, rgba(193, 122, 78, 0.07), transparent 26% ), #0f172a;
 }
 
-body.dark input,
-body.dark select,
-body.dark textarea {
+body.dark input, body.dark select, body.dark textarea {
   color: #e2e8f0;
   border-color: #334155;
   background: #1e293b;
 }
 
-body.dark input::placeholder,
-body.dark textarea::placeholder {
+body.dark input::placeholder, body.dark textarea::placeholder {
   color: #64748b;
 }
 
-body.dark input:-webkit-autofill,
-body.dark input:-webkit-autofill:hover,
-body.dark input:-webkit-autofill:focus {
+body.dark input:-webkit-autofill, body.dark input:-webkit-autofill:hover, body.dark input:-webkit-autofill:focus {
   -webkit-text-fill-color: #e2e8f0;
   box-shadow: 0 0 0 1000px #1e293b inset;
 }
 
 body.dark tbody tr:hover {
-  background-color: rgba(16, 185, 129, 0.055);
+  background-color: rgba( 16, 185, 129, 0.055 );
 }
 
 @media (max-width: 992px) {
-  .profile-page,
-  .settings-page {
+  .profile-page, .settings-page {
     padding: 18px;
   }
 }
 
 @media (max-width: 650px) {
-  .profile-page,
-  .settings-page {
+  .profile-page, .settings-page {
     padding: 12px;
   }
 }
@@ -378,14 +260,10 @@ body.dark tbody tr:hover {
   html {
     scroll-behavior: auto;
   }
-
   .layout-content > * {
     animation: none;
   }
-
-  *,
-  *::before,
-  *::after {
+  *, *::before, *::after {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
@@ -398,7 +276,6 @@ body.dark tbody tr:hover {
     opacity: 0;
     transform: translateY(11px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -408,24 +285,11 @@ body.dark tbody tr:hover {
 body {
   color: #18201c;
   background: #f7f6f4;
-  font-family:
-    Inter,
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    "Segoe UI",
-    sans-serif;
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 .layout {
-  background:
-    radial-gradient(
-      circle at 84% 0%,
-      rgba(193, 122, 78, 0.055),
-      transparent 25%
-    ),
-    #f7f6f4;
+  background: radial-gradient( circle at 84% 0%, rgba(193, 122, 78, 0.055), transparent 25% ), #f7f6f4;
 }
 
 ::selection {
@@ -433,11 +297,7 @@ body {
   background: rgba(166, 95, 54, 0.86);
 }
 
-button:focus-visible,
-a:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible {
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
   outline-color: rgba(185, 111, 67, 0.3);
 }
 
@@ -446,58 +306,28 @@ textarea:focus-visible {
 }
 
 *::-webkit-scrollbar-thumb {
-  background: linear-gradient(#c17a4e, #a65f36) padding-box;
+  background: linear-gradient( #c17a4e, #a65f36 ) padding-box;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(#a65f36, #874827) padding-box;
+  background: linear-gradient( #a65f36, #874827 ) padding-box;
 }
 
-.auth-btn,
-.mess-setup-submit-button,
-.save-btn,
-.profile-edit-button,
-.profile-actions button:first-child,
-.btn-primary {
-  background: linear-gradient(
-    135deg,
-    #874827,
-    #a65f36 58%,
-    #c17a4e
-  );
-  box-shadow:
-    0 10px 22px rgba(135, 72, 39, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.22);
+.auth-btn, .mess-setup-submit-button, .save-btn, .profile-edit-button, .profile-actions button:first-child, .btn-primary {
+  background: linear-gradient( 135deg, #874827, #a65f36 58%, #c17a4e );
+  box-shadow: 0 10px 22px rgba(135, 72, 39, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
-.positive,
-.receive,
-.success,
-.balance-positive,
-.report-balance.positive,
-.mb-balance.positive,
-.print-balance.positive {
+.positive, .receive, .success, .balance-positive, .report-balance.positive, .mb-balance.positive, .print-balance.positive {
   color: #287052 !important;
 }
 
-.negative,
-.pay,
-.danger,
-.balance-negative,
-.report-balance.negative,
-.mb-balance.negative,
-.print-balance.negative {
+.negative, .pay, .danger, .balance-negative, .report-balance.negative, .mb-balance.negative, .print-balance.negative {
   color: #ad4848 !important;
 }
 
 body.dark .layout {
-  background:
-    radial-gradient(
-      circle at 84% 0%,
-      rgba(193, 122, 78, 0.07),
-      transparent 25%
-    ),
-    #131714;
+  background: radial-gradient( circle at 84% 0%, rgba(193, 122, 78, 0.07), transparent 25% ), #131714;
 }
 
 @media screen {
@@ -505,336 +335,115 @@ body.dark .layout {
     color: #edf1ee;
     background: #131714;
   }
-
-  body.dark :is(
-    .meal-module-banner,
-    .meal-submenu,
-    .meal-daily-summary article,
-    .meal-history-summary article:not(.primary),
-    .meal-report-summary article:not(.total),
-    .meal-sheet-card,
-    .meal-history-table-card,
-    .meal-report-table-card,
-    .meal-filter-card,
-    .meal-progress-card,
-    .members-module-banner,
-    .members-submenu,
-    .mess-code-card,
-    .member-summary-grid article,
-    .manager-summary-grid article:not(.primary),
-    .member-filter-card,
-    .member-directory-card,
-    .add-member-form-card,
-    .manager-list-card,
-    .members-access-card,
-    .member-edit-modal
-  ) {
+  body.dark :is( .meal-module-banner, .meal-submenu, .meal-daily-summary article, .meal-history-summary article:not(.primary), .meal-report-summary article:not(.total), .meal-sheet-card, .meal-history-table-card, .meal-report-table-card, .meal-filter-card, .meal-progress-card, .members-module-banner, .members-submenu, .mess-code-card, .member-summary-grid article, .manager-summary-grid article:not(.primary), .member-filter-card, .member-directory-card, .add-member-form-card, .manager-list-card, .members-access-card, .member-edit-modal ) {
     border-color: rgba(255, 255, 255, 0.09);
     background: #1b211d;
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
   }
-
-  body.dark :is(
-    .meal-date-card,
-    .meal-sheet-header,
-    .meal-history-table-title,
-    .meal-report-table-heading,
-    .meal-sheet-footer,
-    .member-profile-card,
-    .manager-member-card,
-    .member-contact-list,
-    .add-member-info,
-    .manager-rule-card,
-    .add-member-role-note,
-    .add-member-form-footer,
-    .member-edit-note
-  ) {
+  body.dark :is( .meal-date-card, .meal-sheet-header, .meal-history-table-title, .meal-report-table-heading, .meal-sheet-footer, .member-profile-card, .manager-member-card, .member-contact-list, .add-member-info, .manager-rule-card, .add-member-role-note, .add-member-form-footer, .member-edit-note ) {
     border-color: rgba(255, 255, 255, 0.09);
     background: #202722;
   }
-
-  body.dark :is(
-    .member-profile-card.current,
-    .manager-member-card.manager
-  ) {
+  body.dark :is(.member-profile-card.current, .manager-member-card.manager) {
     border-color: rgba(229, 177, 142, 0.4);
   }
-
   body.dark .members-module :is(h1, h2, h3, h4) {
     color: #edf1ee;
   }
-
-  body.dark :is(
-    .meal-date-content strong,
-    .meal-sheet-header h3,
-    .meal-history-table-title h3,
-    .meal-report-table-heading h3,
-    .meal-member strong,
-    .meal-history-member strong,
-    .meal-report-member strong,
-    .meal-counter > strong,
-    .meal-filter-heading,
-    .meal-report-summary article:not(.total) strong,
-    .meal-progress-heading strong,
-    .member-form-field > span,
-    .member-edit-modal label > span,
-    .manager-rule-card ul
-  ) {
+  body.dark :is( .meal-date-content strong, .meal-sheet-header h3, .meal-history-table-title h3, .meal-report-table-heading h3, .meal-member strong, .meal-history-member strong, .meal-report-member strong, .meal-counter > strong, .meal-filter-heading, .meal-report-summary article:not(.total) strong, .meal-progress-heading strong, .member-form-field > span, .member-edit-modal label > span, .manager-rule-card ul ) {
     color: #edf1ee;
   }
-
-  body.dark :is(
-    .members-module p,
-    .member-summary-grid span,
-    .manager-summary-grid article:not(.primary) > div > span,
-    .mess-code-information span,
-    .member-list-count span,
-    .members-manager-badge span,
-    .member-contact-list > div,
-    .member-account-status small,
-    .meal-daily-summary span,
-    .meal-daily-summary small,
-    .meal-date-content span,
-    .meal-sheet-header p,
-    .meal-history-table-title p,
-    .meal-report-table-heading p,
-    .meal-sheet-footer > div span,
-    .meal-filter-field > span,
-    .meal-history-summary article:not(.primary) span,
-    .meal-report-date > div span,
-    .meal-report-summary article:not(.total) span,
-    .meal-progress-heading span,
-    .meal-progress-card p,
-    .meal-date-cell
-  ) {
+  body.dark :is( .members-module p, .member-summary-grid span, .manager-summary-grid article:not(.primary) > div > span, .mess-code-information span, .member-list-count span, .members-manager-badge span, .member-contact-list > div, .member-account-status small, .meal-daily-summary span, .meal-daily-summary small, .meal-date-content span, .meal-sheet-header p, .meal-history-table-title p, .meal-report-table-heading p, .meal-sheet-footer > div span, .meal-filter-field > span, .meal-history-summary article:not(.primary) span, .meal-report-date > div span, .meal-report-summary article:not(.total) span, .meal-progress-heading span, .meal-progress-card p, .meal-date-cell ) {
     color: #9aa39d;
   }
-
-  body.dark :is(
-    .meal-module-label,
-    .meal-subpage-eyebrow,
-    .meal-daily-summary strong,
-    .meal-history-summary article:not(.primary) strong,
-    .meal-sheet-footer > div strong,
-    .meal-report-date > div strong,
-    .members-module-label,
-    .members-subpage-eyebrow,
-    .member-summary-grid strong,
-    .manager-summary-grid article:not(.primary) strong,
-    .mess-code-information strong,
-    .member-list-count strong,
-    .members-manager-badge strong,
-    .add-member-info strong,
-    .manager-rule-card strong,
-    .add-member-role-note strong,
-    .member-account-status .connected,
-    .manager-member-status .connected,
-    .member-edit-heading span
-  ) {
+  body.dark :is( .meal-module-label, .meal-subpage-eyebrow, .meal-daily-summary strong, .meal-history-summary article:not(.primary) strong, .meal-sheet-footer > div strong, .meal-report-date > div strong, .members-module-label, .members-subpage-eyebrow, .member-summary-grid strong, .manager-summary-grid article:not(.primary) strong, .mess-code-information strong, .member-list-count strong, .members-manager-badge strong, .add-member-info strong, .manager-rule-card strong, .add-member-role-note strong, .member-account-status .connected, .manager-member-status .connected, .member-edit-heading span ) {
     color: #e5b18e;
   }
-
-  body.dark :is(
-    .meal-submenu-link,
-    .members-submenu-link
-  ):not(.active) {
+  body.dark :is(.meal-submenu-link, .members-submenu-link):not(.active) {
     color: #9aa39d;
   }
-
-  body.dark :is(
-    .meal-submenu-link,
-    .members-submenu-link
-  ):not(.active):hover {
+  body.dark :is(.meal-submenu-link, .members-submenu-link):not(.active):hover {
     border-color: rgba(255, 255, 255, 0.09);
     color: #e5b18e;
     background: #202722;
   }
-
-  body.dark :is(
-    .meal-date-content input,
-    .meal-filter-control input,
-    .meal-filter-field select,
-    .member-search-control input,
-    .member-filter-card select,
-    .member-input-control input,
-    .member-edit-modal input,
-    .meal-counter,
-    .meal-counter.read-only
-  ) {
+  body.dark :is( .meal-date-content input, .meal-filter-control input, .meal-filter-field select, .member-search-control input, .member-filter-card select, .member-input-control input, .member-edit-modal input, .meal-counter, .meal-counter.read-only ) {
     border-color: rgba(255, 255, 255, 0.09);
     color: #edf1ee;
     background: #131714;
   }
-
-  body.dark :is(
-    .meal-today-button,
-    .meal-date-arrow,
-    .meal-counter button,
-    .meal-total-badge,
-    .meal-row-total,
-    .meal-report-total,
-    .meal-entry-count,
-    .meal-member-count,
-    .meal-history-count,
-    .meal-report-date,
-    .meal-access.editable,
-    .member-list-count,
-    .members-manager-badge,
-    .member-readonly-label,
-    .manager-list-heading > span,
-    .member-profile-title > div:first-child span,
-    .manager-member-name span,
-    .mess-code-regenerate,
-    .member-edit-button
-  ) {
+  body.dark :is( .meal-today-button, .meal-date-arrow, .meal-counter button, .meal-total-badge, .meal-row-total, .meal-report-total, .meal-entry-count, .meal-member-count, .meal-history-count, .meal-report-date, .meal-access.editable, .member-list-count, .members-manager-badge, .member-readonly-label, .manager-list-heading > span, .member-profile-title > div:first-child span, .manager-member-name span, .mess-code-regenerate, .member-edit-button ) {
     border-color: rgba(229, 177, 142, 0.22);
     color: #e5b18e;
     background: rgba(193, 122, 78, 0.12);
   }
-
-  body.dark :is(
-    .meal-access.locked,
-    .meal-reset-button,
-    .member-normal-role,
-    .member-role-badge,
-    .member-clear-button,
-    .member-modal-cancel,
-    .member-edit-heading button
-  ) {
+  body.dark :is( .meal-access.locked, .meal-reset-button, .member-normal-role, .member-role-badge, .member-clear-button, .member-modal-cancel, .member-edit-heading button ) {
     border-color: rgba(255, 255, 255, 0.09);
     color: #9aa39d;
     background: #202722;
   }
-
-  body.dark :is(
-    .meal-counter button:disabled,
-    .meal-progress-track
-  ) {
+  body.dark :is(.meal-counter button:disabled, .meal-progress-track) {
     color: #9aa39d;
     background: #202722;
   }
-
-  body.dark :is(
-    .daily-meal-table,
-    .meal-history-table,
-    .meal-report-table
-  ) thead {
+  body.dark :is(.daily-meal-table, .meal-history-table, .meal-report-table) thead {
     background: #202722;
   }
-
-  body.dark :is(
-    .daily-meal-table,
-    .meal-history-table,
-    .meal-report-table
-  ) :is(th, td) {
+  body.dark :is(.daily-meal-table, .meal-history-table, .meal-report-table) :is(th, td) {
     border-color: rgba(255, 255, 255, 0.09);
     color: #edf1ee;
   }
-
-  body.dark :is(
-    .daily-meal-table,
-    .meal-history-table,
-    .meal-report-table
-  ) tbody tr:hover,
-  body.dark .daily-meal-table tbody tr.current-member-row {
+  body.dark :is(.daily-meal-table, .meal-history-table, .meal-report-table) tbody tr:hover, body.dark .daily-meal-table tbody tr.current-member-row {
     background: rgba(193, 122, 78, 0.1);
   }
-
-  body.dark :is(
-    .meal-warning,
-    .member-manager-role,
-    .manager-role-badge
-  ) {
+  body.dark :is(.meal-warning, .member-manager-role, .manager-role-badge) {
     border-color: rgba(245, 203, 125, 0.24);
     color: #f5cb7d;
     background: rgba(180, 120, 40, 0.14);
   }
-
-  body.dark :is(
-    .member-remove-button,
-    .manager-demote-button
-  ) {
+  body.dark :is(.member-remove-button, .manager-demote-button) {
     border-color: rgba(253, 164, 175, 0.24);
     color: #fda4af;
     background: rgba(190, 60, 80, 0.14);
   }
-
-  body.dark :is(
-    .mb-heading-icon,
-    .mb-manager-panel,
-    .mb-entry-list article
-  ) {
+  body.dark :is(.mb-heading-icon, .mb-manager-panel, .mb-entry-list article) {
     background: #1b211d;
   }
-
-  body.dark :is(
-    .mb-entry-form input,
-    .mb-entry-form select,
-    .mb-transfer-button
-  ) {
+  body.dark :is(.mb-entry-form input, .mb-entry-form select, .mb-transfer-button) {
     border-color: rgba(255, 255, 255, 0.09);
     color: #edf1ee;
     background: #131714;
   }
-
   body.dark .mb-settlement-table thead th {
     color: #9aa39d;
     background: #202722;
   }
-
-  body.dark :is(
-    .mb-eyebrow,
-    .mb-heading-icon,
-    .mb-manager-icon,
-    .mb-member-count,
-    .mb-member-avatar,
-    .mb-month-picker
-  ),
-  body.dark .mb-summary-card:not(.featured) .mb-card-icon {
+  body.dark :is(.mb-eyebrow, .mb-heading-icon, .mb-manager-icon, .mb-member-count, .mb-member-avatar, .mb-month-picker), body.dark .mb-summary-card:not(.featured) .mb-card-icon {
     color: #e5b18e;
   }
-
-  body.dark .mb-meal-value,
-  body.dark .mb-summary-card:not(.featured) .mb-card-icon.meals {
+  body.dark .mb-meal-value, body.dark .mb-summary-card:not(.featured) .mb-card-icon.meals {
     color: #c9b5ef;
   }
-
   body.dark .mb-status.receive {
     color: #8ed9b6;
   }
-
   body.dark .mb-status.pay {
     color: #fda4af;
   }
-
   body.dark .mb-status.settled {
     color: #9aa39d;
   }
-
   body.dark :is(.export-eyebrow, .export-month-field) {
     color: #e5b18e;
   }
-
   body.dark .print-report-sheet {
     color: #1d2521;
     color-scheme: light;
   }
-
-  body.dark :is(
-    .balance-positive,
-    .report-balance.positive,
-    .mb-balance.positive,
-    .mb-final-summary .positive
-  ) {
+  body.dark :is( .balance-positive, .report-balance.positive, .mb-balance.positive, .mb-final-summary .positive ) {
     color: #8ed9b6 !important;
   }
-
-  body.dark :is(
-    .balance-negative,
-    .report-balance.negative,
-    .mb-balance.negative,
-    .mb-final-summary .negative
-  ) {
+  body.dark :is( .balance-negative, .report-balance.negative, .mb-balance.negative, .mb-final-summary .negative ) {
     color: #fda4af !important;
   }
 }
@@ -843,137 +452,314 @@ body.dark .layout {
   body.dark .meal-module-banner {
     border: 1px solid rgba(255, 255, 255, 0.09);
   }
-
-  body.dark .meal-module-title h1,
+  body.dark .meal-module-title h1 {
+    color: #edf1ee;
+  }
+  body.dark .meal-module-title p {
+    color: #9aa39d;
+  }
   body.dark .meal-subpage-header h2 {
     color: #edf1ee;
   }
-
-  body.dark .meal-module-title p,
   body.dark .meal-subpage-header p {
     color: #9aa39d;
   }
-
-  body.dark .member-balance-page,
+  body.dark .member-balance-page {
+    color: #edf1ee;
+  }
   body.dark .mb-heading h1 {
     color: #edf1ee;
   }
-
   body.dark .mb-heading p {
     color: #9aa39d;
   }
-
   body.dark .mb-month-picker {
     border: 1px solid rgba(255, 255, 255, 0.09);
     background: #1b211d;
   }
-
   body.dark .mb-month-picker input {
     color: #edf1ee;
   }
-
   body.dark .mb-summary-card {
     border: 1px solid rgba(255, 255, 255, 0.09);
     background: #1b211d;
   }
-
   body.dark .mb-summary-card span {
     color: #9aa39d;
   }
-
   body.dark .mb-summary-card strong {
     color: #edf1ee;
   }
-
   body.dark .mb-manager-header h2 {
     color: #edf1ee;
   }
-
-  body.dark .mb-manager-header p,
+  body.dark .mb-manager-header p {
+    color: #9aa39d;
+  }
   body.dark .mb-entry-form label > span {
     color: #9aa39d;
   }
-
-  body.dark .mb-entry-form input,
-  body.dark .mb-entry-form select {
+  body.dark .mb-entry-form input, body.dark .mb-entry-form select {
     border: 1px solid rgba(255, 255, 255, 0.09);
     color: #edf1ee;
   }
-
   body.dark .mb-entry-list {
     border-top: 1px solid rgba(255, 255, 255, 0.09);
   }
-
   body.dark .mb-entry-list strong {
     color: #edf1ee;
   }
-
   body.dark .mb-entry-list article > div span {
     color: #9aa39d;
   }
-
   body.dark .mb-table-card {
     border: 1px solid rgba(255, 255, 255, 0.09);
     background: #1b211d;
   }
-
   body.dark .mb-table-header {
     border-bottom: 1px solid rgba(255, 255, 255, 0.09);
   }
-
   body.dark .mb-table-header h2 {
     color: #edf1ee;
   }
-
   body.dark .mb-table-header p {
     color: #9aa39d;
   }
-
-  body.dark .mb-settlement-table th,
-  body.dark .mb-settlement-table td,
+  body.dark .mb-settlement-table th, body.dark .mb-settlement-table td {
+    color: #edf1ee;
+  }
   body.dark .mb-settlement-member-name {
     color: #edf1ee;
   }
-
-  body.dark .mb-member-details small,
+  body.dark .mb-member-details small {
+    color: #9aa39d;
+  }
   body.dark .mb-balance.neutral {
     color: #9aa39d;
   }
-
   body.dark .mb-settlement-table tfoot th {
     color: #edf1ee;
     background: #202722;
   }
-
   body.dark .mb-empty {
     color: #9aa39d !important;
   }
-
   body.dark .mb-final-summary article {
     border: 1px solid rgba(255, 255, 255, 0.09);
     background: #1b211d;
   }
-
-  body.dark .mb-final-summary span,
+  body.dark .mb-final-summary span {
+    color: #9aa39d;
+  }
   body.dark .mb-loading {
     color: #9aa39d;
   }
-
-  body.dark .export-report-page,
-  body.dark .export-page-header h1 {
+  body.dark .export-report-page, body.dark .export-page-header h1 {
     color: #edf1ee;
   }
-
   body.dark .export-page-header p {
     color: #9aa39d;
   }
-
   body.dark .export-month-field {
     background: #1b211d;
-    border-color: rgba(255, 255, 255, 0.09);
+    border-color: rgba(255,255,255,0.09);
   }
-
   body.dark .export-month-field input {
     color: #edf1ee;
+  }
+}
+
+@media screen {
+  body .layout {
+    font-size: 16px;
+    line-height: 1.55;
+  }
+
+  body .layout .layout-content :is(p, a, button, strong, b, li, dt, dd) {
+    font-size: max(15px, 1em);
+    line-height: 1.5;
+  }
+
+  body .layout .layout-content :is(span, small, label) {
+    font-size: max(14px, 1em);
+    line-height: 1.5;
+  }
+
+  body .layout .layout-content h1 {
+    font-size: clamp(24px, 2.5vw, 32px);
+    line-height: 1.25;
+  }
+
+  body .layout .layout-content h2 {
+    font-size: 22px;
+    line-height: 1.35;
+  }
+
+  body .layout .layout-content h3 {
+    font-size: 18px;
+    line-height: 1.4;
+  }
+
+  body .layout .layout-content h4 {
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  body .layout .layout-content input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  body .layout .layout-content :is(select, textarea) {
+    min-height: 44px;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  body .layout :is(.navbar-page-title, .navbar-user-information, .sidebar-link-content, .sidebar-user-card, .app-footer) :is(strong, p, a) {
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  body .layout :is(.navbar-page-title, .navbar-user-information, .sidebar-link-content, .sidebar-user-card, .app-footer) :is(span, small) {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  body .layout .layout-content :is(.dashboard-stats-grid, .reports-summary-grid, .mb-summary-grid, .member-report-summary, .profile-stats, .print-summary-grid, .meal-daily-summary, .meal-history-summary, .meal-report-summary, .member-summary-grid, .manager-summary-grid, .bazaar-history-summary, .bazaar-summary-cards) {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+    gap: 16px;
+  }
+
+  body .layout .layout-content :is(.dashboard-stat-card, .report-summary-card, .mb-summary-card, .member-report-summary article, .stat-box, .print-summary-grid article, .meal-daily-summary article, .meal-history-summary article, .meal-report-summary article, .member-summary-grid article, .manager-summary-grid article, .bazaar-history-summary article, .bazaar-summary-cards article) {
+    min-width: 0;
+    min-height: 104px;
+    padding: 16px;
+  }
+
+  body .layout .layout-content :is(.dashboard-stat-content, .report-summary-card, .mb-summary-card, .member-report-summary, .stat-box, .print-summary-grid, .meal-daily-summary, .meal-history-summary, .meal-report-summary, .member-summary-grid, .manager-summary-grid, .bazaar-history-summary, .bazaar-summary-cards, .mess-code-information, .bazaar-form-total, .meal-sheet-footer) strong {
+    font-size: 24px;
+    line-height: 1.3;
+  }
+
+  body .layout .layout-content :is(.dashboard-stat-content, .report-summary-card, .mb-summary-card, .member-report-summary, .stat-box, .print-summary-grid, .meal-daily-summary, .meal-history-summary, .meal-report-summary, .member-summary-grid, .manager-summary-grid, .bazaar-history-summary, .bazaar-summary-cards) :is(span, small, strong) {
+    max-width: 100%;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  body .layout .layout-content :is(.dashboard-header, .dashboard-panel-header, .reports-page-header, .reports-table-header, .mb-page-header, .mb-manager-header, .mb-table-header, .member-meal-report-header, .member-report-table-heading, .export-page-header, .export-actions, .profile-page-heading, .profile-statement-heading, .print-report-header) {
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  body .layout .layout-content :is(.reports-table-header, .mb-table-header, .member-report-table-heading) {
+    padding: 18px;
+  }
+
+  body .layout .layout-content :is(.dashboard-month-field, .reports-month-field, .mb-month-picker, .member-report-month, .export-month-field) {
+    width: auto;
+    max-width: 100%;
+    min-height: 46px;
+  }
+
+  body .layout .layout-content :is(.reports-table-wrapper, .mb-table-wrapper, .member-report-table-wrapper, .meal-table-wrapper, .export-meal-table-wrapper, .print-settlement-wrapper, .bazaar-summary-table-wrapper) {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+
+  body .layout .layout-content :is(.monthly-report-table, .mb-settlement-table, .daily-meal-table, .print-settlement-table) {
+    width: 100%;
+    min-width: 960px !important;
+    table-layout: auto;
+  }
+
+  body .layout .layout-content :is(.member-report-table, .bazaar-summary-table) {
+    width: 100%;
+    min-width: 680px;
+    table-layout: auto;
+  }
+
+  body .layout .layout-content table :is(th, td) {
+    height: auto;
+    padding: 12px 14px;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  body .layout .layout-content :is(.monthly-report-table, .mb-settlement-table, .daily-meal-table, .member-report-table, .print-settlement-table) :is(th, td) {
+    width: auto;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: nowrap;
+  }
+
+  body .layout .layout-content :is(.monthly-report-table, .mb-settlement-table, .daily-meal-table, .member-report-table, .print-settlement-table) :is(th, td):first-child {
+    min-width: 220px;
+    padding-left: 16px;
+  }
+
+  body .layout .layout-content table :is(.report-member-info strong, .mb-settlement-member-name, .member-report-name strong, .meal-member strong, .print-member-name strong) {
+    width: auto;
+    max-width: 260px;
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  body .layout .layout-content :is(.report-member-avatar, .mb-member-avatar, .member-report-avatar, .meal-avatar) {
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+    font-size: 14px;
+  }
+
+  body .layout .layout-content .meal-counter {
+    min-height: 36px;
+  }
+
+  body .layout .layout-content .export-meal-table {
+    width: max-content;
+    min-width: 100%;
+    table-layout: auto;
+  }
+
+  body .layout .layout-content .export-meal-table .export-member-column {
+    width: 150px;
+    min-width: 150px;
+    max-width: none;
+  }
+
+  body .layout .layout-content .export-meal-table :is(.export-date-column, .export-date-cell, .export-total-column) {
+    min-width: 100px;
+  }
+
+  body .layout .layout-content .export-meal-table .export-date-cell {
+    font-size: 15px !important;
+  }
+
+  body .layout .layout-content .export-meal-table thead th span {
+    max-height: none;
+    overflow: visible;
+    line-height: 1.5;
+    white-space: normal;
+  }
+
+  body .layout .layout-content :is(.print-report-meta, .mb-final-summary, .print-verification-grid) strong {
+    font-size: 22px;
+    line-height: 1.4;
+  }
+
+  body .layout .layout-content :is(.profile-info, .mb-final-summary, .print-verification-grid) {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  }
+
+  body .layout .layout-content :is(.profile-identity, .info-box, .dashboard-list-details, .mb-entry-list article > div) :is(strong, span, p) {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 }
